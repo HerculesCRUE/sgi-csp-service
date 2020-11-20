@@ -1,0 +1,1196 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-3.8.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+  <changeSet context="dev" author="master" id="0000000000000-area_tematica">
+    <insert tableName="area_tematica">
+      <column name="id" valueSequenceNext="area_tematica_seq" />
+      <column name="nombre" value="area_tematica AAA" />
+      <column name="descripcion" value="descripcion area tematica AAA" />
+      <column name="area_tematica_padre_id" value="null" />
+      <column name="activo" value="true" />
+    </insert>
+    <insert tableName="area_tematica">
+      <column name="id" valueSequenceNext="area_tematica_seq" />
+      <column name="nombre" value="A-001" />
+      <column name="descripcion" value="area tematica A-001" />
+      <column name="area_tematica_padre_id" valueComputed="(select id from csp.area_tematica where nombre = 'area_tematica AAA')" />
+      <column name="activo" value="true" />
+    </insert>
+    <insert tableName="area_tematica">
+      <column name="id" valueSequenceNext="area_tematica_seq" />
+      <column name="nombre" value="A-011" />
+      <column name="descripcion" value="area tematica A-011" />
+      <column name="area_tematica_padre_id" valueComputed="(select id from csp.area_tematica where nombre = 'A-001')" />
+      <column name="activo" value="true" />
+    </insert>
+    <insert tableName="area_tematica">
+      <column name="id" valueSequenceNext="area_tematica_seq" />
+      <column name="nombre" value="area_tematica BBB" />
+      <column name="descripcion" value="descripcion area tematica BBB" />
+      <column name="area_tematica_padre_id" value="null" />
+      <column name="activo" value="true" />
+    </insert>
+    <insert tableName="area_tematica">
+      <column name="id" valueSequenceNext="area_tematica_seq" />
+      <column name="nombre" value="B-001" />
+      <column name="descripcion" value="area tematica B-001" />
+      <column name="area_tematica_padre_id" valueComputed="(select id from csp.area_tematica where nombre = 'area_tematica BBB')" />
+      <column name="activo" value="true" />
+    </insert>
+    <insert tableName="area_tematica">
+      <column name="id" valueSequenceNext="area_tematica_seq" />
+      <column name="nombre" value="area_tematica CCC" />
+      <column name="descripcion" value="descripcion area tematica CCC" />
+      <column name="area_tematica_padre_id" value="null" />
+      <column name="activo" value="false" />
+    </insert>
+    <insert tableName="area_tematica">
+      <column name="id" valueSequenceNext="area_tematica_seq" />
+      <column name="nombre" value="area_tematica AAA hijo" />
+      <column name="descripcion" value="descripcion area tematica AAA hijo" />
+      <column name="area_tematica_padre_id" valueComputed="(select id from csp.area_tematica where nombre = 'area_tematica AAA')" />
+      <column name="activo" value="true" />
+    </insert>
+    <insert tableName="area_tematica">
+      <column name="id" valueSequenceNext="area_tematica_seq" />
+      <column name="nombre" value="area_tematica AAA nieto" />
+      <column name="descripcion" value="descripcion area tematica AAA nieto" />
+      <column name="area_tematica_padre_id" valueComputed="(select id from csp.area_tematica where nombre = 'area_tematica AAA hijo')" />
+      <column name="activo" value="true" />
+    </insert>
+    <insert tableName="area_tematica">
+      <column name="id" valueSequenceNext="area_tematica_seq" />
+      <column name="nombre" value="area_tematica AAA bisnieto" />
+      <column name="descripcion" value="descripcion area tematica AAA bisnieto" />
+      <column name="area_tematica_padre_id" valueComputed="(select id from csp.area_tematica where nombre = 'area_tematica AAA nieto')" />
+      <column name="activo" value="true" />
+    </insert>
+  </changeSet>
+
+  <changeSet context="dev" author="master" id="0000000000000-modelo_ejecucion">
+    <insert tableName="modelo_ejecucion">
+      <column name="id" valueSequenceNext="modelo_ejecucion_seq" />
+      <column name="nombre" value="nombre-001" />
+      <column name="descripcion" value="descripcion-001" />
+      <column name="activo" value="true" />
+    </insert>
+    <insert tableName="modelo_ejecucion">
+      <column name="id" valueSequenceNext="modelo_ejecucion_seq" />
+      <column name="nombre" value="nombre-002" />
+      <column name="descripcion" value="descripcion-002" />
+      <column name="activo" value="true" />
+    </insert>
+    <insert tableName="modelo_ejecucion">
+      <column name="id" valueSequenceNext="modelo_ejecucion_seq" />
+      <column name="nombre" value="nombre-003" />
+      <column name="descripcion" value="descripcion-003" />
+      <column name="activo" value="false" />
+    </insert>
+    <insert tableName="modelo_ejecucion">
+      <column name="id" valueSequenceNext="modelo_ejecucion_seq" />
+      <column name="nombre" value="prueba-convocatoria" />
+      <column name="descripcion" value="prueba-convocatoria" />
+      <column name="activo" value="true" />
+    </insert>
+  </changeSet>
+
+  <changeSet context="dev" author="master" id="0000000000000-modelo_unidad">
+    <insert tableName="modelo_unidad">
+      <column name="id" valueSequenceNext="modelo_unidad_seq" />
+      <column name="unidad_gestion_ref" value="OTRI" />
+      <column name="modelo_ejecucion_id" valueComputed="(select id from csp.modelo_ejecucion where nombre = 'nombre-001')"></column>
+      <column name="activo" value="true" />
+    </insert>
+    <insert tableName="modelo_unidad">
+      <column name="id" valueSequenceNext="modelo_unidad_seq" />
+      <column name="unidad_gestion_ref" value="UGI" />
+      <column name="modelo_ejecucion_id" valueComputed="(select id from csp.modelo_ejecucion where nombre = 'nombre-002')"></column>
+      <column name="activo" value="false" />
+    </insert>
+    <insert tableName="modelo_unidad">
+      <column name="id" valueSequenceNext="modelo_unidad_seq" />
+      <column name="unidad_gestion_ref" value="OPE" />
+      <column name="modelo_ejecucion_id" valueComputed="(select id from csp.modelo_ejecucion where nombre = 'nombre-002')"></column>
+      <column name="activo" value="true" />
+    </insert>
+    <insert tableName="modelo_unidad">
+      <column name="id" valueSequenceNext="modelo_unidad_seq" />
+      <column name="unidad_gestion_ref" value="OTRI" />
+      <column name="modelo_ejecucion_id" valueComputed="(select id from csp.modelo_ejecucion where nombre = 'nombre-003')"></column>
+      <column name="activo" value="true" />
+    </insert>
+    <insert tableName="modelo_unidad">
+      <column name="id" valueSequenceNext="modelo_unidad_seq" />
+      <column name="unidad_gestion_ref" value="UGI" />
+      <column name="modelo_ejecucion_id" valueComputed="(select id from csp.modelo_ejecucion where nombre = 'nombre-001')"></column>
+      <column name="activo" value="true" />
+    </insert>
+    <insert tableName="modelo_unidad">
+      <column name="id" valueSequenceNext="modelo_unidad_seq" />
+      <column name="unidad_gestion_ref" value="OTRI" />
+      <column name="modelo_ejecucion_id" valueComputed="(select id from csp.modelo_ejecucion where nombre = 'prueba-convocatoria')"></column>
+      <column name="activo" value="true" />
+    </insert>
+  </changeSet>
+
+  <changeSet context="dev" author="master" id="0000000000000-programa">
+    <insert tableName="programa">
+      <column name="id" valueSequenceNext="programa_seq" />
+      <column name="nombre" value="nombre-001" />
+      <column name="descripcion" value="descripcion-001" />
+      <column name="programa_padre_id" value="null" />
+      <column name="activo" value="true" />
+    </insert>
+    <insert tableName="programa">
+      <column name="id" valueSequenceNext="programa_seq" />
+      <column name="nombre" value="nombre-002" />
+      <column name="descripcion" value="descripcion-002" />
+      <column name="programa_padre_id" valueComputed="(select id from csp.programa where nombre = 'nombre-001')" />
+      <column name="activo" value="true" />
+    </insert>
+    <insert tableName="programa">
+      <column name="id" valueSequenceNext="programa_seq" />
+      <column name="nombre" value="nombre-003" />
+      <column name="descripcion" value="descripcion-003" />
+      <column name="programa_padre_id" valueComputed="(select id from csp.programa where nombre = 'nombre-001')" />
+      <column name="activo" value="true" />
+    </insert>
+    <insert tableName="programa">
+      <column name="id" valueSequenceNext="programa_seq" />
+      <column name="nombre" value="nombre-004" />
+      <column name="descripcion" value="descripcion-004" />
+      <column name="programa_padre_id" value="null" />
+      <column name="activo" value="true" />
+    </insert>
+    <insert tableName="programa">
+      <column name="id" valueSequenceNext="programa_seq" />
+      <column name="nombre" value="nombre-005" />
+      <column name="descripcion" value="descripcion-005" />
+      <column name="programa_padre_id" valueComputed="(select id from csp.programa where nombre = 'nombre-002')" />
+      <column name="activo" value="true" />
+    </insert>
+    <insert tableName="programa">
+      <column name="id" valueSequenceNext="programa_seq" />
+      <column name="nombre" value="nombre-006" />
+      <column name="descripcion" value="descripcion-006" />
+      <column name="programa_padre_id" valueComputed="(select id from csp.programa where nombre = 'nombre-005')" />
+      <column name="activo" value="true" />
+    </insert>
+    <insert tableName="programa">
+      <column name="id" valueSequenceNext="programa_seq" />
+      <column name="nombre" value="nombre-007" />
+      <column name="descripcion" value="descripcion-007" />
+      <column name="programa_padre_id" valueComputed="(select id from csp.programa where nombre = 'nombre-006')" />
+      <column name="activo" value="true" />
+    </insert>
+  </changeSet>
+
+  <changeSet context="dev" author="master" id="0000000000000-fuente_financiacion">
+    <insert tableName="fuente_financiacion">
+      <column name="id" valueSequenceNext="fuente_financiacion_seq" />
+      <column name="nombre" value="nombre-001" />
+      <column name="descripcion" value="descripcion-001" />
+      <column name="fondo_estructural" value="true" />
+      <column name="tipo_ambito_geografico_id" valueComputed="(select id from csp.tipo_ambito_geografico where nombre = 'Propio')" />
+      <column name="tipo_origen_fuente_financiacion_id" valueComputed="(select id from csp.tipo_origen_fuente_financiacion where nombre = 'Público')" />
+      <column name="activo" value="true" />
+    </insert>
+    <insert tableName="fuente_financiacion">
+      <column name="id" valueSequenceNext="fuente_financiacion_seq" />
+      <column name="nombre" value="nombre-002" />
+      <column name="descripcion" value="descripcion-002" />
+      <column name="fondo_estructural" value="true" />
+      <column name="tipo_ambito_geografico_id" valueComputed="(select id from csp.tipo_ambito_geografico where nombre = 'Propio')" />
+      <column name="tipo_origen_fuente_financiacion_id" valueComputed="(select id from csp.tipo_origen_fuente_financiacion where nombre = 'Privado')" />
+      <column name="activo" value="true" />
+    </insert>
+    <insert tableName="fuente_financiacion">
+      <column name="id" valueSequenceNext="fuente_financiacion_seq" />
+      <column name="nombre" value="nombre-003" />
+      <column name="descripcion" value="descripcion-003" />
+      <column name="fondo_estructural" value="false" />
+      <column name="tipo_ambito_geografico_id" valueComputed="(select id from csp.tipo_ambito_geografico where nombre = 'Local')" />
+      <column name="tipo_origen_fuente_financiacion_id" valueComputed="(select id from csp.tipo_origen_fuente_financiacion where nombre = 'Público')" />
+      <column name="activo" value="true" />
+    </insert>
+    <insert tableName="fuente_financiacion">
+      <column name="id" valueSequenceNext="fuente_financiacion_seq" />
+      <column name="nombre" value="nombre-004" />
+      <column name="descripcion" value="descripcion-004" />
+      <column name="fondo_estructural" value="true" />
+      <column name="tipo_ambito_geografico_id" valueComputed="(select id from csp.tipo_ambito_geografico where nombre = 'Autonómico')" />
+      <column name="tipo_origen_fuente_financiacion_id" valueComputed="(select id from csp.tipo_origen_fuente_financiacion where nombre = 'Privado')" />
+      <column name="activo" value="false" />
+    </insert>
+
+  </changeSet>
+
+  <changeSet context="dev" author="master" id="0000000000000-tipo_documento">
+    <insert tableName="tipo_documento">
+      <column name="id" valueSequenceNext="tipo_documento_seq" />
+      <column name="nombre" value="nombre-001" />
+      <column name="descripcion" value="descripcion-001" />
+      <column name="activo" value="true" />
+    </insert>
+    <insert tableName="tipo_documento">
+      <column name="id" valueSequenceNext="tipo_documento_seq" />
+      <column name="nombre" value="nombre-002" />
+      <column name="descripcion" value="descripcion-002" />
+      <column name="activo" value="true" />
+    </insert>
+    <insert tableName="tipo_documento">
+      <column name="id" valueSequenceNext="tipo_documento_seq" />
+      <column name="nombre" value="nombre-003" />
+      <column name="descripcion" value="descripcion-003" />
+      <column name="activo" value="true" />
+    </insert>
+    <insert tableName="tipo_documento">
+      <column name="id" valueSequenceNext="tipo_documento_seq" />
+      <column name="nombre" value="nombre-004" />
+      <column name="descripcion" value="descripcion-004" />
+      <column name="activo" value="true" />
+    </insert>
+    <insert tableName="tipo_documento">
+      <column name="id" valueSequenceNext="tipo_documento_seq" />
+      <column name="nombre" value="nombre-005" />
+      <column name="descripcion" value="descripcion-005" />
+      <column name="activo" value="true" />
+    </insert>
+    <insert tableName="tipo_documento">
+      <column name="id" valueSequenceNext="tipo_documento_seq" />
+      <column name="nombre" value="nombre-006" />
+      <column name="descripcion" value="descripcion-006" />
+      <column name="activo" value="true" />
+    </insert>
+  </changeSet>
+
+  <changeSet context="dev" author="master" id="0000000000000-tipo_enlace">
+    <insert tableName="tipo_enlace">
+      <column name="id" valueSequenceNext="tipo_enlace_seq" />
+      <column name="nombre" value="tipo_enlace AAA" />
+      <column name="descripcion" value="tipo_enlace AAA" />
+      <column name="activo" value="true" />
+    </insert>
+    <insert tableName="tipo_enlace">
+      <column name="id" valueSequenceNext="tipo_enlace_seq" />
+      <column name="nombre" value="tipo_enlace BBB" />
+      <column name="descripcion" value="tipo_enlace BBB" />
+      <column name="activo" value="true" />
+    </insert>
+    <insert tableName="tipo_enlace">
+      <column name="id" valueSequenceNext="tipo_enlace_seq" />
+      <column name="nombre" value="tipo_enlace CCC" />
+      <column name="descripcion" value="tipo_enlace CCC" />
+      <column name="activo" value="true" />
+    </insert>
+    <insert tableName="tipo_enlace">
+      <column name="id" valueSequenceNext="tipo_enlace_seq" />
+      <column name="nombre" value="tipo_enlace DDD" />
+      <column name="descripcion" value="tipo_enlace DDD" />
+      <column name="activo" value="true" />
+    </insert>
+    <insert tableName="tipo_enlace">
+      <column name="id" valueSequenceNext="tipo_enlace_seq" />
+      <column name="nombre" value="tipo_enlace EEE" />
+      <column name="descripcion" value="tipo_enlace EEE" />
+      <column name="activo" value="false" />
+    </insert>
+  </changeSet>
+
+  <changeSet context="dev" author="master" id="0000000000000-modelo_tipo_enlace">
+    <insert tableName="modelo_tipo_enlace">
+      <column name="id" valueSequenceNext="modelo_tipo_enlace_seq" />
+      <column name="tipo_enlace_id" valueComputed="(select id from csp.tipo_enlace where nombre = 'tipo_enlace AAA')" />
+      <column name="modelo_ejecucion_id" valueComputed="(select id from csp.modelo_ejecucion where nombre = 'nombre-001')"></column>
+      <column name="activo" value="true" />
+    </insert>
+    <insert tableName="modelo_tipo_enlace">
+      <column name="id" valueSequenceNext="modelo_tipo_enlace_seq" />
+      <column name="tipo_enlace_id" valueComputed="(select id from csp.tipo_enlace where nombre = 'tipo_enlace BBB')" />
+      <column name="modelo_ejecucion_id" valueComputed="(select id from csp.modelo_ejecucion where nombre = 'nombre-001')"></column>
+      <column name="activo" value="false" />
+    </insert>
+    <insert tableName="modelo_tipo_enlace">
+      <column name="id" valueSequenceNext="modelo_tipo_enlace_seq" />
+      <column name="tipo_enlace_id" valueComputed="(select id from csp.tipo_enlace where nombre = 'tipo_enlace CCC')" />
+      <column name="modelo_ejecucion_id" valueComputed="(select id from csp.modelo_ejecucion where nombre = 'nombre-001')"></column>
+      <column name="activo" value="true" />
+    </insert>
+    <insert tableName="modelo_tipo_enlace">
+      <column name="id" valueSequenceNext="modelo_tipo_enlace_seq" />
+      <column name="tipo_enlace_id" valueComputed="(select id from csp.tipo_enlace where nombre = 'tipo_enlace AAA')" />
+      <column name="modelo_ejecucion_id" valueComputed="(select id from csp.modelo_ejecucion where nombre = 'nombre-002')"></column>
+      <column name="activo" value="true" />
+    </insert>
+    <insert tableName="modelo_tipo_enlace">
+      <column name="id" valueSequenceNext="modelo_tipo_enlace_seq" />
+      <column name="tipo_enlace_id" valueComputed="(select id from csp.tipo_enlace where nombre = 'tipo_enlace DDD')" />
+      <column name="modelo_ejecucion_id" valueComputed="(select id from csp.modelo_ejecucion where nombre = 'nombre-002')"></column>
+      <column name="activo" value="true" />
+    </insert>
+  </changeSet>
+
+  <changeSet context="dev" author="master" id="0000000000000-tipo_fase">
+    <insert tableName="tipo_fase">
+      <column name="id" valueSequenceNext="tipo_fase_seq" />
+      <column name="nombre" value="Fase1" />
+      <column name="descripcion" value="Descripción del Fase1"></column>
+      <column name="activo" value="true" />
+    </insert>
+    <insert tableName="tipo_fase">
+      <column name="id" valueSequenceNext="tipo_fase_seq" />
+      <column name="nombre" value="Fase2" />
+      <column name="descripcion" value="Descripción del Fase2"></column>
+      <column name="activo" value="true" />
+    </insert>
+    <insert tableName="tipo_fase">
+      <column name="id" valueSequenceNext="tipo_fase_seq" />
+      <column name="nombre" value="Fase3" />
+      <column name="descripcion" value="Descripción del Fase3"></column>
+      <column name="activo" value="true" />
+    </insert>
+  </changeSet>
+
+  <changeSet context="dev" author="master" id="0000000000000-modelo_tipo_fase">
+    <insert tableName="modelo_tipo_fase">
+      <column name="id" valueSequenceNext="modelo_tipo_fase_seq" />
+      <column name="tipo_fase_id" valueComputed="(select id from csp.tipo_fase where nombre='Fase1')"></column>
+      <column name="modelo_ejecucion_id" valueComputed="(select id from csp.modelo_ejecucion where nombre = 'nombre-001')"></column>
+      <column name="solicitud" value="true" />
+      <column name="convocatoria" value="true" />
+      <column name="proyecto" value="true" />
+      <column name="activo" value="true" />
+    </insert>
+    <insert tableName="modelo_tipo_fase">
+      <column name="id" valueSequenceNext="modelo_tipo_fase_seq" />
+      <column name="tipo_fase_id" valueComputed="(select id from csp.tipo_fase where nombre='Fase2')"></column>
+      <column name="modelo_ejecucion_id" valueComputed="(select id from csp.modelo_ejecucion where nombre = 'nombre-002')"></column>
+      <column name="solicitud" value="true" />
+      <column name="convocatoria" value="true" />
+      <column name="proyecto" value="true" />
+      <column name="activo" value="true" />
+    </insert>
+    <insert tableName="modelo_tipo_fase">
+      <column name="id" valueSequenceNext="modelo_tipo_fase_seq" />
+      <column name="tipo_fase_id" valueComputed="(select id from csp.tipo_fase where nombre='Fase3')"></column>
+      <column name="modelo_ejecucion_id" valueComputed="(select id from csp.modelo_ejecucion where nombre = 'nombre-003')"></column>
+      <column name="solicitud" value="true" />
+      <column name="convocatoria" value="true" />
+      <column name="proyecto" value="true" />
+      <column name="activo" value="true" />
+    </insert>
+  </changeSet>
+
+  <changeSet context="dev" author="master" id="0000000000000-modelo_tipo_documento">
+    <insert tableName="modelo_tipo_documento">
+      <column name="id" valueSequenceNext="modelo_tipo_documento_seq" />
+      <column name="tipo_documento_id" valueComputed="(select id from csp.tipo_documento where nombre = 'nombre-001')" />
+      <column name="modelo_ejecucion_id" valueComputed="(select id from csp.modelo_ejecucion where nombre = 'nombre-001')" />
+      <column name="modelo_tipo_fase_id" valueComputed="(select t.id from csp.modelo_tipo_fase m join csp.tipo_fase t on m.tipo_fase_id = t.id where t.nombre = 'Fase1' limit 1)"></column>
+      <column name="activo" value="true" />
+    </insert>
+    <insert tableName="modelo_tipo_documento">
+      <column name="id" valueSequenceNext="modelo_tipo_documento_seq" />
+      <column name="tipo_documento_id" valueComputed="(select id from csp.tipo_documento where nombre = 'nombre-002')" />
+      <column name="modelo_ejecucion_id" valueComputed="(select id from csp.modelo_ejecucion where nombre = 'nombre-001')" />
+      <column name="modelo_tipo_fase_id" valueComputed="(select t.id from csp.modelo_tipo_fase m join csp.tipo_fase t on m.tipo_fase_id = t.id where t.nombre = 'Fase2' limit 1)"></column>
+      <column name="activo" value="true" />
+    </insert>
+    <insert tableName="modelo_tipo_documento">
+      <column name="id" valueSequenceNext="modelo_tipo_documento_seq" />
+      <column name="tipo_documento_id" valueComputed="(select id from csp.tipo_documento where nombre = 'nombre-003')" />
+      <column name="modelo_ejecucion_id" valueComputed="(select id from csp.modelo_ejecucion where nombre = 'nombre-001')" />
+      <column name="modelo_tipo_fase_id" valueComputed="(select t.id from csp.modelo_tipo_fase m join csp.tipo_fase t on m.tipo_fase_id = t.id where t.nombre = 'Fase3' limit 1)"></column>
+      <column name="activo" value="true" />
+    </insert>
+    <insert tableName="modelo_tipo_documento">
+      <column name="id" valueSequenceNext="modelo_tipo_documento_seq" />
+      <column name="tipo_documento_id" valueComputed="(select id from csp.tipo_documento where nombre = 'nombre-004')" />
+      <column name="modelo_ejecucion_id" valueComputed="(select id from csp.modelo_ejecucion where nombre = 'nombre-002')" />
+      <column name="modelo_tipo_fase_id" valueComputed="(select t.id from csp.modelo_tipo_fase m join csp.tipo_fase t on m.tipo_fase_id = t.id where t.nombre = 'Fase1' limit 1)"></column>
+      <column name="activo" value="true" />
+    </insert>
+    <insert tableName="modelo_tipo_documento">
+      <column name="id" valueSequenceNext="modelo_tipo_documento_seq" />
+      <column name="tipo_documento_id" valueComputed="(select id from csp.tipo_documento where nombre = 'nombre-005')" />
+      <column name="modelo_ejecucion_id" valueComputed="(select id from csp.modelo_ejecucion where nombre = 'nombre-002')" />
+      <column name="modelo_tipo_fase_id" valueComputed="(select t.id from csp.modelo_tipo_fase m join csp.tipo_fase t on m.tipo_fase_id = t.id where t.nombre = 'Fase2' limit 1)"></column>
+      <column name="activo" value="true" />
+    </insert>
+    <insert tableName="modelo_tipo_documento">
+      <column name="id" valueSequenceNext="modelo_tipo_documento_seq" />
+      <column name="tipo_documento_id" valueComputed="(select id from csp.tipo_documento where nombre = 'nombre-006')" />
+      <column name="modelo_ejecucion_id" valueComputed="(select id from csp.modelo_ejecucion where nombre = 'nombre-002')" />
+      <column name="modelo_tipo_fase_id" valueComputed="(select t.id from csp.modelo_tipo_fase m join csp.tipo_fase t on m.tipo_fase_id = t.id where t.nombre = 'Fase3' limit 1)"></column>
+      <column name="activo" value="true" />
+    </insert>
+    <insert tableName="modelo_tipo_documento">
+      <column name="id" valueSequenceNext="modelo_tipo_documento_seq" />
+      <column name="tipo_documento_id" valueComputed="(select id from csp.tipo_documento where nombre = 'nombre-002')" />
+      <column name="modelo_ejecucion_id" valueComputed="(select id from csp.modelo_ejecucion where nombre = 'nombre-001')" />
+      <column name="modelo_tipo_fase_id" value="null"></column>
+      <column name="activo" value="true" />
+    </insert>
+    <insert tableName="modelo_tipo_documento">
+      <column name="id" valueSequenceNext="modelo_tipo_documento_seq" />
+      <column name="tipo_documento_id" valueComputed="(select id from csp.tipo_documento where nombre = 'nombre-003')" />
+      <column name="modelo_ejecucion_id" valueComputed="(select id from csp.modelo_ejecucion where nombre = 'nombre-001')" />
+      <column name="modelo_tipo_fase_id" value="null"></column>
+      <column name="activo" value="true" />
+    </insert>
+  </changeSet>
+
+  <changeSet context="dev" author="master" id="0000000000000-tipo_finalidad">
+    <insert tableName="tipo_finalidad">
+      <column name="id" valueSequenceNext="tipo_finalidad_seq" />
+      <column name="nombre" value="tipo finalidad AAA" />
+      <column name="descripcion" value="tipo finalidad AAA" />
+      <column name="activo" value="true" />
+    </insert>
+    <insert tableName="tipo_finalidad">
+      <column name="id" valueSequenceNext="tipo_finalidad_seq" />
+      <column name="nombre" value="tipo finalidad BBB" />
+      <column name="descripcion" value="tipo finalidad BBB" />
+      <column name="activo" value="true" />
+    </insert>
+    <insert tableName="tipo_finalidad">
+      <column name="id" valueSequenceNext="tipo_finalidad_seq" />
+      <column name="nombre" value="tipo finalidad CCC" />
+      <column name="descripcion" value="tipo finalidad CCC" />
+      <column name="activo" value="true" />
+    </insert>
+    <insert tableName="tipo_finalidad">
+      <column name="id" valueSequenceNext="tipo_finalidad_seq" />
+      <column name="nombre" value="tipo finalidad DDD" />
+      <column name="descripcion" value="tipo finalidad DDD" />
+      <column name="activo" value="true" />
+    </insert>
+    <insert tableName="tipo_finalidad">
+      <column name="id" valueSequenceNext="tipo_finalidad_seq" />
+      <column name="nombre" value="tipo finalidad FFF" />
+      <column name="descripcion" value="tipo finalidad FFF" />
+      <column name="activo" value="false" />
+    </insert>
+    <insert tableName="tipo_finalidad">
+      <column name="id" valueSequenceNext="tipo_finalidad_seq" />
+      <column name="nombre" value="tipo finalidad prueba_convocatoria" />
+      <column name="descripcion" value="tipo finalidad prueba_convocatoria" />
+      <column name="activo" value="true" />
+    </insert>
+  </changeSet>
+
+  <changeSet context="dev" author="master" id="20201008000000-tipo_financiacion">
+    <insert tableName="tipo_financiacion">
+      <column name="id" valueSequenceNext="tipo_financiacion_seq" />
+      <column name="nombre" value="nombreTipoFinanciacion1" />
+      <column name="descripcion" value="descripción tipoFinanciacion1" />
+      <column name="activo" value="true" />
+    </insert>
+    <insert tableName="tipo_financiacion">
+      <column name="id" valueSequenceNext="tipo_financiacion_seq" />
+      <column name="nombre" value="nombreTipoFinanciacion2" />
+      <column name="descripcion" value="descripción tipoFinanciacion2" />
+      <column name="activo" value="true" />
+    </insert>
+    <insert tableName="tipo_financiacion">
+      <column name="id" valueSequenceNext="tipo_financiacion_seq" />
+      <column name="nombre" value="nombreTipoFinanciacion3" />
+      <column name="descripcion" value="descripción tipoFinanciacion3" />
+      <column name="activo" value="true" />
+    </insert>
+  </changeSet>
+
+  <changeSet context="dev" author="master" id="0000000000000-modelo_tipo_finalidad">
+    <insert tableName="modelo_tipo_finalidad">
+      <column name="id" valueSequenceNext="modelo_tipo_finalidad_seq" />
+      <column name="tipo_finalidad_id" valueComputed="(select id from csp.tipo_finalidad where nombre like '% AAA')" />
+      <column name="modelo_ejecucion_id" valueComputed="(select id from csp.modelo_ejecucion where nombre like '%-001')" />
+      <column name="activo" value="true" />
+    </insert>
+    <insert tableName="modelo_tipo_finalidad">
+      <column name="id" valueSequenceNext="modelo_tipo_finalidad_seq" />
+      <column name="tipo_finalidad_id" valueComputed="(select id from csp.tipo_finalidad where nombre like '% BBB')" />
+      <column name="modelo_ejecucion_id" valueComputed="(select id from csp.modelo_ejecucion where nombre like '%-001')" />
+      <column name="activo" value="true" />
+    </insert>
+    <insert tableName="modelo_tipo_finalidad">
+      <column name="id" valueSequenceNext="modelo_tipo_finalidad_seq" />
+      <column name="tipo_finalidad_id" valueComputed="(select id from csp.tipo_finalidad where nombre like '% BBB')" />
+      <column name="modelo_ejecucion_id" valueComputed="(select id from csp.modelo_ejecucion where nombre like '%-002')" />
+      <column name="activo" value="true" />
+    </insert>
+    <insert tableName="modelo_tipo_finalidad">
+      <column name="id" valueSequenceNext="modelo_tipo_finalidad_seq" />
+      <column name="tipo_finalidad_id" valueComputed="(select id from csp.tipo_finalidad where nombre like '% CCC')" />
+      <column name="modelo_ejecucion_id" valueComputed="(select id from csp.modelo_ejecucion where nombre like '%-002')" />
+      <column name="activo" value="true" />
+    </insert>
+    <insert tableName="modelo_tipo_finalidad">
+      <column name="id" valueSequenceNext="modelo_tipo_finalidad_seq" />
+      <column name="tipo_finalidad_id" valueComputed="(select id from csp.tipo_finalidad where nombre like '%convocatoria%')" />
+      <column name="modelo_ejecucion_id" valueComputed="(select id from csp.modelo_ejecucion where nombre like '%convocatoria%')" />
+      <column name="activo" value="true" />
+    </insert>
+  </changeSet>
+
+  <changeSet context="dev" author="master" id="0000000000000-tipo_hito">
+    <insert tableName="tipo_hito">
+      <column name="id" valueSequenceNext="tipo_hito_seq" />
+      <column name="nombre" value="Hito1" />
+      <column name="descripcion" value="Descripción del Hito1"></column>
+      <column name="activo" value="true" />
+    </insert>
+    <insert tableName="tipo_hito">
+      <column name="id" valueSequenceNext="tipo_hito_seq" />
+      <column name="nombre" value="Hito2" />
+      <column name="descripcion" value="Descripción del Hito2"></column>
+      <column name="activo" value="true" />
+    </insert>
+    <insert tableName="tipo_hito">
+      <column name="id" valueSequenceNext="tipo_hito_seq" />
+      <column name="nombre" value="Hito3" />
+      <column name="descripcion" value="Descripción del Hito3"></column>
+      <column name="activo" value="true" />
+    </insert>
+  </changeSet>
+
+  <changeSet context="dev" author="master" id="0000000000000-modelo_tipo_hito">
+    <insert tableName="modelo_tipo_hito">
+      <column name="id" valueSequenceNext="modelo_tipo_hito_seq" />
+      <column name="tipo_hito_id" valueComputed="(select id from csp.tipo_hito where nombre like '%Hito1')" />
+      <column name="modelo_ejecucion_id" valueComputed="(select id from csp.modelo_ejecucion where nombre like '%-001')" />
+      <column name="solicitud" value="true" />
+      <column name="convocatoria" value="true" />
+      <column name="proyecto" value="true" />
+      <column name="activo" value="true" />
+    </insert>
+    <insert tableName="modelo_tipo_hito">
+      <column name="id" valueSequenceNext="modelo_tipo_hito_seq" />
+      <column name="tipo_hito_id" valueComputed="(select id from csp.tipo_hito where nombre like '%Hito2')" />
+      <column name="modelo_ejecucion_id" valueComputed="(select id from csp.modelo_ejecucion where nombre like '%-001')" />
+      <column name="solicitud" value="true" />
+      <column name="convocatoria" value="true" />
+      <column name="proyecto" value="true" />
+      <column name="activo" value="true" />
+    </insert>
+    <insert tableName="modelo_tipo_hito">
+      <column name="id" valueSequenceNext="modelo_tipo_hito_seq" />
+      <column name="tipo_hito_id" valueComputed="(select id from csp.tipo_hito where nombre like '%Hito1')" />
+      <column name="modelo_ejecucion_id" valueComputed="(select id from csp.modelo_ejecucion where nombre like '%-002')" />
+      <column name="solicitud" value="true" />
+      <column name="convocatoria" value="true" />
+      <column name="proyecto" value="true" />
+      <column name="activo" value="true" />
+    </insert>
+    <insert tableName="modelo_tipo_hito">
+      <column name="id" valueSequenceNext="modelo_tipo_hito_seq" />
+      <column name="tipo_hito_id" valueComputed="(select id from csp.tipo_hito where nombre like '%Hito3')" />
+      <column name="modelo_ejecucion_id" valueComputed="(select id from csp.modelo_ejecucion where nombre like '%-002')" />
+      <column name="solicitud" value="true" />
+      <column name="convocatoria" value="true" />
+      <column name="proyecto" value="true" />
+      <column name="activo" value="true" />
+    </insert>
+    <insert tableName="modelo_tipo_hito">
+      <column name="id" valueSequenceNext="modelo_tipo_hito_seq" />
+      <column name="tipo_hito_id" valueComputed="(select id from csp.tipo_hito where nombre like '%Hito3')" />
+      <column name="modelo_ejecucion_id" valueComputed="(select id from csp.modelo_ejecucion where nombre like '%-003')" />
+      <column name="solicitud" value="true" />
+      <column name="convocatoria" value="true" />
+      <column name="proyecto" value="true" />
+      <column name="activo" value="true" />
+    </insert>
+  </changeSet>
+
+  <changeSet context="dev" author="master" id="20201009000000-concepto_gasto">
+    <insert tableName="concepto_gasto">
+      <column name="id" valueSequenceNext="concepto_gasto_seq" />
+      <column name="nombre" value="conceptoGasto1" />
+      <column name="descripcion" value="descripción conceptoGasto1" />
+      <column name="activo" value="true" />
+    </insert>
+    <insert tableName="concepto_gasto">
+      <column name="id" valueSequenceNext="concepto_gasto_seq" />
+      <column name="nombre" value="conceptoGasto2" />
+      <column name="descripcion" value="descripción conceptoGasto2" />
+      <column name="activo" value="true" />
+    </insert>
+    <insert tableName="concepto_gasto">
+      <column name="id" valueSequenceNext="concepto_gasto_seq" />
+      <column name="nombre" value="conceptoGasto3" />
+      <column name="descripcion" value="conceptoGasto3" />
+      <column name="activo" value="true" />
+    </insert>
+  </changeSet>
+
+  <changeSet context="dev" author="master" id="0000000000000-convocatoria">
+    <insert tableName="convocatoria">
+      <column name="id" valueSequenceNext="convocatoria_seq" />
+      <column name="unidad_gestion_ref" value="OTRI" />
+      <column name="modelo_ejecucion_id" valueComputed="(select id from csp.modelo_ejecucion where nombre = 'nombre-001')" />
+      <column name="codigo" value="codigo-001" />
+      <column name="anio" value="2020" />
+      <column name="titulo" value="titulo-001" />
+      <column name="objeto" value="objeto-001" />
+      <column name="observaciones" value="observaciones-001" />
+      <column name="tipo_finalidad_id" valueComputed="(select t.id from csp.modelo_tipo_finalidad m join csp.tipo_finalidad t on m.tipo_finalidad_id = t.id where t.nombre like '% AAA' limit 1)" />
+      <column name="tipo_regimen_concurrencia_id" valueComputed="(select id from csp.tipo_regimen_concurrencia where nombre = 'Concesión directa')" />
+      <column name="destinatarios" value="Individual" />
+      <column name="colaborativos" value="false" />
+      <column name="estado_actual" value="Registrada" />
+      <column name="duracion" value="24" />
+      <column name="tipo_ambito_geografico_id" valueComputed="(select id from csp.tipo_ambito_geografico where nombre = 'Propio')" />
+      <column name="clasificacion_cvn" value="Ayudas y becas" />
+      <column name="activo" value="true" />
+    </insert>
+    <insert tableName="convocatoria">
+      <column name="id" valueSequenceNext="convocatoria_seq" />
+      <column name="unidad_gestion_ref" value="OPE" />
+      <column name="modelo_ejecucion_id" valueComputed="(select id from csp.modelo_ejecucion where nombre = 'nombre-002')" />
+      <column name="codigo" value="codigo-002" />
+      <column name="anio" value="2020" />
+      <column name="titulo" value="titulo-002" />
+      <column name="objeto" value="objeto-002" />
+      <column name="observaciones" value="observaciones-002" />
+      <column name="tipo_finalidad_id" valueComputed="(select t.id from csp.modelo_tipo_finalidad m join csp.tipo_finalidad t on m.tipo_finalidad_id = t.id where t.nombre like '% BBB' limit 1)" />
+      <column name="tipo_regimen_concurrencia_id" valueComputed="(select id from csp.tipo_regimen_concurrencia where nombre = 'Concesión directa')" />
+      <column name="destinatarios" value="Equipo de proyecto" />
+      <column name="colaborativos" value="true" />
+      <column name="estado_actual" value="Registrada" />
+      <column name="duracion" value="12" />
+      <column name="tipo_ambito_geografico_id" valueComputed="(select id from csp.tipo_ambito_geografico where nombre = 'nombre-002')" />
+      <column name="clasificacion_cvn" value="Contratos, convenios, proyectos no competitivos" />
+      <column name="activo" value="true" />
+    </insert>
+    <insert tableName="convocatoria">
+      <column name="id" valueSequenceNext="convocatoria_seq" />
+      <column name="unidad_gestion_ref" value="UGI" />
+      <column name="modelo_ejecucion_id" valueComputed="(select id from csp.modelo_ejecucion where nombre = 'nombre-003')" />
+      <column name="codigo" value="codigo-003" />
+      <column name="anio" value="2020" />
+      <column name="titulo" value="titulo-003" />
+      <column name="objeto" value="objeto-003" />
+      <column name="observaciones" value="observaciones-003" />
+      <column name="tipo_finalidad_id" valueComputed="(select t.id from csp.modelo_tipo_finalidad m join csp.tipo_finalidad t on m.tipo_finalidad_id = t.id where t.nombre like '% CCC' limit 1)" />
+      <column name="tipo_regimen_concurrencia_id" valueComputed="(select id from csp.tipo_regimen_concurrencia where nombre = 'Concurrencia competitiva')" />
+      <column name="destinatarios" value="Grupo de investigación" />
+      <column name="colaborativos" value="true" />
+      <column name="estado_actual" value="Borrador" />
+      <column name="duracion" value="24" />
+      <column name="tipo_ambito_geografico_id" valueComputed="(select id from csp.tipo_ambito_geografico where nombre = 'nombre-003')" />
+      <column name="clasificacion_cvn" value="Proyectos competitivos" />
+      <column name="activo" value="true" />
+    </insert>
+    <insert tableName="convocatoria">
+      <column name="id" valueSequenceNext="convocatoria_seq" />
+      <column name="unidad_gestion_ref" value="OTRI" />
+      <column name="modelo_ejecucion_id" valueComputed="(select id from csp.modelo_ejecucion where nombre = 'nombre-001')" />
+      <column name="codigo" value="codigo-004" />
+      <column name="anio" value="2021" />
+      <column name="titulo" value="titulo-004" />
+      <column name="objeto" value="objeto-004" />
+      <column name="observaciones" value="observaciones-004" />
+      <column name="tipo_finalidad_id" valueComputed="(select t.id from csp.modelo_tipo_finalidad m join csp.tipo_finalidad t on m.tipo_finalidad_id = t.id where t.nombre like '% DDD' limit 1)" />
+      <column name="destinatarios" value="Individual" />
+      <column name="colaborativos" value="true" />
+      <column name="estado_actual" value="Borrador" />
+      <column name="duracion" value="24" />
+      <column name="tipo_ambito_geografico_id" valueComputed="(select id from csp.tipo_ambito_geografico where nombre = 'nombre-002')" />
+      <column name="activo" value="false" />
+    </insert>
+  </changeSet>
+
+  <changeSet context="dev" author="master" id="0000000000000-convocatoria_area_tematica">
+    <insert tableName="convocatoria_area_tematica">
+      <column name="id" valueSequenceNext="convocatoria_area_tematica_seq" />
+      <column name="area_tematica_id" valueComputed="(select id from csp.area_tematica where nombre = 'area_tematica AAA')"></column>
+      <column name="convocatoria_id" valueComputed="(select id from csp.convocatoria where codigo = 'codigo-001')"></column>
+      <column name="observaciones" value="Observaciones AAA" />
+    </insert>
+    <insert tableName="convocatoria_area_tematica">
+      <column name="id" valueSequenceNext="convocatoria_area_tematica_seq" />
+      <column name="area_tematica_id" valueComputed="(select id from csp.area_tematica where nombre = 'area_tematica BBB')"></column>
+      <column name="convocatoria_id" valueComputed="(select id from csp.convocatoria where codigo = 'codigo-002')"></column>
+      <column name="observaciones" value="Observaciones BBB" />
+    </insert>
+    <insert tableName="convocatoria_area_tematica">
+      <column name="id" valueSequenceNext="convocatoria_area_tematica_seq" />
+      <column name="area_tematica_id" valueComputed="(select id from csp.area_tematica where nombre = 'area_tematica CCC')"></column>
+      <column name="convocatoria_id" valueComputed="(select id from csp.convocatoria where codigo = 'codigo-003')"></column>
+      <column name="observaciones" value="Observaciones CCC" />
+    </insert>
+    <insert tableName="convocatoria_area_tematica">
+      <column name="id" valueSequenceNext="convocatoria_area_tematica_seq" />
+      <column name="area_tematica_id" valueComputed="(select id from csp.area_tematica where nombre = 'area_tematica AAA hijo')"></column>
+      <column name="convocatoria_id" valueComputed="(select id from csp.convocatoria where codigo = 'codigo-001')"></column>
+      <column name="observaciones" value="Observaciones AAA" />
+    </insert>
+    <insert tableName="convocatoria_area_tematica">
+      <column name="id" valueSequenceNext="convocatoria_area_tematica_seq" />
+      <column name="area_tematica_id" valueComputed="(select id from csp.area_tematica where nombre = 'area_tematica AAA nieto')"></column>
+      <column name="convocatoria_id" valueComputed="(select id from csp.convocatoria where codigo = 'codigo-001')"></column>
+      <column name="observaciones" value="Observaciones AAA" />
+    </insert>
+    <insert tableName="convocatoria_area_tematica">
+      <column name="id" valueSequenceNext="convocatoria_area_tematica_seq" />
+      <column name="area_tematica_id" valueComputed="(select id from csp.area_tematica where nombre = 'area_tematica AAA bisnieto')"></column>
+      <column name="convocatoria_id" valueComputed="(select id from csp.convocatoria where codigo = 'codigo-001')"></column>
+      <column name="observaciones" value="Observaciones AAA" />
+    </insert>
+  </changeSet>
+
+  <changeSet context="dev" author="master" id="0000000000000-convocatoria_documento">
+    <insert tableName="convocatoria_documento">
+      <column name="id" valueSequenceNext="convocatoria_documento_seq" />
+      <column name="convocatoria_id" valueComputed="(select id from csp.convocatoria where codigo = 'codigo-001')"></column>
+      <column name="tipo_fase_id" valueComputed="(select tf.id from csp.convocatoria c join csp.modelo_ejecucion me on c.modelo_ejecucion_id = me.id join csp.modelo_tipo_fase mtf on me.id = mtf.modelo_ejecucion_id join csp.tipo_fase tf on mtf.tipo_fase_id = tf.id where c.codigo = 'codigo-001' and tf.nombre= 'Fase1' limit 1)"></column>
+      <column name="tipo_documento_id" valueComputed="(select td.id from csp.convocatoria c join csp.modelo_ejecucion me on c.modelo_ejecucion_id = me.id join csp.modelo_tipo_documento mtd on me.id = mtd.modelo_ejecucion_id join csp.tipo_documento td on mtd.tipo_documento_id = td.id join csp.modelo_tipo_fase mtf on me.id = mtf.modelo_ejecucion_id join csp.tipo_fase tf on mtf.tipo_fase_id = tf.id where c.codigo = 'codigo-001' and tf.nombre='Fase1' and td.nombre = 'nombre-001' limit 1)"></column>
+      <column name="nombre" value="nombre doc-1" />
+      <column name="publico" value="true" />
+      <column name="observaciones" value="observaciones documento Conv1 con tipo fase y tipo documento" />
+      <column name="documento_ref" value="DocumentoRef1" />
+    </insert>
+    <insert tableName="convocatoria_documento">
+      <column name="id" valueSequenceNext="convocatoria_documento_seq" />
+      <column name="convocatoria_id" valueComputed="(select id from csp.convocatoria where codigo = 'codigo-001')"></column>
+      <column name="tipo_fase_id" valueComputed="(select tf.id from csp.convocatoria c join csp.modelo_ejecucion me on c.modelo_ejecucion_id = me.id join csp.modelo_tipo_fase mtf on me.id = mtf.modelo_ejecucion_id join csp.tipo_fase tf on mtf.tipo_fase_id = tf.id where c.codigo = 'codigo-001' and tf.nombre= 'Fase1' limit 1)"></column>
+      <column name="tipo_documento_id" value="null" />
+      <column name="nombre" value="nombre doc-2" />
+      <column name="publico" value="true" />
+      <column name="observaciones" value="observaciones documento Conv1 con tipo fase y sin tipo documento" />
+      <column name="documento_ref" value="DocumentoRef2" />
+    </insert>
+    <insert tableName="convocatoria_documento">
+      <column name="id" valueSequenceNext="convocatoria_documento_seq" />
+      <column name="convocatoria_id" valueComputed="(select id from csp.convocatoria where codigo = 'codigo-001')"></column>
+      <column name="tipo_fase_id" value="null" />
+      <column name="tipo_documento_id" valueComputed="(select td.id from csp.convocatoria c join csp.modelo_ejecucion me on c.modelo_ejecucion_id = me.id join csp.modelo_tipo_documento mtd on me.id = mtd.modelo_ejecucion_id join csp.tipo_documento td on mtd.tipo_documento_id = td.id where c.codigo = 'codigo-001' and td.nombre = 'nombre-002' limit 1)"></column>
+      <column name="nombre" value="nombre doc-3" />
+      <column name="publico" value="true" />
+      <column name="observaciones" value="observaciones documento Conv1 sin tipo fase y con tipo documento" />
+      <column name="documento_ref" value="DocumentoRef3" />
+    </insert>
+    <insert tableName="convocatoria_documento">
+      <column name="id" valueSequenceNext="convocatoria_documento_seq" />
+      <column name="convocatoria_id" valueComputed="(select id from csp.convocatoria where codigo = 'codigo-001')"></column>
+      <column name="tipo_fase_id" value="null" />
+      <column name="tipo_documento_id" value="null" />
+      <column name="nombre" value="nombre doc-4" />
+      <column name="publico" value="true" />
+      <column name="observaciones" value="observaciones documento Conv1 sin tipo fase y sin tipo documento" />
+      <column name="documento_ref" value="DocumentoRef4" />
+    </insert>
+    <insert tableName="convocatoria_documento">
+      <column name="id" valueSequenceNext="convocatoria_documento_seq" />
+      <column name="convocatoria_id" valueComputed="(select id from csp.convocatoria where codigo = 'codigo-002')"></column>
+      <column name="tipo_fase_id" value="null" />
+      <column name="tipo_documento_id" valueComputed="(select td.id from csp.convocatoria c join csp.modelo_ejecucion me on c.modelo_ejecucion_id = me.id join csp.modelo_tipo_documento mtd on me.id = mtd.modelo_ejecucion_id join csp.tipo_documento td on mtd.tipo_documento_id = td.id where c.codigo = 'codigo-002' and td.nombre = 'nombre-002' limit 1)"></column>
+      <column name="nombre" value="nombre doc-5" />
+      <column name="publico" value="true" />
+      <column name="observaciones" value="observaciones documento Conv2 sin tipo fase y con tipo documento" />
+      <column name="documento_ref" value="DocumentoRef5" />
+    </insert>
+    <insert tableName="convocatoria_documento">
+      <column name="id" valueSequenceNext="convocatoria_documento_seq" />
+      <column name="convocatoria_id" valueComputed="(select id from csp.convocatoria where codigo = 'codigo-002')"></column>
+      <column name="tipo_fase_id" value="null" />
+      <column name="tipo_documento_id" value="null" />
+      <column name="nombre" value="nombre doc-6" />
+      <column name="publico" value="true" />
+      <column name="observaciones" value="observaciones documento Conv2 sin tipo fase y sin tipo documento" />
+      <column name="documento_ref" value="DocumentoRef6" />
+    </insert>
+  </changeSet>
+
+  <changeSet context="dev" author="master" id="20201016000000-convocatoria_enlace">
+    <insert tableName="convocatoria_enlace">
+      <column name="id" valueSequenceNext="convocatoria_enlace_seq" />
+      <column name="convocatoria_id" valueComputed="(select id from csp.convocatoria where codigo = 'codigo-001')"></column>
+      <column name="url" value="www.url1.com" />
+      <column name="descripcion" value="descripcion1" />
+      <column name="tipo_enlace_id" valueComputed="(select id from csp.tipo_enlace where nombre = 'tipo_enlace AAA')"></column>
+    </insert>
+    <insert tableName="convocatoria_enlace">
+      <column name="id" valueSequenceNext="convocatoria_enlace_seq" />
+      <column name="convocatoria_id" valueComputed="(select id from csp.convocatoria where codigo = 'codigo-002')"></column>
+      <column name="url" value="www.url2.com" />
+      <column name="descripcion" value="descripcion2" />
+      <column name="tipo_enlace_id" valueComputed="(select id from csp.tipo_enlace where nombre = 'tipo_enlace BBB')"></column>
+    </insert>
+    <insert tableName="convocatoria_enlace">
+      <column name="id" valueSequenceNext="convocatoria_enlace_seq" />
+      <column name="convocatoria_id" valueComputed="(select id from csp.convocatoria where codigo = 'codigo-003')"></column>
+      <column name="url" value="www.url3.com" />
+      <column name="descripcion" value="descripcion3" />
+      <column name="tipo_enlace_id" valueComputed="(select id from csp.tipo_enlace where nombre = 'tipo_enlace CCC')"></column>
+    </insert>
+  </changeSet>
+
+  <changeSet context="dev" author="master" id="0000000000000-convocatoria_entidad_convocante">
+    <insert tableName="convocatoria_entidad_convocante">
+      <column name="id" valueSequenceNext="convocatoria_entidad_convocante_seq" />
+      <column name="convocatoria_id" valueComputed="(select id from csp.convocatoria where codigo = 'codigo-001')"></column>
+      <column name="entidad_ref" value="ent-001" />
+      <column name="programa_id" valueComputed="(select id from csp.programa where nombre = 'nombre-001')"></column>
+    </insert>
+    <insert tableName="convocatoria_entidad_convocante">
+      <column name="id" valueSequenceNext="convocatoria_entidad_convocante_seq" />
+      <column name="convocatoria_id" valueComputed="(select id from csp.convocatoria where codigo = 'codigo-002')"></column>
+      <column name="entidad_ref" value="ent-002" />
+      <column name="programa_id" valueComputed="(select id from csp.programa where nombre = 'nombre-001')"></column>
+    </insert>
+    <insert tableName="convocatoria_entidad_convocante">
+      <column name="id" valueSequenceNext="convocatoria_entidad_convocante_seq" />
+      <column name="convocatoria_id" valueComputed="(select id from csp.convocatoria where codigo = 'codigo-003')"></column>
+      <column name="entidad_ref" value="ent-003" />
+      <column name="programa_id" valueComputed="(select id from csp.programa where nombre = 'nombre-001')"></column>
+    </insert>
+  </changeSet>
+
+  <changeSet context="dev" author="master" id="0000000000000-convocatoria_entidad_financiadora">
+    <insert tableName="convocatoria_entidad_financiadora">
+      <column name="id" valueSequenceNext="convocatoria_entidad_financiadora_seq" />
+      <column name="convocatoria_id" valueComputed="(select id from csp.convocatoria where codigo = 'codigo-001')"></column>
+      <column name="entidad_ref" value="ent-004" />
+      <column name="fuente_financiacion_id" valueComputed="(select id from csp.fuente_financiacion where nombre = 'nombre-001')"></column>
+      <column name="tipo_financiacion_id" valueComputed="(select id from csp.tipo_financiacion where nombre = 'nombreTipoFinanciacion1')"></column>
+      <column name="porcentaje_financiacion" value="10" />
+    </insert>
+    <insert tableName="convocatoria_entidad_financiadora">
+      <column name="id" valueSequenceNext="convocatoria_entidad_financiadora_seq" />
+      <column name="convocatoria_id" valueComputed="(select id from csp.convocatoria where codigo = 'codigo-002')"></column>
+      <column name="entidad_ref" value="ent-006" />
+      <column name="fuente_financiacion_id" valueComputed="(select id from csp.fuente_financiacion where nombre = 'nombre-002')"></column>
+      <column name="tipo_financiacion_id" valueComputed="(select id from csp.tipo_financiacion where nombre = 'nombreTipoFinanciacion1')"></column>
+      <column name="porcentaje_financiacion" value="50" />
+    </insert>
+    <insert tableName="convocatoria_entidad_financiadora">
+      <column name="id" valueSequenceNext="convocatoria_entidad_financiadora_seq" />
+      <column name="convocatoria_id" valueComputed="(select id from csp.convocatoria where codigo = 'codigo-003')"></column>
+      <column name="entidad_ref" value="ent-006" />
+      <column name="fuente_financiacion_id" valueComputed="(select id from csp.fuente_financiacion where nombre = 'nombre-003')"></column>
+      <column name="tipo_financiacion_id" valueComputed="(select id from csp.tipo_financiacion where nombre = 'nombreTipoFinanciacion2')"></column>
+      <column name="porcentaje_financiacion" value="30" />
+    </insert>
+  </changeSet>
+
+  <changeSet context="dev" author="master" id="0000000000000-convocatoria_entidad_gestora">
+    <insert tableName="convocatoria_entidad_gestora">
+      <column name="id" valueSequenceNext="convocatoria_entidad_gestora_seq" />
+      <column name="convocatoria_id" valueComputed="(select id from csp.convocatoria where codigo = 'codigo-001')"></column>
+      <column name="entidad_ref" value="ent-001" />
+    </insert>
+    <insert tableName="convocatoria_entidad_gestora">
+      <column name="id" valueSequenceNext="convocatoria_entidad_gestora_seq" />
+      <column name="convocatoria_id" valueComputed="(select id from csp.convocatoria where codigo = 'codigo-002')"></column>
+      <column name="entidad_ref" value="ent-002" />
+    </insert>
+    <insert tableName="convocatoria_entidad_gestora">
+      <column name="id" valueSequenceNext="convocatoria_entidad_gestora_seq" />
+      <column name="convocatoria_id" valueComputed="(select id from csp.convocatoria where codigo = 'codigo-003')"></column>
+      <column name="entidad_ref" value="ent-003" />
+    </insert>
+  </changeSet>
+
+  <changeSet context="dev" author="master" id="20201018000000-convocatoria_fase">
+    <insert tableName="convocatoria_fase">
+      <column name="id" valueSequenceNext="convocatoria_fase_seq" />
+      <column name="convocatoria_id" valueComputed="(select id from csp.convocatoria where codigo = 'codigo-001')"></column>
+      <column name="tipo_fase_id" valueComputed="(select id from csp.tipo_fase where nombre = 'Fase1')"></column>
+      <column name="fecha_inicio" value="2020-10-12" />
+      <column name="fecha_fin" value="2020-10-15" />
+      <column name="observaciones" value="observaciones1" />
+    </insert>
+    <insert tableName="convocatoria_fase">
+      <column name="id" valueSequenceNext="convocatoria_fase_seq" />
+      <column name="convocatoria_id" valueComputed="(select id from csp.convocatoria where codigo = 'codigo-002')"></column>
+      <column name="tipo_fase_id" valueComputed="(select id from csp.tipo_fase where nombre = 'Fase2')"></column>
+      <column name="fecha_inicio" value="2020-10-16" />
+      <column name="fecha_fin" value="2020-10-20" />
+      <column name="observaciones" value="observaciones2" />
+    </insert>
+    <insert tableName="convocatoria_fase">
+      <column name="id" valueSequenceNext="convocatoria_fase_seq" />
+      <column name="convocatoria_id" valueComputed="(select id from csp.convocatoria where codigo = 'codigo-003')"></column>
+      <column name="tipo_fase_id" valueComputed="(select id from csp.tipo_fase where nombre = 'Fase3')"></column>
+      <column name="fecha_inicio" value="2020-10-23" />
+      <column name="fecha_fin" value="2021-10-30" />
+      <column name="observaciones" value="observaciones3" />
+    </insert>
+  </changeSet>
+
+  <changeSet context="dev" author="master" id="20201022000000-convocatoria_hito">
+    <insert tableName="convocatoria_hito">
+      <column name="id" valueSequenceNext="convocatoria_hito_seq" />
+      <column name="convocatoria_id" valueComputed="(select id from csp.convocatoria where codigo = 'codigo-001')"></column>
+      <column name="tipo_hito_id" valueComputed="(select id from csp.tipo_hito where nombre = 'Hito1')"></column>
+      <column name="fecha" value="2021-10-22" />
+      <column name="comentario" value="comentario1" />
+      <column name="genera_aviso" value="true" />
+    </insert>
+    <insert tableName="convocatoria_hito">
+      <column name="id" valueSequenceNext="convocatoria_hito_seq" />
+      <column name="convocatoria_id" valueComputed="(select id from csp.convocatoria where codigo = 'codigo-002')"></column>
+      <column name="tipo_hito_id" valueComputed="(select id from csp.tipo_hito where nombre = 'Hito2')"></column>
+      <column name="fecha" value="2021-10-23" />
+      <column name="comentario" value="comentario2" />
+      <column name="genera_aviso" value="true" />
+    </insert>
+    <insert tableName="convocatoria_hito">
+      <column name="id" valueSequenceNext="convocatoria_hito_seq" />
+      <column name="convocatoria_id" valueComputed="(select id from csp.convocatoria where codigo = 'codigo-003')"></column>
+      <column name="tipo_hito_id" valueComputed="(select id from csp.tipo_hito where nombre = 'Hito3')"></column>
+      <column name="fecha" value="2021-10-24" />
+      <column name="comentario" value="comentario3" />
+      <column name="genera_aviso" value="true" />
+    </insert>
+  </changeSet>
+
+  <changeSet context="dev" author="master" id="0000000000000-convocatoria_periodo_justificacion">
+    <insert tableName="convocatoria_periodo_justificacion">
+      <column name="id" valueSequenceNext="convocatoria_periodo_justificacion_seq" />
+      <column name="convocatoria_id" valueComputed="(select id from csp.convocatoria where codigo = 'codigo-001')"></column>
+      <column name="num_periodo" value="1" />
+      <column name="mes_inicial" value="2" />
+      <column name="mes_final" value="3" />
+      <column name="fecha_inicio_presentacion" value="2021-02-12" />
+      <column name="fecha_fin_presentacion" value="2021-03-12" />
+      <column name="observaciones" value="observaciones 1" />
+      <column name="tipo_justificacion" value="periodica" />
+    </insert>
+    <insert tableName="convocatoria_periodo_justificacion">
+      <column name="id" valueSequenceNext="convocatoria_periodo_justificacion_seq" />
+      <column name="convocatoria_id" valueComputed="(select id from csp.convocatoria where codigo = 'codigo-001')"></column>
+      <column name="num_periodo" value="2" />
+      <column name="mes_inicial" value="4" />
+      <column name="mes_final" value="6" />
+      <column name="fecha_inicio_presentacion" value="2021-05-04" />
+      <column name="fecha_fin_presentacion" value="2021-05-22" />
+      <column name="observaciones" value="observaciones 2" />
+      <column name="tipo_justificacion" value="final" />
+    </insert>
+    <insert tableName="convocatoria_periodo_justificacion">
+      <column name="id" valueSequenceNext="convocatoria_periodo_justificacion_seq" />
+      <column name="convocatoria_id" valueComputed="(select id from csp.convocatoria where codigo = 'codigo-002')"></column>
+      <column name="num_periodo" value="1" />
+      <column name="mes_inicial" value="40" />
+      <column name="mes_final" value="56" />
+      <column name="fecha_inicio_presentacion" value="2021-02-14" />
+      <column name="fecha_fin_presentacion" value="2021-03-25" />
+      <column name="observaciones" value="observaciones 2" />
+      <column name="tipo_justificacion" value="final" />
+    </insert>
+  </changeSet>
+
+  <changeSet context="dev" author="master" id="0000000000000-convocatoria_periodo_seguimiento_cientifico">
+    <insert tableName="convocatoria_periodo_seguimiento_cientifico">
+      <column name="id" valueSequenceNext="convocatoria_periodo_seguimiento_cientifico_seq" />
+      <column name="convocatoria_id" valueComputed="(select id from csp.convocatoria where codigo = 'codigo-001')"></column>
+      <column name="num_periodo" value="1" />
+      <column name="mes_inicial" value="1" />
+      <column name="mes_final" value="6" />
+      <column name="fecha_inicio_presentacion" value="2020-01-01" />
+      <column name="fecha_fin_presentacion" value="2020-06-30" />
+      <column name="observaciones" value="Observaciones meses 1-6" />
+    </insert>
+    <insert tableName="convocatoria_periodo_seguimiento_cientifico">
+      <column name="id" valueSequenceNext="convocatoria_periodo_seguimiento_cientifico_seq" />
+      <column name="convocatoria_id" valueComputed="(select id from csp.convocatoria where codigo = 'codigo-001')"></column>
+      <column name="num_periodo" value="2" />
+      <column name="mes_inicial" value="7" />
+      <column name="mes_final" value="12" />
+      <column name="fecha_inicio_presentacion" value="2020-07-01" />
+      <column name="fecha_fin_presentacion" value="2020-12-30" />
+      <column name="observaciones" value="Observaciones meses 7-12" />
+    </insert>
+    <insert tableName="convocatoria_periodo_seguimiento_cientifico">
+      <column name="id" valueSequenceNext="convocatoria_periodo_seguimiento_cientifico_seq" />
+      <column name="convocatoria_id" valueComputed="(select id from csp.convocatoria where codigo = 'codigo-001')"></column>
+      <column name="num_periodo" value="3" />
+      <column name="mes_inicial" value="13" />
+      <column name="mes_final" value="18" />
+      <column name="fecha_inicio_presentacion" value="2021-01-01" />
+      <column name="fecha_fin_presentacion" value="2021-06-30" />
+      <column name="observaciones" value="Observaciones meses 13-18" />
+    </insert>
+    <insert tableName="convocatoria_periodo_seguimiento_cientifico">
+      <column name="id" valueSequenceNext="convocatoria_periodo_seguimiento_cientifico_seq" />
+      <column name="convocatoria_id" valueComputed="(select id from csp.convocatoria where codigo = 'codigo-002')"></column>
+      <column name="num_periodo" value="1" />
+      <column name="mes_inicial" value="1" />
+      <column name="mes_final" value="3" />
+      <column name="fecha_inicio_presentacion" value="2019-12-01" />
+      <column name="fecha_fin_presentacion" value="2020-03-30" />
+      <column name="observaciones" value="Observaciones meses 1-3" />
+    </insert>
+    <insert tableName="convocatoria_periodo_seguimiento_cientifico">
+      <column name="id" valueSequenceNext="convocatoria_periodo_seguimiento_cientifico_seq" />
+      <column name="convocatoria_id" valueComputed="(select id from csp.convocatoria where codigo = 'codigo-002')"></column>
+      <column name="num_periodo" value="2" />
+      <column name="mes_inicial" value="4" />
+      <column name="mes_final" value="6" />
+      <column name="fecha_inicio_presentacion" value="2020-03-01" />
+      <column name="fecha_fin_presentacion" value="2020-04-30" />
+      <column name="observaciones" value="Observaciones meses 4-6" />
+    </insert>
+  </changeSet>
+  <changeSet context="dev" author="master" id="20201022000000-requisito_equipo">
+    <insert tableName="requisito_equipo">
+      <column name="id" valueSequenceNext="requisito_equipo_seq" />
+      <column name="convocatoria_id" valueComputed="(select id from csp.convocatoria where codigo = 'codigo-002')" />
+      <column name="nivel_academico_ref" value="na-001" />
+      <column name="anios_nivel_academico" value="4" />
+      <column name="edad_maxima" value="48" />
+      <column name="ratio_mujeres" value="5" />
+      <column name="vinculacion_universidad" value="false" />
+      <column name="modalidad_contrato_ref" value="mc-001" />
+      <column name="anios_vinculacion" value="10" />
+      <column name="num_minimo_competitivos" value="11" />
+      <column name="num_minimo_no_competitivos" value="5" />
+      <column name="num_maximo_competitivos_activos" value="10" />
+      <column name="num_maximo_no_competitivos_activos" value="3" />
+      <column name="otros_requisitos" value="otros" />
+    </insert>
+    <insert tableName="requisito_equipo">
+      <column name="id" valueSequenceNext="requisito_equipo_seq" />
+      <column name="convocatoria_id" valueComputed="(select id from csp.convocatoria where codigo = 'codigo-001')" />
+      <column name="nivel_academico_ref" value="na-002" />
+      <column name="anios_nivel_academico" value="4" />
+      <column name="edad_maxima" value="3" />
+      <column name="ratio_mujeres" value="3" />
+      <column name="vinculacion_universidad" value="false" />
+      <column name="modalidad_contrato_ref" value="mc-002" />
+      <column name="anios_vinculacion" value="10" />
+      <column name="num_minimo_competitivos" value="11" />
+      <column name="num_minimo_no_competitivos" value="5" />
+      <column name="num_maximo_competitivos_activos" value="10" />
+      <column name="num_maximo_no_competitivos_activos" value="3" />
+      <column name="otros_requisitos" value="otros" />
+    </insert>
+  </changeSet>
+
+
+  <changeSet context="dev" author="master" id="20201022000000-requisito_ip">
+    <insert tableName="requisito_ip">
+      <column name="id" valueSequenceNext="requisito_ip_seq" />
+      <column name="convocatoria_id" valueComputed="(select id from csp.convocatoria where codigo = 'codigo-002')" />
+      <column name="num_maximo_ip" value="8" />
+      <column name="nivel_academico_ref" value="na-001" />
+      <column name="anios_nivel_academico" value="4" />
+      <column name="edad_maxima" value="48" />
+      <column name="sexo" value="Hombre" />
+      <column name="vinculacion_universidad" value="false" />
+      <column name="modalidad_contrato_ref" value="mc-001" />
+      <column name="anios_vinculacion" value="10" />
+      <column name="num_minimo_competitivos" value="11" />
+      <column name="num_minimo_no_competitivos" value="5" />
+      <column name="num_maximo_competitivos_activos" value="10" />
+      <column name="num_maximo_no_competitivos_activos" value="3" />
+      <column name="otros_requisitos" value="otros" />
+    </insert>
+    <insert tableName="requisito_ip">
+      <column name="id" valueSequenceNext="requisito_ip_seq" />
+      <column name="convocatoria_id" valueComputed="(select id from csp.convocatoria where codigo = 'codigo-001')" />
+      <column name="num_maximo_ip" value="8" />
+      <column name="nivel_academico_ref" value="na-002" />
+      <column name="anios_nivel_academico" value="4" />
+      <column name="edad_maxima" value="48" />
+      <column name="sexo" value="Mujer" />
+      <column name="vinculacion_universidad" value="false" />
+      <column name="modalidad_contrato_ref" value="mc-002" />
+      <column name="anios_vinculacion" value="10" />
+      <column name="num_minimo_competitivos" value="11" />
+      <column name="num_minimo_no_competitivos" value="5" />
+      <column name="num_maximo_competitivos_activos" value="10" />
+      <column name="num_maximo_no_competitivos_activos" value="3" />
+      <column name="otros_requisitos" value="otros" />
+    </insert>
+    <insert tableName="requisito_ip">
+      <column name="id" valueSequenceNext="requisito_ip_seq" />
+      <column name="convocatoria_id" valueComputed="(select id from csp.convocatoria where codigo = 'codigo-003')" />
+      <column name="num_maximo_ip" value="8" />
+      <column name="nivel_academico_ref" value="na-003" />
+      <column name="anios_nivel_academico" value="4" />
+      <column name="edad_maxima" value="52" />
+      <column name="sexo" value="Hombre" />
+      <column name="vinculacion_universidad" value="false" />
+      <column name="modalidad_contrato_ref" value="mc-003" />
+      <column name="anios_vinculacion" value="10" />
+      <column name="num_minimo_competitivos" value="11" />
+      <column name="num_minimo_no_competitivos" value="20" />
+      <column name="num_maximo_competitivos_activos" value="10" />
+      <column name="num_maximo_no_competitivos_activos" value="3" />
+      <column name="otros_requisitos" value="otros requisitos" />
+    </insert>
+    <insert tableName="requisito_ip">
+      <column name="id" valueSequenceNext="requisito_ip_seq" />
+      <column name="convocatoria_id" valueComputed="(select id from csp.convocatoria where codigo = 'codigo-004')" />
+      <column name="num_maximo_ip" value="8" />
+      <column name="nivel_academico_ref" value="na-004" />
+      <column name="anios_nivel_academico" value="2" />
+      <column name="edad_maxima" value="70" />
+      <column name="sexo" value="Mujer" />
+      <column name="vinculacion_universidad" value="false" />
+      <column name="modalidad_contrato_ref" value="mc-004" />
+      <column name="anios_vinculacion" value="15" />
+      <column name="num_minimo_competitivos" value="11" />
+      <column name="num_minimo_no_competitivos" value="5" />
+      <column name="num_maximo_competitivos_activos" value="10" />
+      <column name="num_maximo_no_competitivos_activos" value="3" />
+      <column name="otros_requisitos" value="otros" />
+    </insert>
+  </changeSet>
+
+  <changeSet context="dev" author="master" id="0000000000000-convocatoria_concepto_gasto">
+    <insert tableName="convocatoria_concepto_gasto">
+      <column name="id" valueSequenceNext="convocatoria_concepto_gasto_seq" />
+      <column name="convocatoria_id" valueComputed="(select id from csp.convocatoria where codigo = 'codigo-001')" />
+      <column name="concepto_gasto_id" valueComputed="(select id from csp.concepto_gasto where nombre = 'conceptoGasto2')" />
+      <column name="observaciones" value="Observaciones permitido" />
+      <column name="importe_maximo" value="100.0" />
+      <column name="permitido" value="true" />
+      <column name="num_meses" value="4" />
+      <column name="porcentaje_coste_indirecto" value="25" />
+    </insert>
+    <insert tableName="convocatoria_concepto_gasto">
+      <column name="id" valueSequenceNext="convocatoria_concepto_gasto_seq" />
+      <column name="convocatoria_id" valueComputed="(select id from csp.convocatoria where codigo = 'codigo-001')" />
+      <column name="concepto_gasto_id" valueComputed="(select id from csp.concepto_gasto where nombre = 'conceptoGasto1')" />
+      <column name="observaciones" value="Observaciones permitido obs" />
+      <column name="importe_maximo" value="600.0" />
+      <column name="permitido" value="true" />
+      <column name="num_meses" value="2" />
+    </insert>
+
+    <insert tableName="convocatoria_concepto_gasto">
+      <column name="id" valueSequenceNext="convocatoria_concepto_gasto_seq" />
+      <column name="convocatoria_id" valueComputed="(select id from csp.convocatoria where codigo = 'codigo-001')" />
+      <column name="concepto_gasto_id" valueComputed="(select id from csp.concepto_gasto where nombre = 'conceptoGasto2')" />
+      <column name="observaciones" value="Observaciones no permitido" />
+      <column name="importe_maximo" value="100.0" />
+      <column name="permitido" value="false" />
+      <column name="num_meses" value="4" />
+    </insert>
+    <insert tableName="convocatoria_concepto_gasto">
+      <column name="id" valueSequenceNext="convocatoria_concepto_gasto_seq" />
+      <column name="convocatoria_id" valueComputed="(select id from csp.convocatoria where codigo = 'codigo-001')" />
+      <column name="concepto_gasto_id" valueComputed="(select id from csp.concepto_gasto where nombre = 'conceptoGasto3')" />
+      <column name="observaciones" value="Observaciones no permitido obs" />
+      <column name="importe_maximo" value="600.0" />
+      <column name="permitido" value="false" />
+      <column name="num_meses" value="2" />
+    </insert>
+  </changeSet>
+
+  <changeSet context="dev" author="master" id="0000000000000-convocatoria_concepto_gasto_codigo_ec">
+    <insert tableName="convocatoria_concepto_gasto_codigo_ec">
+      <column name="id" valueSequenceNext="convocatoria_concepto_gasto_codigo_ec_seq" />
+      <column name="convocatoria_concepto_gasto_id" valueComputed="(select ccg.id from csp.convocatoria_concepto_gasto ccg inner join csp.convocatoria c on ccg.convocatoria_id = c.id where c.codigo = 'codigo-001' and ccg.concepto_gasto_id=1 and ccg.permitido='true')" />
+      <column name="codigo_economico_ref" value="cod-001" />
+      <column name="fecha_inicio" value="2020-10-12" />
+      <column name="fecha_fin" value="2020-10-15" />
+      <column name="observaciones" value="Obs codigo economico" />
+    </insert>
+  </changeSet>
+
+</databaseChangeLog>
