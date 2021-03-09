@@ -45,7 +45,7 @@ public class ConvocatoriaConceptoGastoCodigoEcIT {
     headers.setContentType(MediaType.APPLICATION_JSON);
     headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
     headers.set("Authorization", String.format("bearer %s",
-        tokenBuilder.buildToken("user", "CSP-CGAS-B", "CSP-CGAS-C", "CSP-CGAS-E", "CSP-CGAS-V")));
+        tokenBuilder.buildToken("user", "CSP-CGAS-B", "CSP-CGAS-C", "CSP-CGAS-E", "CSP-CGAS-V", "CSP-CONV-C")));
 
     HttpEntity<ConvocatoriaConceptoGastoCodigoEc> request = new HttpEntity<>(entity, headers);
     return request;
@@ -156,7 +156,7 @@ public class ConvocatoriaConceptoGastoCodigoEcIT {
     convocatoriaConceptoGastoCodigoEc.setId(id);
     convocatoriaConceptoGastoCodigoEc.setConvocatoriaConceptoGasto(convocatoriaConceptoGasto);
     convocatoriaConceptoGastoCodigoEc.setCodigoEconomicoRef("cod-" + (id == null ? 1 : id));
-    convocatoriaConceptoGastoCodigoEc.setFechaInicio(LocalDate.now());
+    convocatoriaConceptoGastoCodigoEc.setFechaInicio(LocalDate.now().minusDays(1));
     convocatoriaConceptoGastoCodigoEc.setFechaFin(LocalDate.now());
 
     return convocatoriaConceptoGastoCodigoEc;

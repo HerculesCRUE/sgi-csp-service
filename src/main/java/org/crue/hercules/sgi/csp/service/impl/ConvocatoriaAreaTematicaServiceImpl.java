@@ -1,7 +1,5 @@
 package org.crue.hercules.sgi.csp.service.impl;
 
-import java.util.List;
-
 import org.crue.hercules.sgi.csp.exceptions.AreaTematicaNotFoundException;
 import org.crue.hercules.sgi.csp.exceptions.ConvocatoriaAreaTematicaNotFoundException;
 import org.crue.hercules.sgi.csp.exceptions.ConvocatoriaNotFoundException;
@@ -12,8 +10,8 @@ import org.crue.hercules.sgi.csp.repository.ConvocatoriaAreaTematicaRepository;
 import org.crue.hercules.sgi.csp.repository.ConvocatoriaRepository;
 import org.crue.hercules.sgi.csp.repository.specification.ConvocatoriaAreaTematicaSpecifications;
 import org.crue.hercules.sgi.csp.service.ConvocatoriaAreaTematicaService;
-import org.crue.hercules.sgi.framework.data.jpa.domain.QuerySpecification;
-import org.crue.hercules.sgi.framework.data.search.QueryCriteria;
+import org.crue.hercules.sgi.csp.service.ConvocatoriaService;
+import org.crue.hercules.sgi.framework.rsql.SgiRSQLJPASupport;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -34,12 +32,15 @@ public class ConvocatoriaAreaTematicaServiceImpl implements ConvocatoriaAreaTema
   private final ConvocatoriaAreaTematicaRepository repository;
   private final ConvocatoriaRepository convocatoriaRepository;
   private final AreaTematicaRepository areaTematicaRepository;
+  private final ConvocatoriaService convocatoriaService;
 
   public ConvocatoriaAreaTematicaServiceImpl(ConvocatoriaAreaTematicaRepository repository,
-      ConvocatoriaRepository convocatoriaRepository, AreaTematicaRepository areaTematicaRepository) {
+      ConvocatoriaRepository convocatoriaRepository, AreaTematicaRepository areaTematicaRepository,
+      ConvocatoriaService convocatoriaService) {
     this.repository = repository;
     this.convocatoriaRepository = convocatoriaRepository;
     this.areaTematicaRepository = areaTematicaRepository;
+    this.convocatoriaService = convocatoriaService;
   }
 
   /**
@@ -66,6 +67,12 @@ public class ConvocatoriaAreaTematicaServiceImpl implements ConvocatoriaAreaTema
     convocatoriaAreaTematica
         .setConvocatoria(convocatoriaRepository.findById(convocatoriaAreaTematica.getConvocatoria().getId())
             .orElseThrow(() -> new ConvocatoriaNotFoundException(convocatoriaAreaTematica.getConvocatoria().getId())));
+
+    // comprobar si convocatoria es modificable
+    Assert.isTrue(
+        convocatoriaService.modificable(convocatoriaAreaTematica.getConvocatoria().getId(),
+            convocatoriaAreaTematica.getConvocatoria().getUnidadGestionRef()),
+        "No se puede crear ConvocatoriaAreaTematica. No tiene los permisos necesarios o la convocatoria está registrada y cuenta con solicitudes o proyectos asociados");
 
     convocatoriaAreaTematica
         .setAreaTematica(areaTematicaRepository.findById(convocatoriaAreaTematica.getAreaTematica().getId())
@@ -99,6 +106,13 @@ public class ConvocatoriaAreaTematicaServiceImpl implements ConvocatoriaAreaTema
         "ConvocatoriaAreaTematica id no puede ser null para actualizar un ConvocatoriaAreaTematica");
 
     return repository.findById(convocatoriaAreaTematicaActualizar.getId()).map(convocatoriaAreaTematica -> {
+
+      // comprobar si convocatoria es modificable
+      Assert.isTrue(
+          convocatoriaService.modificable(convocatoriaAreaTematica.getConvocatoria().getId(),
+              convocatoriaAreaTematica.getConvocatoria().getUnidadGestionRef()),
+          "No se puede modificar ConvocatoriaAreaTematica. No tiene los permisos necesarios o la convocatoria está registrada y cuenta con solicitudes o proyectos asociados");
+
       convocatoriaAreaTematica.setObservaciones(convocatoriaAreaTematicaActualizar.getObservaciones());
       ConvocatoriaAreaTematica returnValue = repository.save(convocatoriaAreaTematicaActualizar);
       log.debug("update(ConvocatoriaAreaTematica convocatoriaAreaTematicaActualizar) - end");
@@ -117,9 +131,17 @@ public class ConvocatoriaAreaTematicaServiceImpl implements ConvocatoriaAreaTema
     log.debug("delete(Long id) - start");
 
     Assert.notNull(id, "ConvocatoriaAreaTematica id no puede ser null para eliminar un ConvocatoriaAreaTematica");
-    if (!repository.existsById(id)) {
-      throw new ConvocatoriaAreaTematicaNotFoundException(id);
-    }
+
+    repository.findById(id).map(convocatoriaAreaTematica -> {
+
+      // comprobar si convocatoria es modificable
+      Assert.isTrue(
+          convocatoriaService.modificable(convocatoriaAreaTematica.getConvocatoria().getId(),
+              convocatoriaAreaTematica.getConvocatoria().getUnidadGestionRef()),
+          "No se puede eliminar ConvocatoriaAreaTematica. No tiene los permisos necesarios o la convocatoria está registrada y cuenta con solicitudes o proyectos asociados");
+
+      return convocatoriaAreaTematica;
+    }).orElseThrow(() -> new ConvocatoriaAreaTematicaNotFoundException(id));
 
     repository.deleteById(id);
     log.debug("delete(Long id) - end");
@@ -150,17 +172,13 @@ public class ConvocatoriaAreaTematicaServiceImpl implements ConvocatoriaAreaTema
    * @return la lista de entidades {@link ConvocatoriaAreaTematica} de la
    *         {@link Convocatoria} paginadas.
    */
-  public Page<ConvocatoriaAreaTematica> findAllByConvocatoria(Long convocatoriaId, List<QueryCriteria> query,
-      Pageable pageable) {
-    log.debug("findAllByConvocatoria(Long convocatoriaId, List<QueryCriteria> query, Pageable pageable) - start");
-    Specification<ConvocatoriaAreaTematica> specByQuery = new QuerySpecification<ConvocatoriaAreaTematica>(query);
-    Specification<ConvocatoriaAreaTematica> specByConvocatoria = ConvocatoriaAreaTematicaSpecifications
-        .byConvocatoriaId(convocatoriaId);
-
-    Specification<ConvocatoriaAreaTematica> specs = Specification.where(specByConvocatoria).and(specByQuery);
+  public Page<ConvocatoriaAreaTematica> findAllByConvocatoria(Long convocatoriaId, String query, Pageable pageable) {
+    log.debug("findAllByConvocatoria(Long convocatoriaId, String query, Pageable pageable) - start");
+    Specification<ConvocatoriaAreaTematica> specs = ConvocatoriaAreaTematicaSpecifications
+        .byConvocatoriaId(convocatoriaId).and(SgiRSQLJPASupport.toSpecification(query));
 
     Page<ConvocatoriaAreaTematica> returnValue = repository.findAll(specs, pageable);
-    log.debug("findAllByConvocatoria(Long convocatoriaId, List<QueryCriteria> query, Pageable pageable) - end");
+    log.debug("findAllByConvocatoria(Long convocatoriaId, String query, Pageable pageable) - end");
     return returnValue;
   }
 

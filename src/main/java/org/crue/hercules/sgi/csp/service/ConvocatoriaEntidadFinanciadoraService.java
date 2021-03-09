@@ -1,10 +1,7 @@
 package org.crue.hercules.sgi.csp.service;
 
-import java.util.List;
-
 import org.crue.hercules.sgi.csp.model.Convocatoria;
 import org.crue.hercules.sgi.csp.model.ConvocatoriaEntidadFinanciadora;
-import org.crue.hercules.sgi.framework.data.search.QueryCriteria;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -58,7 +55,16 @@ public interface ConvocatoriaEntidadFinanciadoraService {
    * @return la lista de entidades {@link ConvocatoriaEntidadFinanciadora} de la
    *         {@link Convocatoria} paginadas.
    */
-  Page<ConvocatoriaEntidadFinanciadora> findAllByConvocatoria(Long idConvocatoria, List<QueryCriteria> query,
-      Pageable pageable);
+  Page<ConvocatoriaEntidadFinanciadora> findAllByConvocatoria(Long idConvocatoria, String query, Pageable pageable);
+
+  /**
+   * Comprueba si existen datos vinculados a la {@link Convocatoria} de
+   * {@link ConvocatoriaEntidadFinanciadora} con el fin de permitir la edición de
+   * los campo Desglose de presupuesto
+   *
+   * @param id Id del {@link ConvocatoriaEntidadFinanciadora}.
+   * @return true existen datos vinculados/false no existen datos vinculados.
+   */
+  Boolean hasConvocatoriaEntidad(Long id);
 
 }

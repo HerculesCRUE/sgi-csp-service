@@ -25,6 +25,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 public class TipoFaseIT extends BaseIT {
 
   private static final String PATH_PARAMETER_ID = "/{id}";
+  private static final String PATH_PARAMETER_DESACTIVAR = "/desactivar";
+  private static final String PATH_PARAMETER_REACTIVAR = "/reactivar";
   private static final String TIPO_FASE_CONTROLLER_BASE_PATH = "/tipofases";
 
   private HttpEntity<TipoFase> buildRequest(HttpHeaders headers, TipoFase entity) throws Exception {
@@ -78,26 +80,37 @@ public class TipoFaseIT extends BaseIT {
   @Sql
   @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:cleanup.sql")
   @Test
-  public void delete_Return204() throws Exception {
-
+  public void reactivar_ReturnTipoFase() throws Exception {
     Long idTipoFase = 1L;
 
-    final ResponseEntity<TipoFase> response = restTemplate.exchange(TIPO_FASE_CONTROLLER_BASE_PATH + PATH_PARAMETER_ID,
-        HttpMethod.DELETE, buildRequest(null, null), TipoFase.class, idTipoFase);
+    final ResponseEntity<TipoFase> response = restTemplate.exchange(
+        TIPO_FASE_CONTROLLER_BASE_PATH + PATH_PARAMETER_ID + PATH_PARAMETER_REACTIVAR, HttpMethod.PATCH,
+        buildRequest(null, null), TipoFase.class, idTipoFase);
 
-    Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
-
+    Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    TipoFase tipoFaseDisabled = response.getBody();
+    Assertions.assertThat(tipoFaseDisabled.getId()).as("getId()").isEqualTo(idTipoFase);
+    Assertions.assertThat(tipoFaseDisabled.getNombre()).as("getNombre()").isEqualTo("TipoFase1");
+    Assertions.assertThat(tipoFaseDisabled.getDescripcion()).as("getDescripcion()").isEqualTo("Descripción1");
+    Assertions.assertThat(tipoFaseDisabled.getActivo()).as("getActivo()").isEqualTo(Boolean.TRUE);
   }
 
+  @Sql
   @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:cleanup.sql")
   @Test
-  public void deleteTipoFase_DoNotGetTipoFase() throws Exception {
+  public void desactivar_ReturnTipoFase() throws Exception {
+    Long idTipoFase = 1L;
 
-    final ResponseEntity<TipoFase> response = restTemplate.exchange(TIPO_FASE_CONTROLLER_BASE_PATH + PATH_PARAMETER_ID,
-        HttpMethod.DELETE, buildRequest(null, null), TipoFase.class, 2L);
+    final ResponseEntity<TipoFase> response = restTemplate.exchange(
+        TIPO_FASE_CONTROLLER_BASE_PATH + PATH_PARAMETER_ID + PATH_PARAMETER_DESACTIVAR, HttpMethod.PATCH,
+        buildRequest(null, null), TipoFase.class, idTipoFase);
 
-    Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-
+    Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    TipoFase tipoFaseDisabled = response.getBody();
+    Assertions.assertThat(tipoFaseDisabled.getId()).as("getId()").isEqualTo(idTipoFase);
+    Assertions.assertThat(tipoFaseDisabled.getNombre()).as("getNombre()").isEqualTo("TipoFase1");
+    Assertions.assertThat(tipoFaseDisabled.getDescripcion()).as("getDescripcion()").isEqualTo("Descripción1");
+    Assertions.assertThat(tipoFaseDisabled.getActivo()).as("getActivo()").isEqualTo(Boolean.FALSE);
   }
 
   @Sql
@@ -128,8 +141,8 @@ public class TipoFaseIT extends BaseIT {
     headers.set("Authorization", String.format("bearer %s", tokenBuilder.buildToken("user", "CSP-TDOC-V")));
     headers.add("X-Page", "0");
     headers.add("X-Page-Size", "3");
-    String sort = "nombre-";
-    String filter = "descripcion~%00%";
+    String sort = "nombre,desc";
+    String filter = "descripcion=ke=00";
 
     URI uri = UriComponentsBuilder.fromUriString(TIPO_FASE_CONTROLLER_BASE_PATH).queryParam("s", sort)
         .queryParam("q", filter).build(false).toUri();
@@ -162,8 +175,8 @@ public class TipoFaseIT extends BaseIT {
     headers.set("Authorization", String.format("bearer %s", tokenBuilder.buildToken("user", "CSP-TDOC-V")));
     headers.add("X-Page", "0");
     headers.add("X-Page-Size", "3");
-    String sort = "nombre-";
-    String filter = "descripcion~%00%";
+    String sort = "nombre,desc";
+    String filter = "descripcion=ke=00";
 
     URI uri = UriComponentsBuilder.fromUriString(TIPO_FASE_CONTROLLER_BASE_PATH + "/todos").queryParam("s", sort)
         .queryParam("q", filter).build(false).toUri();

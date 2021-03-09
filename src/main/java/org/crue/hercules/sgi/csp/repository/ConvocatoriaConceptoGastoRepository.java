@@ -1,6 +1,6 @@
 package org.crue.hercules.sgi.csp.repository;
 
-import java.util.Optional;
+import java.util.List;
 
 import org.crue.hercules.sgi.csp.model.ConvocatoriaConceptoGasto;
 import org.crue.hercules.sgi.csp.model.Convocatoria;
@@ -22,7 +22,7 @@ public interface ConvocatoriaConceptoGastoRepository
    * @param permitido       indica si el concepto de gasto es permitido o no
    * @return una {@link ConvocatoriaConceptoGasto}
    */
-  Optional<ConvocatoriaConceptoGasto> findByConvocatoriaIdAndConceptoGastoActivoTrueAndConceptoGastoIdAndPermitidoIs(
+  List<ConvocatoriaConceptoGasto> findByConvocatoriaIdAndConceptoGastoActivoTrueAndConceptoGastoIdAndPermitidoIs(
       Long convocatoriaId, Long conceptoGastoId, Boolean permitido);
 
   /**
@@ -48,5 +48,14 @@ public interface ConvocatoriaConceptoGastoRepository
    */
   Page<ConvocatoriaConceptoGasto> findAllByConvocatoriaIdAndConceptoGastoActivoTrueAndPermitidoFalse(
       Long convocatoriaId, Pageable paging);
+
+  /**
+   * Obtiene las {@link ConvocatoriaConceptoGasto} para una {@link Convocatoria}.
+   *
+   * @param convocatoriaId el id de la {@link Convocatoria}.
+   * @return la lista de entidades {@link ConvocatoriaConceptoGasto} de la
+   *         {@link Convocatoria} paginadas.
+   */
+  List<ConvocatoriaConceptoGasto> findAllByConvocatoriaIdAndConceptoGastoActivoTrue(Long convocatoriaId);
 
 }

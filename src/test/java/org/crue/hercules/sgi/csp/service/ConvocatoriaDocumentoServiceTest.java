@@ -5,9 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.assertj.core.api.Assertions;
-import org.crue.hercules.sgi.csp.enums.ClasificacionCVNEnum;
-import org.crue.hercules.sgi.csp.enums.TipoDestinatarioEnum;
-import org.crue.hercules.sgi.csp.enums.TipoEstadoConvocatoriaEnum;
+import org.crue.hercules.sgi.csp.enums.ClasificacionCVN;
 import org.crue.hercules.sgi.csp.exceptions.ConvocatoriaDocumentoNotFoundException;
 import org.crue.hercules.sgi.csp.exceptions.ConvocatoriaNotFoundException;
 import org.crue.hercules.sgi.csp.model.Convocatoria;
@@ -28,12 +26,10 @@ import org.crue.hercules.sgi.csp.repository.ModeloTipoFaseRepository;
 import org.crue.hercules.sgi.csp.service.impl.ConvocatoriaDocumentoServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.BDDMockito;
 import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -43,8 +39,7 @@ import org.springframework.data.jpa.domain.Specification;
 /**
  * ConvocatoriaDocumentoServiceTest
  */
-@ExtendWith(MockitoExtension.class)
-public class ConvocatoriaDocumentoServiceTest {
+public class ConvocatoriaDocumentoServiceTest extends BaseServiceTest {
 
   @Mock
   private ConvocatoriaDocumentoRepository repository;
@@ -1076,12 +1071,12 @@ public class ConvocatoriaDocumentoServiceTest {
         .observaciones("observaciones-" + String.format("%03d", convocatoriaId))//
         .finalidad((modeloTipoFinalidad == null) ? null : modeloTipoFinalidad.getTipoFinalidad())//
         .regimenConcurrencia(tipoRegimenConcurrencia)//
-        .destinatarios(TipoDestinatarioEnum.INDIVIDUAL)//
+        .destinatarios(Convocatoria.Destinatarios.INDIVIDUAL)//
         .colaborativos(Boolean.TRUE)//
-        .estadoActual(TipoEstadoConvocatoriaEnum.REGISTRADA)//
+        .estado(Convocatoria.Estado.REGISTRADA)//
         .duracion(12)//
         .ambitoGeografico(tipoAmbitoGeografico)//
-        .clasificacionCVN(ClasificacionCVNEnum.AYUDAS)//
+        .clasificacionCVN(ClasificacionCVN.AYUDAS)//
         .activo(activo)//
         .build();
 

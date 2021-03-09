@@ -1,11 +1,7 @@
 package org.crue.hercules.sgi.csp.repository;
 
-import java.util.Optional;
-
 import org.assertj.core.api.Assertions;
-import org.crue.hercules.sgi.csp.enums.ClasificacionCVNEnum;
-import org.crue.hercules.sgi.csp.enums.TipoDestinatarioEnum;
-import org.crue.hercules.sgi.csp.enums.TipoEstadoConvocatoriaEnum;
+import org.crue.hercules.sgi.csp.enums.ClasificacionCVN;
 import org.crue.hercules.sgi.csp.model.ConceptoGasto;
 import org.crue.hercules.sgi.csp.model.Convocatoria;
 import org.crue.hercules.sgi.csp.model.ConvocatoriaConceptoGasto;
@@ -24,59 +20,6 @@ public class ConvocatoriaConceptoGastoRepositoryTest extends BaseRepositoryTest 
 
   @Autowired
   private ConvocatoriaConceptoGastoRepository repository;
-
-  @Test
-  public void findByConvocatoriaIdAndConceptoGastoActivoTrueAndConceptoGastoIdAndPermitidoIs_ReturnsConvocatoriaConceptoGasto()
-      throws Exception {
-    // given: data ConvocatoriaConceptoGasto to find by Convocatoria and
-    // ConceptoGasto and permitido
-    ConvocatoriaConceptoGasto convocatoriaConceptoGasto1 = generarConvocatoriaConceptoGasto("-001", true);
-
-    entityManager.persistAndFlush(convocatoriaConceptoGasto1);
-    ConvocatoriaConceptoGasto convocatoriaConceptoGasto2 = generarConvocatoriaConceptoGasto("-002", false);
-    entityManager.persistAndFlush(convocatoriaConceptoGasto2);
-
-    Long convocatoriaIdBuscado = convocatoriaConceptoGasto1.getConvocatoria().getId();
-    Long conceptoGastoIdBuscado = convocatoriaConceptoGasto1.getConceptoGasto().getId();
-
-    // when: find by Convocatoria and ConceptoGasto and permitido
-    ConvocatoriaConceptoGasto dataFound = repository
-        .findByConvocatoriaIdAndConceptoGastoActivoTrueAndConceptoGastoIdAndPermitidoIs(convocatoriaIdBuscado,
-            conceptoGastoIdBuscado, true)
-        .get();
-
-    // then: ConvocatoriaConceptoGasto is found
-    Assertions.assertThat(dataFound).isNotNull();
-    Assertions.assertThat(dataFound.getId()).isEqualTo(convocatoriaConceptoGasto1.getId());
-    Assertions.assertThat(dataFound.getConvocatoria().getId())
-        .isEqualTo(convocatoriaConceptoGasto1.getConvocatoria().getId());
-    Assertions.assertThat(dataFound.getConceptoGasto().getId())
-        .isEqualTo(convocatoriaConceptoGasto1.getConceptoGasto().getId());
-    Assertions.assertThat(dataFound.getPermitido()).isEqualTo(convocatoriaConceptoGasto1.getPermitido());
-  }
-
-  @Test
-  public void findByConvocatoriaIdAndConceptoGastoActivoTrueAndConceptoGastoIdAndPermitidoIs_ReturnsNull()
-      throws Exception {
-    // given: data ConvocatoriaConceptoGasto to find by Convocatoria and
-    // ConceptoGasto and permitido
-    ConvocatoriaConceptoGasto convocatoriaConceptoGasto1 = generarConvocatoriaConceptoGasto("-001", false);
-
-    entityManager.persistAndFlush(convocatoriaConceptoGasto1);
-    ConvocatoriaConceptoGasto convocatoriaConceptoGasto2 = generarConvocatoriaConceptoGasto("-002", true);
-    entityManager.persistAndFlush(convocatoriaConceptoGasto2);
-
-    Long convocatoriaIdBuscado = convocatoriaConceptoGasto1.getConvocatoria().getId();
-    Long conceptoGastoIdBuscado = convocatoriaConceptoGasto1.getConceptoGasto().getId();
-
-    // when: find by Convocatoria and ConceptoGasto and permitido
-    Optional<ConvocatoriaConceptoGasto> dataFound = repository
-        .findByConvocatoriaIdAndConceptoGastoActivoTrueAndConceptoGastoIdAndPermitidoIs(convocatoriaIdBuscado,
-            conceptoGastoIdBuscado, true);
-
-    // then: ConvocatoriaConceptoGasto is not found
-    Assertions.assertThat(dataFound).isEqualTo(Optional.empty());
-  }
 
   @Test
   public void findAllByConvocatoriaIdAndConceptoGastoActivoTrueAndPermitidoTrue_ReturnsPageConvocatoriaConceptoGasto()
@@ -175,12 +118,13 @@ public class ConvocatoriaConceptoGastoRepositoryTest extends BaseRepositoryTest 
         .observaciones("observaciones" + suffix)//
         .finalidad(modeloTipoFinalidad.getTipoFinalidad())//
         .regimenConcurrencia(tipoRegimenConcurrencia)//
-        .destinatarios(TipoDestinatarioEnum.INDIVIDUAL)//
+        .destinatarios(Convocatoria.Destinatarios.INDIVIDUAL)//
         .colaborativos(Boolean.TRUE)//
-        .estadoActual(TipoEstadoConvocatoriaEnum.REGISTRADA)//
+        .estado(Convocatoria.Estado.REGISTRADA)//
         .duracion(12)//
         .ambitoGeografico(tipoAmbitoGeografico)//
-        .clasificacionCVN(ClasificacionCVNEnum.AYUDAS).activo(Boolean.TRUE)//
+        .clasificacionCVN(ClasificacionCVN.AYUDAS)//
+        .activo(Boolean.TRUE)//
         .build();
     entityManager.persistAndFlush(convocatoria);
 

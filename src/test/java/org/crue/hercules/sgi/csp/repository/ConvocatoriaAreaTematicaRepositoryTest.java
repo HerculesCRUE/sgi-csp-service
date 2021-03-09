@@ -3,9 +3,7 @@ package org.crue.hercules.sgi.csp.repository;
 import java.util.Optional;
 
 import org.assertj.core.api.Assertions;
-import org.crue.hercules.sgi.csp.enums.ClasificacionCVNEnum;
-import org.crue.hercules.sgi.csp.enums.TipoDestinatarioEnum;
-import org.crue.hercules.sgi.csp.enums.TipoEstadoConvocatoriaEnum;
+import org.crue.hercules.sgi.csp.enums.ClasificacionCVN;
 import org.crue.hercules.sgi.csp.model.AreaTematica;
 import org.crue.hercules.sgi.csp.model.Convocatoria;
 import org.crue.hercules.sgi.csp.model.ConvocatoriaAreaTematica;
@@ -67,6 +65,40 @@ public class ConvocatoriaAreaTematicaRepositoryTest extends BaseRepositoryTest {
     Assertions.assertThat(dataFound).isEqualTo(Optional.empty());
   }
 
+  @Test
+  public void findByConvocatoriaId_ReturnsConvocatoriaAreaTematica() throws Exception {
+
+    // given: data ConvocatoriaAreaTematica to find by Convocatoria and
+    // AreaTematicaId
+    ConvocatoriaAreaTematica convocatoriaAreaTematica1 = generarConvocatoriaAreaTematica("-001");
+    generarConvocatoriaAreaTematica("-002");
+
+    Long convocatoriaIdBuscado = convocatoriaAreaTematica1.getConvocatoria().getId();
+
+    // when: find by Convocatoria and AreaTematicaId
+    ConvocatoriaAreaTematica dataFound = repository.findByConvocatoriaId(convocatoriaIdBuscado).get();
+
+    // then: ConvocatoriaAreaTematica is found
+    Assertions.assertThat(dataFound).isNotNull();
+    Assertions.assertThat(dataFound.getId()).isEqualTo(convocatoriaAreaTematica1.getId());
+    Assertions.assertThat(dataFound.getConvocatoria().getId())
+        .isEqualTo(convocatoriaAreaTematica1.getConvocatoria().getId());
+    Assertions.assertThat(dataFound.getAreaTematica().getId())
+        .isEqualTo(convocatoriaAreaTematica1.getAreaTematica().getId());
+  }
+
+  @Test
+  public void findByConvocatoriaId_ReturnsNull() throws Exception {
+    // given: data ConvocatoriaAreaTematica to find by Convocatoria and
+    // AreaTematicaId
+
+    // when: find by by Convocatoria and AreaTematicaId
+    Optional<ConvocatoriaAreaTematica> dataFound = repository.findByConvocatoriaId(5L);
+
+    // then: ConvocatoriaAreaTematica is not found
+    Assertions.assertThat(dataFound).isEqualTo(Optional.empty());
+  }
+
   /**
    * Función que genera ConvocatoriaEntidadGestora
    * 
@@ -116,12 +148,13 @@ public class ConvocatoriaAreaTematicaRepositoryTest extends BaseRepositoryTest {
         .observaciones("observaciones" + suffix)//
         .finalidad(modeloTipoFinalidad.getTipoFinalidad())//
         .regimenConcurrencia(tipoRegimenConcurrencia)//
-        .destinatarios(TipoDestinatarioEnum.INDIVIDUAL)//
+        .destinatarios(Convocatoria.Destinatarios.INDIVIDUAL)//
         .colaborativos(Boolean.TRUE)//
-        .estadoActual(TipoEstadoConvocatoriaEnum.REGISTRADA)//
+        .estado(Convocatoria.Estado.REGISTRADA)//
         .duracion(12)//
         .ambitoGeografico(tipoAmbitoGeografico)//
-        .clasificacionCVN(ClasificacionCVNEnum.AYUDAS).activo(Boolean.TRUE)//
+        .clasificacionCVN(ClasificacionCVN.AYUDAS)//
+        .activo(Boolean.TRUE)//
         .build();
     entityManager.persistAndFlush(convocatoria);
 

@@ -10,7 +10,6 @@ import org.assertj.core.api.Assertions;
 import org.crue.hercules.sgi.csp.exceptions.TipoEnlaceNotFoundException;
 import org.crue.hercules.sgi.csp.model.TipoEnlace;
 import org.crue.hercules.sgi.csp.service.TipoEnlaceService;
-import org.crue.hercules.sgi.framework.data.search.QueryCriteria;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
@@ -42,6 +41,8 @@ public class TipoEnlaceControllerTest extends BaseControllerTest {
   private TipoEnlaceService service;
 
   private static final String PATH_PARAMETER_ID = "/{id}";
+  private static final String PATH_PARAMETER_DESACTIVAR = "/desactivar";
+  private static final String PATH_PARAMETER_REACTIVAR = "/reactivar";
   private static final String CONTROLLER_BASE_PATH = "/tipoenlaces";
 
   @Test
@@ -175,33 +176,88 @@ public class TipoEnlaceControllerTest extends BaseControllerTest {
   }
 
   @Test
-  @WithMockUser(username = "user", authorities = { "CSP-TENL-B" })
-  public void delete_WithExistingId_Return204() throws Exception {
+  @WithMockUser(username = "user", authorities = { "CSP-TENL-X" })
+  public void reactivar_WithExistingId_ReturnTipoEnlace() throws Exception {
     // given: existing id
-    TipoEnlace data = generarMockTipoEnlace(1L, Boolean.TRUE);
-    BDDMockito.given(service.disable(ArgumentMatchers.<Long>any())).willReturn(data);
+    TipoEnlace tipoEnlace = generarMockTipoEnlace(1L, Boolean.FALSE);
 
-    // when: delete by id
+    BDDMockito.given(service.enable(ArgumentMatchers.<Long>any())).willAnswer((InvocationOnMock invocation) -> {
+      TipoEnlace tipoEnlaceEnabled = new TipoEnlace();
+      BeanUtils.copyProperties(tipoEnlace, tipoEnlaceEnabled);
+      tipoEnlaceEnabled.setActivo(Boolean.TRUE);
+      return tipoEnlaceEnabled;
+    });
+
+    // when: enable by id
     mockMvc
-        .perform(MockMvcRequestBuilders.delete(CONTROLLER_BASE_PATH + PATH_PARAMETER_ID, data.getId())
+        .perform(MockMvcRequestBuilders
+            .patch(CONTROLLER_BASE_PATH + PATH_PARAMETER_ID + PATH_PARAMETER_REACTIVAR, tipoEnlace.getId())
             .with(SecurityMockMvcRequestPostProcessors.csrf()).contentType(MediaType.APPLICATION_JSON))
         .andDo(MockMvcResultHandlers.print())
-        // then: 204
-        .andExpect(MockMvcResultMatchers.status().isNoContent());
+        // then: return enabled TipoEnlace
+        .andExpect(MockMvcResultMatchers.status().isOk())
+        .andExpect(MockMvcResultMatchers.jsonPath("id").value(tipoEnlace.getId()))
+        .andExpect(MockMvcResultMatchers.jsonPath("nombre").value(tipoEnlace.getNombre()))
+        .andExpect(MockMvcResultMatchers.jsonPath("descripcion").value(tipoEnlace.getDescripcion()))
+        .andExpect(MockMvcResultMatchers.jsonPath("activo").value(Boolean.TRUE));
+  }
+
+  @Test
+  @WithMockUser(username = "user", authorities = { "CSP-TENL-X" })
+  public void reactivar_NoExistingId_Return404() throws Exception {
+    // given: non existing id
+    Long id = 1L;
+
+    BDDMockito.willThrow(new TipoEnlaceNotFoundException(id)).given(service).enable(ArgumentMatchers.<Long>any());
+
+    // when: enable by non existing id
+    mockMvc
+        .perform(MockMvcRequestBuilders.patch(CONTROLLER_BASE_PATH + PATH_PARAMETER_ID + PATH_PARAMETER_REACTIVAR, id)
+            .with(SecurityMockMvcRequestPostProcessors.csrf()).contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON))
+        .andDo(MockMvcResultHandlers.print())
+        // then: 404 error
+        .andExpect(MockMvcResultMatchers.status().isNotFound());
   }
 
   @Test
   @WithMockUser(username = "user", authorities = { "CSP-TENL-B" })
-  public void delete_NoExistingId_Return404() throws Exception {
+  public void desactivar_WithExistingId_ReturnTipoEnlace() throws Exception {
+    // given: existing id
+    Long idBuscado = 1L;
+    TipoEnlace tipoEnlace = generarMockTipoEnlace(idBuscado, Boolean.TRUE);
+
+    BDDMockito.given(service.disable(ArgumentMatchers.<Long>any())).willAnswer((InvocationOnMock invocation) -> {
+      TipoEnlace tipoEnlaceDisabled = new TipoEnlace();
+      BeanUtils.copyProperties(tipoEnlace, tipoEnlaceDisabled);
+      tipoEnlaceDisabled.setActivo(false);
+      return tipoEnlaceDisabled;
+    });
+
+    // when: disable by id
+    mockMvc
+        .perform(MockMvcRequestBuilders
+            .patch(CONTROLLER_BASE_PATH + PATH_PARAMETER_ID + PATH_PARAMETER_DESACTIVAR, idBuscado)
+            .with(SecurityMockMvcRequestPostProcessors.csrf()).contentType(MediaType.APPLICATION_JSON))
+        .andDo(MockMvcResultHandlers.print())
+        // then: return disabled TipoEnlace
+        .andExpect(MockMvcResultMatchers.status().isOk())
+        .andExpect(MockMvcResultMatchers.jsonPath("id").value(idBuscado))
+        .andExpect(MockMvcResultMatchers.jsonPath("nombre").value(tipoEnlace.getNombre()))
+        .andExpect(MockMvcResultMatchers.jsonPath("descripcion").value(tipoEnlace.getDescripcion()))
+        .andExpect(MockMvcResultMatchers.jsonPath("activo").value(Boolean.FALSE));
+  }
+
+  @Test
+  @WithMockUser(username = "user", authorities = { "CSP-TENL-B" })
+  public void desactivar_NoExistingId_Return404() throws Exception {
     // given: non existing id
     Long id = 1L;
-
-    BDDMockito.willThrow(new TipoEnlaceNotFoundException(id)).given(service).findById(ArgumentMatchers.<Long>any());
     BDDMockito.willThrow(new TipoEnlaceNotFoundException(id)).given(service).disable(ArgumentMatchers.<Long>any());
 
-    // when: delete by non existing id
+    // when: disable by non existing id
     mockMvc
-        .perform(MockMvcRequestBuilders.delete(CONTROLLER_BASE_PATH + PATH_PARAMETER_ID, id)
+        .perform(MockMvcRequestBuilders.patch(CONTROLLER_BASE_PATH + PATH_PARAMETER_ID + PATH_PARAMETER_DESACTIVAR, id)
             .with(SecurityMockMvcRequestPostProcessors.csrf()).contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON))
         .andDo(MockMvcResultHandlers.print())
@@ -258,7 +314,7 @@ public class TipoEnlaceControllerTest extends BaseControllerTest {
       data.add(generarMockTipoEnlace(Long.valueOf(i), Boolean.TRUE));
     }
 
-    BDDMockito.given(service.findAll(ArgumentMatchers.<List<QueryCriteria>>any(), ArgumentMatchers.<Pageable>any()))
+    BDDMockito.given(service.findAll(ArgumentMatchers.<String>any(), ArgumentMatchers.<Pageable>any()))
         .willAnswer(new Answer<Page<TipoEnlace>>() {
           @Override
           public Page<TipoEnlace> answer(InvocationOnMock invocation) throws Throwable {
@@ -303,7 +359,7 @@ public class TipoEnlaceControllerTest extends BaseControllerTest {
   @WithMockUser(username = "user", authorities = { "CSP-TENL-V" })
   public void findAll_EmptyList_Returns204() throws Exception {
     // given: no data TipoEnlace
-    BDDMockito.given(service.findAll(ArgumentMatchers.<List<QueryCriteria>>any(), ArgumentMatchers.<Pageable>any()))
+    BDDMockito.given(service.findAll(ArgumentMatchers.<String>any(), ArgumentMatchers.<Pageable>any()))
         .willAnswer(new Answer<Page<TipoEnlace>>() {
           @Override
           public Page<TipoEnlace> answer(InvocationOnMock invocation) throws Throwable {
@@ -330,8 +386,7 @@ public class TipoEnlaceControllerTest extends BaseControllerTest {
       data.add(generarMockTipoEnlace(Long.valueOf(i), Boolean.TRUE));
     }
 
-    BDDMockito
-        .given(service.findAllTodos(ArgumentMatchers.<List<QueryCriteria>>any(), ArgumentMatchers.<Pageable>any()))
+    BDDMockito.given(service.findAllTodos(ArgumentMatchers.<String>any(), ArgumentMatchers.<Pageable>any()))
         .willAnswer(new Answer<Page<TipoEnlace>>() {
           @Override
           public Page<TipoEnlace> answer(InvocationOnMock invocation) throws Throwable {
@@ -377,8 +432,7 @@ public class TipoEnlaceControllerTest extends BaseControllerTest {
   @WithMockUser(username = "user", authorities = { "CSP-TENL-V" })
   public void findAllTodos_EmptyList_Returns204() throws Exception {
     // given: no data TipoEnlace
-    BDDMockito
-        .given(service.findAllTodos(ArgumentMatchers.<List<QueryCriteria>>any(), ArgumentMatchers.<Pageable>any()))
+    BDDMockito.given(service.findAllTodos(ArgumentMatchers.<String>any(), ArgumentMatchers.<Pageable>any()))
         .willAnswer(new Answer<Page<TipoEnlace>>() {
           @Override
           public Page<TipoEnlace> answer(InvocationOnMock invocation) throws Throwable {

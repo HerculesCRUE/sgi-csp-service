@@ -1,9 +1,7 @@
 package org.crue.hercules.sgi.csp.service;
 
-import java.util.List;
-
+import org.crue.hercules.sgi.csp.model.Convocatoria;
 import org.crue.hercules.sgi.csp.model.TipoDocumento;
-import org.crue.hercules.sgi.framework.data.search.QueryCriteria;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -29,6 +27,14 @@ public interface TipoDocumentoService {
   TipoDocumento update(TipoDocumento tipoDocumentoActualizar);
 
   /**
+   * Reactiva el {@link TipoDocumento}.
+   *
+   * @param id Id del {@link TipoDocumento}.
+   * @return la entidad {@link TipoDocumento} persistida.
+   */
+  TipoDocumento enable(Long id);
+
+  /**
    * Desactiva el {@link TipoDocumento}.
    *
    * @param id Id del {@link TipoDocumento}.
@@ -44,7 +50,7 @@ public interface TipoDocumentoService {
    * @param query    la información del filtro.
    * @return la lista de entidades {@link TipoDocumento} paginadas y/o filtradas.
    */
-  Page<TipoDocumento> findAll(List<QueryCriteria> query, Pageable pageable);
+  Page<TipoDocumento> findAll(String query, Pageable pageable);
 
   /**
    * Obtener todas las entidades {@link TipoDocumento} paginadas y/o filtradas.
@@ -53,7 +59,7 @@ public interface TipoDocumentoService {
    * @param query    la información del filtro.
    * @return la lista de entidades {@link TipoDocumento} paginadas y/o filtradas.
    */
-  Page<TipoDocumento> findAllTodos(List<QueryCriteria> query, Pageable pageable);
+  Page<TipoDocumento> findAllTodos(String query, Pageable pageable);
 
   /**
    * Obtiene {@link TipoDocumento} por su id.
@@ -62,5 +68,15 @@ public interface TipoDocumentoService {
    * @return la entidad {@link TipoDocumento}.
    */
   TipoDocumento findById(Long id);
+
+  /**
+   * Obtener todas las entidades {@link TipoDocumento} asociados a la fase de
+   * presentación de solicitudes de la {@link Convocatoria}.
+   *
+   * @param convocatoriaId identificador de la {@link Convocatoria}.
+   * @param pageable       la información de la paginación.
+   * @return la lista de entidades {@link TipoDocumento} paginadas y/o filtradas.
+   */
+  Page<TipoDocumento> findAllTipoDocumentosFasePresentacionConvocatoria(Long convocatoriaId, Pageable pageable);
 
 }

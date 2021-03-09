@@ -4,8 +4,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 import org.assertj.core.api.Assertions;
-import org.crue.hercules.sgi.csp.enums.TipoEstadoConvocatoriaEnum;
-import org.crue.hercules.sgi.csp.enums.TipoJustificacionEnum;
 import org.crue.hercules.sgi.csp.model.Convocatoria;
 import org.crue.hercules.sgi.csp.model.ConvocatoriaPeriodoJustificacion;
 import org.junit.jupiter.api.Test;
@@ -22,20 +20,34 @@ public class ConvocatoriaPeriodoJustificacionRepositoryTest extends BaseReposito
   public void findAllByConvocatoriaId_ReturnsConvocatoriaPeriodoJustificacion() throws Exception {
 
     // given: 2 ConvocatoriaPeriodoJustificacion para el ConvocatoriaId buscado
-    Convocatoria convocatoria1 = Convocatoria.builder().codigo("codigo-1")
-        .estadoActual(TipoEstadoConvocatoriaEnum.BORRADOR).activo(Boolean.TRUE).colaborativos(Boolean.FALSE).build();
+    Convocatoria convocatoria1 = Convocatoria.builder()//
+        .estado(Convocatoria.Estado.BORRADOR)//
+        .codigo("codigo-1")//
+        .unidadGestionRef("OPE")//
+        .anio(2020)//
+        .titulo("titulo")//
+        .activo(Boolean.TRUE)//
+        .build();
+    ;
     entityManager.persistAndFlush(convocatoria1);
-    Convocatoria convocatoria2 = Convocatoria.builder().codigo("codigo-2")
-        .estadoActual(TipoEstadoConvocatoriaEnum.BORRADOR).activo(Boolean.TRUE).colaborativos(Boolean.FALSE).build();
+    Convocatoria convocatoria2 = Convocatoria.builder()//
+        .estado(Convocatoria.Estado.BORRADOR)//
+        .codigo("codigo-2")//
+        .unidadGestionRef("OPE")//
+        .anio(2020)//
+        .titulo("titulo")//
+        .activo(Boolean.TRUE)//
+        .build();
+    ;
     entityManager.persistAndFlush(convocatoria2);
 
     ConvocatoriaPeriodoJustificacion convocatoriaPeriodoJustificacion1 = new ConvocatoriaPeriodoJustificacion(null,
         convocatoria1, 1, 1, 2, LocalDate.of(2020, 10, 10), LocalDate.of(2020, 11, 20), "observaciones-1",
-        TipoJustificacionEnum.FINAL);
+        ConvocatoriaPeriodoJustificacion.Tipo.FINAL);
     entityManager.persistAndFlush(convocatoriaPeriodoJustificacion1);
     ConvocatoriaPeriodoJustificacion convocatoriaPeriodoJustificacion2 = new ConvocatoriaPeriodoJustificacion(null,
         convocatoria1, 2, 3, 5, LocalDate.of(2020, 12, 10), LocalDate.of(2021, 11, 20), "observaciones-2",
-        TipoJustificacionEnum.PERIODICA);
+        ConvocatoriaPeriodoJustificacion.Tipo.PERIODICO);
     entityManager.persistAndFlush(convocatoriaPeriodoJustificacion2);
 
     Long convocatoriaIdBuscado = convocatoria1.getId();
@@ -58,17 +70,23 @@ public class ConvocatoriaPeriodoJustificacionRepositoryTest extends BaseReposito
       throws Exception {
 
     // given: 2 ConvocatoriaPeriodoJustificacion de una Convocatoria
-    Convocatoria convocatoria1 = Convocatoria.builder().codigo("codigo-1")
-        .estadoActual(TipoEstadoConvocatoriaEnum.BORRADOR).activo(Boolean.TRUE).colaborativos(Boolean.FALSE).build();
+    Convocatoria convocatoria1 = Convocatoria.builder()//
+        .estado(Convocatoria.Estado.BORRADOR)//
+        .codigo("codigo-1")//
+        .unidadGestionRef("OPE")//
+        .anio(2020)//
+        .titulo("titulo")//
+        .activo(Boolean.TRUE)//
+        .build();
     entityManager.persistAndFlush(convocatoria1);
 
     ConvocatoriaPeriodoJustificacion convocatoriaPeriodoJustificacion1 = new ConvocatoriaPeriodoJustificacion(null,
         convocatoria1, 2, 7, 9, LocalDate.of(2020, 12, 10), LocalDate.of(2021, 11, 20), "observaciones-1",
-        TipoJustificacionEnum.PERIODICA);
+        ConvocatoriaPeriodoJustificacion.Tipo.PERIODICO);
     entityManager.persistAndFlush(convocatoriaPeriodoJustificacion1);
     ConvocatoriaPeriodoJustificacion convocatoriaPeriodoJustificacion2 = new ConvocatoriaPeriodoJustificacion(null,
         convocatoria1, 1, 3, 5, LocalDate.of(2020, 10, 10), LocalDate.of(2020, 11, 20), "observaciones-2",
-        TipoJustificacionEnum.PERIODICA);
+        ConvocatoriaPeriodoJustificacion.Tipo.PERIODICO);
     entityManager.persistAndFlush(convocatoriaPeriodoJustificacion2);
 
     Long convocatoriaIdBuscado = convocatoria1.getId();

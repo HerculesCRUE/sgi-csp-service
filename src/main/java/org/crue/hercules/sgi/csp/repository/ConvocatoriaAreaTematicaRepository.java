@@ -20,4 +20,13 @@ public interface ConvocatoriaAreaTematicaRepository
    * @return una {@link ConvocatoriaAreaTematica}
    */
   Optional<ConvocatoriaAreaTematica> findByConvocatoriaIdAndAreaTematicaId(Long convocatoriaId, Long areaTematicaId);
+
+  /**
+   * Obtiene la {@link ConvocatoriaAreaTematica} para una {@link Convocatoria}.
+   *
+   * @param convocatoriaId el id de la {@link Convocatoria}.
+   * @return la entidad {@link ConvocatoriaAreaTematica} de la
+   *         {@link Convocatoria}.
+   */
+  Optional<ConvocatoriaAreaTematica> findByConvocatoriaId(Long convocatoriaId);
 }

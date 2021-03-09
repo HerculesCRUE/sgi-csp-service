@@ -11,12 +11,10 @@ import org.crue.hercules.sgi.csp.repository.TipoHitoRepository;
 import org.crue.hercules.sgi.csp.service.impl.TipoHitoServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.BDDMockito;
 import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
@@ -28,7 +26,6 @@ import org.springframework.data.jpa.domain.Specification;
 /**
  * TipoHitoServiceTest
  */
-@ExtendWith(MockitoExtension.class)
 public class TipoHitoServiceTest extends BaseServiceTest {
 
   @Mock
@@ -64,7 +61,7 @@ public class TipoHitoServiceTest extends BaseServiceTest {
     // given: Un nuevo TipoHito
     TipoHito tipoHito = generarMockTipoHito(null);
 
-    BDDMockito.given(tipoHitoRepository.findByNombre(tipoHito.getNombre())).willReturn(Optional.empty());
+    BDDMockito.given(tipoHitoRepository.findByNombreAndActivoIsTrue(tipoHito.getNombre())).willReturn(Optional.empty());
 
     BDDMockito.given(tipoHitoRepository.save(tipoHito)).will((InvocationOnMock invocation) -> {
       TipoHito tipoHitoCreado = invocation.getArgument(0);
@@ -90,7 +87,8 @@ public class TipoHitoServiceTest extends BaseServiceTest {
     // when: Creamos el TipoHito
     // then: Lanza una excepcion porque el TipoHito ya tiene id
     Assertions.assertThatThrownBy(() -> tipoHitoService.create(tipoHitoNew))
-        .isInstanceOf(IllegalArgumentException.class);
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessage("TipoHito id tiene que ser null para crear un nuevo tipoHito");
   }
 
   @Test
@@ -131,13 +129,15 @@ public class TipoHitoServiceTest extends BaseServiceTest {
     BeanUtils.copyProperties(givenData, newTHito);
     newTHito.setId(null);
 
-    BDDMockito.given(tipoHitoRepository.findByNombre(ArgumentMatchers.anyString())).willReturn(Optional.of(givenData));
+    BDDMockito.given(tipoHitoRepository.findByNombreAndActivoIsTrue(ArgumentMatchers.anyString()))
+        .willReturn(Optional.of(givenData));
 
     Assertions.assertThatThrownBy(
         // when: create TipoHito
         () -> tipoHitoService.create(newTHito))
         // then: throw exception as Nombre already exists
-        .isInstanceOf(IllegalArgumentException.class);
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessage("Ya existe un TipoHito activo con el nombre '%s'", newTHito.getNombre());
   }
 
   @Test
@@ -146,12 +146,14 @@ public class TipoHitoServiceTest extends BaseServiceTest {
     TipoHito tipoHitoUpdated = generarMockTipoHito(1L, "nombreRepetido");
     TipoHito tipoHito = generarMockTipoHito(2L, "nombreRepetido");
 
-    BDDMockito.given(tipoHitoRepository.findByNombre(tipoHitoUpdated.getNombre())).willReturn(Optional.of(tipoHito));
+    BDDMockito.given(tipoHitoRepository.findByNombreAndActivoIsTrue(tipoHitoUpdated.getNombre()))
+        .willReturn(Optional.of(tipoHito));
 
     // when: Actualizamos el TipoHito
     // then: Lanza una excepcion porque ya existe otro TipoHito con ese nombre
     Assertions.assertThatThrownBy(() -> tipoHitoService.update(tipoHitoUpdated))
-        .isInstanceOf(IllegalArgumentException.class);
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessage("Ya existe un TipoHito activo con el nombre '%s'", tipoHito.getNombre());
   }
 
   @Test
@@ -232,6 +234,104 @@ public class TipoHitoServiceTest extends BaseServiceTest {
       TipoHito tipoHito = page.getContent().get(i);
       Assertions.assertThat(tipoHito.getNombre()).isEqualTo("TipoHito" + String.format("%03d", j));
     }
+  }
+
+  @Test
+  public void enable_ReturnsTipoHito() {
+    // given: Un nuevo TipoHito inactivo
+    TipoHito tipoHito = generarMockTipoHito(1L);
+    tipoHito.setActivo(Boolean.FALSE);
+
+    BDDMockito.given(tipoHitoRepository.findById(ArgumentMatchers.<Long>any())).willReturn(Optional.of(tipoHito));
+    BDDMockito.given(tipoHitoRepository.save(ArgumentMatchers.<TipoHito>any())).willAnswer(new Answer<TipoHito>() {
+      @Override
+      public TipoHito answer(InvocationOnMock invocation) throws Throwable {
+        TipoHito givenData = invocation.getArgument(0, TipoHito.class);
+        givenData.setActivo(Boolean.TRUE);
+        return givenData;
+      }
+    });
+
+    // when: activamos el TipoHito
+    TipoHito tipoHitoActualizado = tipoHitoService.enable(tipoHito.getId());
+
+    // then: El TipoHito se activa correctamente.
+    Assertions.assertThat(tipoHitoActualizado).as("isNotNull()").isNotNull();
+    Assertions.assertThat(tipoHitoActualizado.getId()).as("getId()").isEqualTo(1L);
+    Assertions.assertThat(tipoHitoActualizado.getNombre()).as("getNombre()").isEqualTo(tipoHito.getNombre());
+    Assertions.assertThat(tipoHitoActualizado.getDescripcion()).as("getDescripcion()")
+        .isEqualTo(tipoHito.getDescripcion());
+    Assertions.assertThat(tipoHitoActualizado.getActivo()).as("getActivo()").isEqualTo(Boolean.TRUE);
+
+  }
+
+  @Test
+  public void enable_WithIdNotExist_ThrowsTipoFinanciacionNotFoundException() {
+    // given: Un id de un TipoHito que no existe
+    Long idNoExiste = 1L;
+    BDDMockito.given(tipoHitoRepository.findById(ArgumentMatchers.<Long>any())).willReturn(Optional.empty());
+    // when: activamos el TipoHito
+    // then: Lanza una excepcion porque el TipoHito no existe
+    Assertions.assertThatThrownBy(() -> tipoHitoService.enable(idNoExiste))
+        .isInstanceOf(TipoHitoNotFoundException.class);
+  }
+
+  @Test
+  public void enable_WithDuplicatedNombre_ThrowsIllegalArgumentException() {
+    // given: Un TipoHito inactivo con nombre existente
+    TipoHito tipoHitoExistente = generarMockTipoHito(2L);
+    TipoHito tipoHito = generarMockTipoHito(1L);
+    tipoHito.setActivo(Boolean.FALSE);
+
+    BDDMockito.given(tipoHitoRepository.findById(ArgumentMatchers.<Long>any())).willReturn(Optional.of(tipoHito));
+    BDDMockito.given(tipoHitoRepository.findByNombreAndActivoIsTrue(ArgumentMatchers.<String>any()))
+        .willReturn(Optional.of(tipoHitoExistente));
+
+    // when: activamos el TipoHito
+    // then: Lanza una excepcion porque el TipoHito no existe
+    Assertions.assertThatThrownBy(() -> tipoHitoService.enable(tipoHito.getId()))
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessage("Ya existe un TipoHito activo con el nombre '%s'", tipoHito.getNombre());
+
+  }
+
+  @Test
+  public void disable_ReturnsTipoHito() {
+    // given: Un nuevo TipoHito activo
+    TipoHito tipoHito = generarMockTipoHito(1L);
+
+    BDDMockito.given(tipoHitoRepository.findById(ArgumentMatchers.<Long>any())).willReturn(Optional.of(tipoHito));
+    BDDMockito.given(tipoHitoRepository.save(ArgumentMatchers.<TipoHito>any())).willAnswer(new Answer<TipoHito>() {
+      @Override
+      public TipoHito answer(InvocationOnMock invocation) throws Throwable {
+        TipoHito givenData = invocation.getArgument(0, TipoHito.class);
+        givenData.setActivo(Boolean.FALSE);
+        return givenData;
+      }
+    });
+
+    // when: Desactivamos el TipoHito
+    TipoHito tipoHitoActualizado = tipoHitoService.disable(tipoHito.getId());
+
+    // then: El TipoHito se desactiva correctamente.
+    Assertions.assertThat(tipoHitoActualizado).as("isNotNull()").isNotNull();
+    Assertions.assertThat(tipoHitoActualizado.getId()).as("getId()").isEqualTo(1L);
+    Assertions.assertThat(tipoHitoActualizado.getNombre()).as("getNombre()").isEqualTo(tipoHito.getNombre());
+    Assertions.assertThat(tipoHitoActualizado.getDescripcion()).as("getDescripcion()")
+        .isEqualTo(tipoHito.getDescripcion());
+    Assertions.assertThat(tipoHitoActualizado.getActivo()).as("getActivo()").isEqualTo(false);
+
+  }
+
+  @Test
+  public void disable_WithIdNotExist_ThrowsTipoHitoNotFoundException() {
+    // given: Un id de un TipoHito que no existe
+    Long idNoExiste = 1L;
+    BDDMockito.given(tipoHitoRepository.findById(ArgumentMatchers.<Long>any())).willReturn(Optional.empty());
+    // when: desactivamos el TipoHito
+    // then: Lanza una excepcion porque el TipoHito no existe
+    Assertions.assertThatThrownBy(() -> tipoHitoService.disable(idNoExiste))
+        .isInstanceOf(TipoHitoNotFoundException.class);
   }
 
   /**

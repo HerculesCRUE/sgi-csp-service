@@ -14,8 +14,8 @@ import org.crue.hercules.sgi.csp.repository.ConvocatoriaPeriodoSeguimientoCienti
 import org.crue.hercules.sgi.csp.repository.ConvocatoriaRepository;
 import org.crue.hercules.sgi.csp.repository.specification.ConvocatoriaPeriodoSeguimientoCientificoSpecifications;
 import org.crue.hercules.sgi.csp.service.ConvocatoriaPeriodoSeguimientoCientificoService;
-import org.crue.hercules.sgi.framework.data.jpa.domain.QuerySpecification;
-import org.crue.hercules.sgi.framework.data.search.QueryCriteria;
+import org.crue.hercules.sgi.csp.service.ConvocatoriaService;
+import org.crue.hercules.sgi.framework.rsql.SgiRSQLJPASupport;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -37,11 +37,14 @@ public class ConvocatoriaPeriodoSeguimientoCientificoServiceImpl
 
   private final ConvocatoriaPeriodoSeguimientoCientificoRepository repository;
   private final ConvocatoriaRepository convocatoriaRepository;
+  private final ConvocatoriaService convocatoriaService;
 
   public ConvocatoriaPeriodoSeguimientoCientificoServiceImpl(
-      ConvocatoriaPeriodoSeguimientoCientificoRepository repository, ConvocatoriaRepository convocatoriaRepository) {
+      ConvocatoriaPeriodoSeguimientoCientificoRepository repository, ConvocatoriaRepository convocatoriaRepository,
+      ConvocatoriaService convocatoriaService) {
     this.repository = repository;
     this.convocatoriaRepository = convocatoriaRepository;
+    this.convocatoriaService = convocatoriaService;
   }
 
   /**
@@ -71,6 +74,10 @@ public class ConvocatoriaPeriodoSeguimientoCientificoServiceImpl
 
     Convocatoria convocatoria = convocatoriaRepository.findById(convocatoriaId)
         .orElseThrow(() -> new ConvocatoriaNotFoundException(convocatoriaId));
+
+    // comprobar si convocatoria es modificable
+    Assert.isTrue(convocatoriaService.modificable(convocatoria.getId(), convocatoria.getUnidadGestionRef()),
+        "No se puede modificar ConvocatoriaPeriodoSeguimientoCientifico. No tiene los permisos necesarios o la convocatoria está registrada y cuenta con solicitudes o proyectos asociados");
 
     List<ConvocatoriaPeriodoSeguimientoCientifico> convocatoriaPeriodoSeguimientoCientificoesBD = repository
         .findAllByConvocatoriaIdOrderByMesInicial(convocatoriaId);
@@ -175,19 +182,14 @@ public class ConvocatoriaPeriodoSeguimientoCientificoServiceImpl
    *         {@link ConvocatoriaPeriodoSeguimientoCientifico} de la
    *         {@link Convocatoria} paginadas.
    */
-  public Page<ConvocatoriaPeriodoSeguimientoCientifico> findAllByConvocatoria(Long convocatoriaId,
-      List<QueryCriteria> query, Pageable pageable) {
-    log.debug("findAllByConvocatoria(Long convocatoriaId, List<QueryCriteria> query, Pageable pageable) - start");
-    Specification<ConvocatoriaPeriodoSeguimientoCientifico> specByQuery = new QuerySpecification<ConvocatoriaPeriodoSeguimientoCientifico>(
-        query);
-    Specification<ConvocatoriaPeriodoSeguimientoCientifico> specByConvocatoria = ConvocatoriaPeriodoSeguimientoCientificoSpecifications
-        .byConvocatoriaId(convocatoriaId);
-
-    Specification<ConvocatoriaPeriodoSeguimientoCientifico> specs = Specification.where(specByConvocatoria)
-        .and(specByQuery);
+  public Page<ConvocatoriaPeriodoSeguimientoCientifico> findAllByConvocatoria(Long convocatoriaId, String query,
+      Pageable pageable) {
+    log.debug("findAllByConvocatoria(Long convocatoriaId, String query, Pageable pageable) - start");
+    Specification<ConvocatoriaPeriodoSeguimientoCientifico> specs = ConvocatoriaPeriodoSeguimientoCientificoSpecifications
+        .byConvocatoriaId(convocatoriaId).and(SgiRSQLJPASupport.toSpecification(query));
 
     Page<ConvocatoriaPeriodoSeguimientoCientifico> returnValue = repository.findAll(specs, pageable);
-    log.debug("findAllByConvocatoria(Long convocatoriaId, List<QueryCriteria> query, Pageable pageable) - end");
+    log.debug("findAllByConvocatoria(Long convocatoriaId, String query, Pageable pageable) - end");
     return returnValue;
   }
 

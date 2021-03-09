@@ -11,12 +11,10 @@ import org.crue.hercules.sgi.csp.repository.TipoFinalidadRepository;
 import org.crue.hercules.sgi.csp.service.impl.TipoFinalidadServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.BDDMockito;
 import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
@@ -25,7 +23,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 
-@ExtendWith(MockitoExtension.class)
 public class TipoFinalidadServiceTest extends BaseServiceTest {
 
   @Mock
@@ -74,7 +71,7 @@ public class TipoFinalidadServiceTest extends BaseServiceTest {
         // when: create TipoFinalidad
         () -> service.create(data))
         // then: throw exception as id can't be provided
-        .isInstanceOf(IllegalArgumentException.class);
+        .isInstanceOf(IllegalArgumentException.class).hasMessage("Id tiene que ser null para crear TipoFinalidad");
   }
 
   @Test
@@ -86,13 +83,15 @@ public class TipoFinalidadServiceTest extends BaseServiceTest {
     BeanUtils.copyProperties(givenData, newData);
     newData.setId(null);
 
-    BDDMockito.given(repository.findByNombre(ArgumentMatchers.anyString())).willReturn(Optional.of(givenData));
+    BDDMockito.given(repository.findByNombreAndActivoIsTrue(ArgumentMatchers.anyString()))
+        .willReturn(Optional.of(givenData));
 
     Assertions.assertThatThrownBy(
         // when: create TipoFinalidad
         () -> service.create(newData))
         // then: throw exception as Nombre already exists
-        .isInstanceOf(IllegalArgumentException.class);
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessage("Ya existe un TipoFinalidad activo con el nombre '%s'", newData.getNombre());
   }
 
   @Test
@@ -146,7 +145,7 @@ public class TipoFinalidadServiceTest extends BaseServiceTest {
         // when: update TipoFinalidad
         () -> service.update(data))
         // then: throw exception as id must be provided
-        .isInstanceOf(IllegalArgumentException.class);
+        .isInstanceOf(IllegalArgumentException.class).hasMessage("Id no puede ser null para actualizar TipoFinalidad");
   }
 
   @Test
@@ -157,22 +156,79 @@ public class TipoFinalidadServiceTest extends BaseServiceTest {
     BeanUtils.copyProperties(givenData, data);
     data.setId(2L);
 
-    BDDMockito.given(repository.findByNombre(ArgumentMatchers.anyString())).willReturn(Optional.of(givenData));
+    BDDMockito.given(repository.findByNombreAndActivoIsTrue(ArgumentMatchers.anyString()))
+        .willReturn(Optional.of(givenData));
 
     Assertions.assertThatThrownBy(
         // when: update TipoFinalidad
         () -> service.update(data))
         // then: throw exception as Nombre already exists
-        .isInstanceOf(IllegalArgumentException.class);
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessage("Ya existe un TipoFinalidad activo con el nombre '%s'", data.getNombre());
   }
 
   @Test
-  public void disable_WithExistingId_ReturnsTipoFinalidad() {
-    // given: existing TipoFinalidad
-    TipoFinalidad data = generarMockTipoFinalidad(1L, Boolean.TRUE);
+  public void enable_ReturnsTipoFinalidad() {
+    // given: Un nuevo TipoFinalidad inactivo
+    TipoFinalidad tipoFinalidad = generarMockTipoFinalidad(1L, Boolean.FALSE);
 
-    BDDMockito.given(repository.findById(ArgumentMatchers.anyLong())).willReturn(Optional.of(data));
+    BDDMockito.given(repository.findById(ArgumentMatchers.<Long>any())).willReturn(Optional.of(tipoFinalidad));
+    BDDMockito.given(repository.save(ArgumentMatchers.<TipoFinalidad>any())).willAnswer(new Answer<TipoFinalidad>() {
+      @Override
+      public TipoFinalidad answer(InvocationOnMock invocation) throws Throwable {
+        TipoFinalidad givenData = invocation.getArgument(0, TipoFinalidad.class);
+        givenData.setActivo(Boolean.TRUE);
+        return givenData;
+      }
+    });
 
+    // when: activamos el TipoFinalidad
+    TipoFinalidad tipoFinalidadActualizado = service.enable(tipoFinalidad.getId());
+
+    // then: El TipoFinalidad se activa correctamente.
+    Assertions.assertThat(tipoFinalidadActualizado).as("isNotNull()").isNotNull();
+    Assertions.assertThat(tipoFinalidadActualizado.getId()).as("getId()").isEqualTo(1L);
+    Assertions.assertThat(tipoFinalidadActualizado.getNombre()).as("getNombre()").isEqualTo(tipoFinalidad.getNombre());
+    Assertions.assertThat(tipoFinalidadActualizado.getDescripcion()).as("getDescripcion()")
+        .isEqualTo(tipoFinalidad.getDescripcion());
+    Assertions.assertThat(tipoFinalidadActualizado.getActivo()).as("getActivo()").isEqualTo(Boolean.TRUE);
+
+  }
+
+  @Test
+  public void enable_WithIdNotExist_ThrowsTipoFinanciacionNotFoundException() {
+    // given: Un id de un TipoFinalidad que no existe
+    Long idNoExiste = 1L;
+    BDDMockito.given(repository.findById(ArgumentMatchers.<Long>any())).willReturn(Optional.empty());
+    // when: activamos el TipoFinalidad
+    // then: Lanza una excepcion porque el TipoFinalidad no existe
+    Assertions.assertThatThrownBy(() -> service.enable(idNoExiste)).isInstanceOf(TipoFinalidadNotFoundException.class);
+  }
+
+  @Test
+  public void enable_WithDuplicatedNombre_ThrowsIllegalArgumentException() {
+    // given: Un TipoFinalidad inactivo con nombre existente
+    TipoFinalidad tipoFinalidadExistente = generarMockTipoFinalidad(2L, Boolean.TRUE);
+    TipoFinalidad tipoFinalidad = generarMockTipoFinalidad(1L, Boolean.FALSE);
+
+    BDDMockito.given(repository.findById(ArgumentMatchers.<Long>any())).willReturn(Optional.of(tipoFinalidad));
+    BDDMockito.given(repository.findByNombreAndActivoIsTrue(ArgumentMatchers.<String>any()))
+        .willReturn(Optional.of(tipoFinalidadExistente));
+
+    // when: activamos el TipoFinalidad
+    // then: Lanza una excepcion porque el TipoFinalidad no existe
+    Assertions.assertThatThrownBy(() -> service.enable(tipoFinalidad.getId()))
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessage("Ya existe un TipoFinalidad activo con el nombre '%s'", tipoFinalidad.getNombre());
+
+  }
+
+  @Test
+  public void disable_ReturnsTipoFinalidad() {
+    // given: Un nuevo TipoFinalidad activo
+    TipoFinalidad tipoFinalidad = generarMockTipoFinalidad(1L, Boolean.TRUE);
+
+    BDDMockito.given(repository.findById(ArgumentMatchers.<Long>any())).willReturn(Optional.of(tipoFinalidad));
     BDDMockito.given(repository.save(ArgumentMatchers.<TipoFinalidad>any())).willAnswer(new Answer<TipoFinalidad>() {
       @Override
       public TipoFinalidad answer(InvocationOnMock invocation) throws Throwable {
@@ -182,30 +238,27 @@ public class TipoFinalidadServiceTest extends BaseServiceTest {
       }
     });
 
-    // when: disable TipoFinalidad
-    TipoFinalidad disabledData = service.disable(data.getId());
+    // when: Desactivamos el TipoFinalidad
+    TipoFinalidad tipoFinalidadActualizado = service.disable(tipoFinalidad.getId());
 
-    // then: TipoFinalidad is disabled
-    Assertions.assertThat(disabledData).isNotNull();
-    Assertions.assertThat(disabledData.getId()).isNotNull();
-    Assertions.assertThat(disabledData.getId()).isEqualTo(data.getId());
-    Assertions.assertThat(disabledData.getNombre()).isEqualTo(data.getNombre());
-    Assertions.assertThat(disabledData.getDescripcion()).isEqualTo(data.getDescripcion());
-    Assertions.assertThat(disabledData.getActivo()).isEqualTo(Boolean.FALSE);
+    // then: El TipoFinalidad se desactiva correctamente.
+    Assertions.assertThat(tipoFinalidadActualizado).as("isNotNull()").isNotNull();
+    Assertions.assertThat(tipoFinalidadActualizado.getId()).as("getId()").isEqualTo(1L);
+    Assertions.assertThat(tipoFinalidadActualizado.getNombre()).as("getNombre()").isEqualTo(tipoFinalidad.getNombre());
+    Assertions.assertThat(tipoFinalidadActualizado.getDescripcion()).as("getDescripcion()")
+        .isEqualTo(tipoFinalidad.getDescripcion());
+    Assertions.assertThat(tipoFinalidadActualizado.getActivo()).as("getActivo()").isEqualTo(false);
+
   }
 
   @Test
-  public void disable_WithNoExistingId_ThrowsNotFoundException() throws Exception {
-    // given: no existing id
-    TipoFinalidad data = generarMockTipoFinalidad(1L, Boolean.TRUE);
-
-    BDDMockito.given(repository.findById(ArgumentMatchers.anyLong())).willReturn(Optional.empty());
-
-    Assertions.assertThatThrownBy(
-        // when: update non existing TipoFinalidad
-        () -> service.disable(data.getId()))
-        // then: NotFoundException is thrown
-        .isInstanceOf(TipoFinalidadNotFoundException.class);
+  public void disable_WithIdNotExist_ThrowsTipoFinalidadNotFoundException() {
+    // given: Un id de un TipoFinalidad que no existe
+    Long idNoExiste = 1L;
+    BDDMockito.given(repository.findById(ArgumentMatchers.<Long>any())).willReturn(Optional.empty());
+    // when: desactivamos el TipoFinalidad
+    // then: Lanza una excepcion porque el TipoFinalidad no existe
+    Assertions.assertThatThrownBy(() -> service.disable(idNoExiste)).isInstanceOf(TipoFinalidadNotFoundException.class);
   }
 
   @Test

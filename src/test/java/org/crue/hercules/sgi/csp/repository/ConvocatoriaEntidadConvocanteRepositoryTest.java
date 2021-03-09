@@ -3,7 +3,6 @@ package org.crue.hercules.sgi.csp.repository;
 import java.util.Optional;
 
 import org.assertj.core.api.Assertions;
-import org.crue.hercules.sgi.csp.enums.TipoEstadoConvocatoriaEnum;
 import org.crue.hercules.sgi.csp.model.Convocatoria;
 import org.crue.hercules.sgi.csp.model.ConvocatoriaEntidadConvocante;
 import org.junit.jupiter.api.Test;
@@ -21,11 +20,23 @@ public class ConvocatoriaEntidadConvocanteRepositoryTest extends BaseRepositoryT
 
     // given: 2 ConvocatoriaEntidadConvocante de los que 1 coincide con el
     // ConvocatoriaId y EntidadRef buscado
-    Convocatoria convocatoria1 = Convocatoria.builder().codigo("codigo-1")
-        .estadoActual(TipoEstadoConvocatoriaEnum.BORRADOR).activo(Boolean.TRUE).colaborativos(Boolean.FALSE).build();
+    Convocatoria convocatoria1 = Convocatoria.builder()//
+        .estado(Convocatoria.Estado.BORRADOR)//
+        .codigo("codigo-1")//
+        .unidadGestionRef("OPE")//
+        .anio(2020)//
+        .titulo("titulo")//
+        .activo(Boolean.TRUE)//
+        .build();
     entityManager.persistAndFlush(convocatoria1);
-    Convocatoria convocatoria2 = Convocatoria.builder().codigo("codigo-2")
-        .estadoActual(TipoEstadoConvocatoriaEnum.BORRADOR).activo(Boolean.TRUE).colaborativos(Boolean.FALSE).build();
+    Convocatoria convocatoria2 = Convocatoria.builder()//
+        .estado(Convocatoria.Estado.BORRADOR)//
+        .codigo("codigo-2")//
+        .unidadGestionRef("OPE")//
+        .anio(2020)//
+        .titulo("titulo")//
+        .activo(Boolean.TRUE)//
+        .build();
     entityManager.persistAndFlush(convocatoria2);
 
     ConvocatoriaEntidadConvocante convocatoriaEntidadConvocante1 = new ConvocatoriaEntidadConvocante(null,
@@ -56,11 +67,23 @@ public class ConvocatoriaEntidadConvocanteRepositoryTest extends BaseRepositoryT
   public void findByConvocatoriaIdIdAndEntidadRef_ReturnsNull() throws Exception {
     // given: 2 ConvocatoriaEntidadConvocante que no coincide con el ConvocatoriaId
     // y EntidadRef buscado
-    Convocatoria convocatoria1 = Convocatoria.builder().codigo("codigo-1")
-        .estadoActual(TipoEstadoConvocatoriaEnum.BORRADOR).activo(Boolean.TRUE).colaborativos(Boolean.FALSE).build();
+    Convocatoria convocatoria1 = Convocatoria.builder()//
+        .estado(Convocatoria.Estado.BORRADOR)//
+        .codigo("codigo-1")//
+        .unidadGestionRef("OPE")//
+        .anio(2020)//
+        .titulo("titulo")//
+        .activo(Boolean.TRUE)//
+        .build();
     entityManager.persistAndFlush(convocatoria1);
-    Convocatoria convocatoria2 = Convocatoria.builder().codigo("codigo-2")
-        .estadoActual(TipoEstadoConvocatoriaEnum.BORRADOR).activo(Boolean.TRUE).colaborativos(Boolean.FALSE).build();
+    Convocatoria convocatoria2 = Convocatoria.builder()//
+        .estado(Convocatoria.Estado.BORRADOR)//
+        .codigo("codigo-2")//
+        .unidadGestionRef("OPE")//
+        .anio(2020)//
+        .titulo("titulo")//
+        .activo(Boolean.TRUE)//
+        .build();
     entityManager.persistAndFlush(convocatoria2);
 
     ConvocatoriaEntidadConvocante convocatoriaEntidadConvocante1 = new ConvocatoriaEntidadConvocante(null,

@@ -1,7 +1,5 @@
 package org.crue.hercules.sgi.csp.service.impl;
 
-import java.util.List;
-
 import org.crue.hercules.sgi.csp.exceptions.ConvocatoriaEntidadConvocanteNotFoundException;
 import org.crue.hercules.sgi.csp.exceptions.ConvocatoriaNotFoundException;
 import org.crue.hercules.sgi.csp.exceptions.ProgramaNotFoundException;
@@ -12,8 +10,8 @@ import org.crue.hercules.sgi.csp.repository.ConvocatoriaRepository;
 import org.crue.hercules.sgi.csp.repository.ProgramaRepository;
 import org.crue.hercules.sgi.csp.repository.specification.ConvocatoriaEntidadConvocanteSpecifications;
 import org.crue.hercules.sgi.csp.service.ConvocatoriaEntidadConvocanteService;
-import org.crue.hercules.sgi.framework.data.jpa.domain.QuerySpecification;
-import org.crue.hercules.sgi.framework.data.search.QueryCriteria;
+import org.crue.hercules.sgi.csp.service.ConvocatoriaService;
+import org.crue.hercules.sgi.framework.rsql.SgiRSQLJPASupport;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -35,13 +33,16 @@ public class ConvocatoriaEntidadConvocanteServiceImpl implements ConvocatoriaEnt
   private final ConvocatoriaEntidadConvocanteRepository repository;
   private final ConvocatoriaRepository convocatoriaRepository;
   private final ProgramaRepository programaRepository;
+  private final ConvocatoriaService convocatoriaService;
 
   public ConvocatoriaEntidadConvocanteServiceImpl(
       ConvocatoriaEntidadConvocanteRepository convocatoriaEntidadConvocanteRepository,
-      ConvocatoriaRepository convocatoriaRepository, ProgramaRepository programaRepository) {
+      ConvocatoriaRepository convocatoriaRepository, ProgramaRepository programaRepository,
+      ConvocatoriaService convocatoriaService) {
     this.repository = convocatoriaEntidadConvocanteRepository;
     this.convocatoriaRepository = convocatoriaRepository;
     this.programaRepository = programaRepository;
+    this.convocatoriaService = convocatoriaService;
   }
 
   /**
@@ -66,6 +67,12 @@ public class ConvocatoriaEntidadConvocanteServiceImpl implements ConvocatoriaEnt
     convocatoriaEntidadConvocante.setConvocatoria(
         convocatoriaRepository.findById(convocatoriaEntidadConvocante.getConvocatoria().getId()).orElseThrow(
             () -> new ConvocatoriaNotFoundException(convocatoriaEntidadConvocante.getConvocatoria().getId())));
+
+    // comprobar si convocatoria es modificable
+    Assert.isTrue(
+        convocatoriaService.modificable(convocatoriaEntidadConvocante.getConvocatoria().getId(),
+            convocatoriaEntidadConvocante.getConvocatoria().getUnidadGestionRef()),
+        "No se puede crear ConvocatoriaEntidadConvocante. No tiene los permisos necesarios o la convocatoria está registrada y cuenta con solicitudes o proyectos asociados");
 
     Assert.isTrue(
         !repository.findByConvocatoriaIdAndEntidadRef(convocatoriaEntidadConvocante.getConvocatoria().getId(),
@@ -106,6 +113,13 @@ public class ConvocatoriaEntidadConvocanteServiceImpl implements ConvocatoriaEnt
         "ConvocatoriaEntidadConvocante id no puede ser null para actualizar un ConvocatoriaEntidadConvocante");
 
     return repository.findById(convocatoriaEntidadConvocanteActualizar.getId()).map(convocatoriaEntidadConvocante -> {
+
+      // comprobar si convocatoria es modificable
+      Assert.isTrue(
+          convocatoriaService.modificable(convocatoriaEntidadConvocante.getConvocatoria().getId(),
+              convocatoriaEntidadConvocante.getConvocatoria().getUnidadGestionRef()),
+          "No se puede modificar ConvocatoriaEntidadConvocante. No tiene los permisos necesarios o la convocatoria está registrada y cuenta con solicitudes o proyectos asociados");
+
       repository.findByConvocatoriaIdAndEntidadRef(convocatoriaEntidadConvocanteActualizar.getConvocatoria().getId(),
           convocatoriaEntidadConvocanteActualizar.getEntidadRef()).ifPresent(convocatoriaR -> {
             Assert.isTrue(convocatoriaEntidadConvocante.getId() == convocatoriaR.getId(),
@@ -146,9 +160,16 @@ public class ConvocatoriaEntidadConvocanteServiceImpl implements ConvocatoriaEnt
     Assert.notNull(id,
         "ConvocatoriaEntidadConvocante id no puede ser null para desactivar un ConvocatoriaEntidadConvocante");
 
-    if (!repository.existsById(id)) {
-      throw new ConvocatoriaEntidadConvocanteNotFoundException(id);
-    }
+    repository.findById(id).map(convocatoriaEntidadConvocante -> {
+
+      // comprobar si convocatoria es modificable
+      Assert.isTrue(
+          convocatoriaService.modificable(convocatoriaEntidadConvocante.getConvocatoria().getId(),
+              convocatoriaEntidadConvocante.getConvocatoria().getUnidadGestionRef()),
+          "No se puede eliminar ConvocatoriaEntidadConvocante. No tiene los permisos necesarios o la convocatoria está registrada y cuenta con solicitudes o proyectos asociados");
+
+      return convocatoriaEntidadConvocante;
+    }).orElseThrow(() -> new ConvocatoriaEntidadConvocanteNotFoundException(id));
 
     repository.deleteById(id);
     log.debug("delete(Long id) - end");
@@ -179,18 +200,14 @@ public class ConvocatoriaEntidadConvocanteServiceImpl implements ConvocatoriaEnt
    * @return la lista de entidades {@link ConvocatoriaEntidadConvocante} de la
    *         {@link Convocatoria} paginadas.
    */
-  public Page<ConvocatoriaEntidadConvocante> findAllByConvocatoria(Long idConvocatoria, List<QueryCriteria> query,
+  public Page<ConvocatoriaEntidadConvocante> findAllByConvocatoria(Long idConvocatoria, String query,
       Pageable pageable) {
-    log.debug("findAllByConvocatoria(Long idConvocatoria, List<QueryCriteria> query, Pageable pageable) - start");
-    Specification<ConvocatoriaEntidadConvocante> specByQuery = new QuerySpecification<ConvocatoriaEntidadConvocante>(
-        query);
-    Specification<ConvocatoriaEntidadConvocante> specByConvocatoria = ConvocatoriaEntidadConvocanteSpecifications
-        .byConvocatoriaId(idConvocatoria);
-
-    Specification<ConvocatoriaEntidadConvocante> specs = Specification.where(specByConvocatoria).and(specByQuery);
+    log.debug("findAllByConvocatoria(Long idConvocatoria, String query, Pageable pageable) - start");
+    Specification<ConvocatoriaEntidadConvocante> specs = ConvocatoriaEntidadConvocanteSpecifications
+        .byConvocatoriaId(idConvocatoria).and(SgiRSQLJPASupport.toSpecification(query));
 
     Page<ConvocatoriaEntidadConvocante> returnValue = repository.findAll(specs, pageable);
-    log.debug("findAllByConvocatoria(Long idConvocatoria, List<QueryCriteria> query, Pageable pageable) - end");
+    log.debug("findAllByConvocatoria(Long idConvocatoria, String query, Pageable pageable) - end");
     return returnValue;
   }
 

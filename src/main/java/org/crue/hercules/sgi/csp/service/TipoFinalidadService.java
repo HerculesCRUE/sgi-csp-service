@@ -1,9 +1,6 @@
 package org.crue.hercules.sgi.csp.service;
 
-import java.util.List;
-
 import org.crue.hercules.sgi.csp.model.TipoFinalidad;
-import org.crue.hercules.sgi.framework.data.search.QueryCriteria;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -31,6 +28,14 @@ public interface TipoFinalidadService {
   TipoFinalidad update(final TipoFinalidad tipoFinalidadActualizar);
 
   /**
+   * Reactiva el {@link TipoFinalidad}.
+   *
+   * @param id Id del {@link TipoFinalidad}.
+   * @return la entidad {@link TipoFinalidad} persistida.
+   */
+  TipoFinalidad enable(Long id);
+
+  /**
    * Desactiva el {@link TipoFinalidad}.
    *
    * @param id Id del {@link TipoFinalidad}.
@@ -46,7 +51,7 @@ public interface TipoFinalidadService {
    * @param paging información de paginación.
    * @return el listado de entidades {@link TipoFinalidad} paginadas y filtradas.
    */
-  Page<TipoFinalidad> findAll(List<QueryCriteria> query, Pageable paging);
+  Page<TipoFinalidad> findAll(String query, Pageable paging);
 
   /**
    * Obtiene todas las entidades {@link TipoFinalidad} paginadas y filtradas.
@@ -55,7 +60,7 @@ public interface TipoFinalidadService {
    * @param paging información de paginación.
    * @return el listado de entidades {@link TipoFinalidad} paginadas y filtradas.
    */
-  Page<TipoFinalidad> findAllTodos(List<QueryCriteria> query, Pageable paging);
+  Page<TipoFinalidad> findAllTodos(String query, Pageable paging);
 
   /**
    * Obtiene una entidad {@link TipoFinalidad} por id.

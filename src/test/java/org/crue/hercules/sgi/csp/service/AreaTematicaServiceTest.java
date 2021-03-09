@@ -12,12 +12,10 @@ import org.crue.hercules.sgi.csp.repository.AreaTematicaRepository;
 import org.crue.hercules.sgi.csp.service.impl.AreaTematicaServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.BDDMockito;
 import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -28,7 +26,6 @@ import org.springframework.data.jpa.domain.Specification;
 /**
  * AreaTematicaServiceTest
  */
-@ExtendWith(MockitoExtension.class)
 public class AreaTematicaServiceTest extends BaseServiceTest {
 
   @Mock
@@ -549,7 +546,7 @@ public class AreaTematicaServiceTest extends BaseServiceTest {
     // when: Desactivamos el AreaTematica
     AreaTematica areaTematicaActualizado = service.disable(areaTematica.getId());
 
-    // then: El AreaTematica y todos sus hijos se desactivan correctamente
+    // then: El AreaTematica se desactiva correctamente
     Assertions.assertThat(areaTematicaActualizado).as("isNotNull()").isNotNull();
     Assertions.assertThat(areaTematicaActualizado.getId()).as("getId()").isEqualTo(1L);
     Assertions.assertThat(areaTematicaActualizado.getNombre()).as("getNombre()").isEqualTo(areaTematica.getNombre());

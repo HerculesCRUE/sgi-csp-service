@@ -1,14 +1,11 @@
 package org.crue.hercules.sgi.csp.service.impl;
 
-import java.util.List;
-
 import org.crue.hercules.sgi.csp.exceptions.TipoEnlaceNotFoundException;
 import org.crue.hercules.sgi.csp.model.TipoEnlace;
 import org.crue.hercules.sgi.csp.repository.TipoEnlaceRepository;
 import org.crue.hercules.sgi.csp.repository.specification.TipoEnlaceSpecifications;
 import org.crue.hercules.sgi.csp.service.TipoEnlaceService;
-import org.crue.hercules.sgi.framework.data.jpa.domain.QuerySpecification;
-import org.crue.hercules.sgi.framework.data.search.QueryCriteria;
+import org.crue.hercules.sgi.framework.rsql.SgiRSQLJPASupport;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -44,8 +41,8 @@ public class TipoEnlaceServiceImpl implements TipoEnlaceService {
     log.debug("create(TipoEnlace tipoEnlace) - start");
 
     Assert.isNull(tipoEnlace.getId(), "Id tiene que ser null para crear TipoEnlace");
-    Assert.isTrue(!(repository.findByNombre(tipoEnlace.getNombre()).isPresent()),
-        "Ya existe TipoEnlace con el nombre " + tipoEnlace.getNombre());
+    Assert.isTrue(!(repository.findByNombreAndActivoIsTrue(tipoEnlace.getNombre()).isPresent()),
+        "Ya existe un TipoEnlace activo con el nombre '" + tipoEnlace.getNombre() + "'");
 
     tipoEnlace.setActivo(Boolean.TRUE);
     TipoEnlace returnValue = repository.save(tipoEnlace);
@@ -67,20 +64,47 @@ public class TipoEnlaceServiceImpl implements TipoEnlaceService {
     log.debug("update(TipoEnlace tipoEnlace) - start");
 
     Assert.notNull(tipoEnlace.getId(), "Id no puede ser null para actualizar TipoEnlace");
-    repository.findByNombre(tipoEnlace.getNombre()).ifPresent((tipoEnlaceExistente) -> {
+    repository.findByNombreAndActivoIsTrue(tipoEnlace.getNombre()).ifPresent((tipoEnlaceExistente) -> {
       Assert.isTrue(tipoEnlace.getId() == tipoEnlaceExistente.getId(),
-          "Ya existe un TipoEnlace con el nombre " + tipoEnlaceExistente.getNombre());
+          "Ya existe un TipoEnlace activo con el nombre '" + tipoEnlaceExistente.getNombre() + "'");
     });
 
     return repository.findById(tipoEnlace.getId()).map((data) -> {
       data.setNombre(tipoEnlace.getNombre());
       data.setDescripcion(tipoEnlace.getDescripcion());
-      data.setActivo(tipoEnlace.getActivo());
 
       TipoEnlace returnValue = repository.save(data);
       log.debug("update(TipoEnlace tipoEnlace) - end");
       return returnValue;
     }).orElseThrow(() -> new TipoEnlaceNotFoundException(tipoEnlace.getId()));
+  }
+
+  /**
+   * Reactiva el {@link TipoEnlace}.
+   *
+   * @param id Id del {@link TipoEnlace}.
+   * @return la entidad {@link TipoEnlace} persistida.
+   */
+  @Override
+  @Transactional
+  public TipoEnlace enable(Long id) {
+    log.debug("enable(Long id) - start");
+
+    Assert.notNull(id, "TipoEnlace id no puede ser null para reactivar un TipoEnlace");
+
+    return repository.findById(id).map(tipoEnlace -> {
+      if (tipoEnlace.getActivo()) {
+        return tipoEnlace;
+      }
+
+      Assert.isTrue(!(repository.findByNombreAndActivoIsTrue(tipoEnlace.getNombre()).isPresent()),
+          "Ya existe un TipoEnlace activo con el nombre '" + tipoEnlace.getNombre() + "'");
+
+      tipoEnlace.setActivo(true);
+      TipoEnlace returnValue = repository.save(tipoEnlace);
+      log.debug("enable(Long id) - end");
+      return returnValue;
+    }).orElseThrow(() -> new TipoEnlaceNotFoundException(id));
   }
 
   /**
@@ -97,8 +121,11 @@ public class TipoEnlaceServiceImpl implements TipoEnlaceService {
     Assert.notNull(id, "TipoEnlace id no puede ser null para desactivar un TipoEnlace");
 
     return repository.findById(id).map(tipoEnlace -> {
-      tipoEnlace.setActivo(false);
+      if (!tipoEnlace.getActivo()) {
+        return tipoEnlace;
+      }
 
+      tipoEnlace.setActivo(false);
       TipoEnlace returnValue = repository.save(tipoEnlace);
       log.debug("disable(Long id) - end");
       return returnValue;
@@ -113,15 +140,12 @@ public class TipoEnlaceServiceImpl implements TipoEnlaceService {
    * @return el listado de entidades {@link TipoEnlace} paginadas y filtradas.
    */
   @Override
-  public Page<TipoEnlace> findAll(List<QueryCriteria> query, Pageable paging) {
-    log.debug("findAll(List<QueryCriteria> query, Pageable paging) - start");
-    Specification<TipoEnlace> specByQuery = new QuerySpecification<TipoEnlace>(query);
-    Specification<TipoEnlace> specActivos = TipoEnlaceSpecifications.activos();
-
-    Specification<TipoEnlace> specs = Specification.where(specActivos).and(specByQuery);
+  public Page<TipoEnlace> findAll(String query, Pageable paging) {
+    log.debug("findAll(String query, Pageable paging) - start");
+    Specification<TipoEnlace> specs = TipoEnlaceSpecifications.activos().and(SgiRSQLJPASupport.toSpecification(query));
 
     Page<TipoEnlace> returnValue = repository.findAll(specs, paging);
-    log.debug("findAll(List<QueryCriteria> query, Pageable paging) - end");
+    log.debug("findAll(String query, Pageable paging) - end");
     return returnValue;
   }
 
@@ -133,11 +157,11 @@ public class TipoEnlaceServiceImpl implements TipoEnlaceService {
    * @return el listado de entidades {@link TipoEnlace} paginadas y filtradas.
    */
   @Override
-  public Page<TipoEnlace> findAllTodos(List<QueryCriteria> query, Pageable paging) {
-    log.debug("findAllTodos(List<QueryCriteria> query, Pageable paging) - start");
-    Specification<TipoEnlace> spec = new QuerySpecification<TipoEnlace>(query);
-    Page<TipoEnlace> returnValue = repository.findAll(spec, paging);
-    log.debug("findAllTodos(List<QueryCriteria> query, Pageable paging) - end");
+  public Page<TipoEnlace> findAllTodos(String query, Pageable paging) {
+    log.debug("findAllTodos(String query, Pageable paging) - start");
+    Specification<TipoEnlace> specs = SgiRSQLJPASupport.toSpecification(query);
+    Page<TipoEnlace> returnValue = repository.findAll(specs, paging);
+    log.debug("findAllTodos(String query, Pageable paging) - end");
     return returnValue;
   }
 

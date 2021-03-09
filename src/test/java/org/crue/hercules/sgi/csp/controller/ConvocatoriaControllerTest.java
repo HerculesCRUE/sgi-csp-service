@@ -1,6 +1,7 @@
 package org.crue.hercules.sgi.csp.controller;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -9,17 +10,13 @@ import java.util.List;
 import com.fasterxml.jackson.core.type.TypeReference;
 
 import org.assertj.core.api.Assertions;
-import org.crue.hercules.sgi.csp.enums.ClasificacionCVNEnum;
-import org.crue.hercules.sgi.csp.enums.TipoDestinatarioEnum;
-import org.crue.hercules.sgi.csp.enums.TipoEstadoConvocatoriaEnum;
-import org.crue.hercules.sgi.csp.enums.TipoJustificacionEnum;
+import org.crue.hercules.sgi.csp.enums.ClasificacionCVN;
 import org.crue.hercules.sgi.csp.exceptions.ConvocatoriaNotFoundException;
 import org.crue.hercules.sgi.csp.model.AreaTematica;
 import org.crue.hercules.sgi.csp.model.ConceptoGasto;
 import org.crue.hercules.sgi.csp.model.Convocatoria;
 import org.crue.hercules.sgi.csp.model.ConvocatoriaAreaTematica;
 import org.crue.hercules.sgi.csp.model.ConvocatoriaConceptoGasto;
-import org.crue.hercules.sgi.csp.model.ConvocatoriaConceptoGastoCodigoEc;
 import org.crue.hercules.sgi.csp.model.ConvocatoriaDocumento;
 import org.crue.hercules.sgi.csp.model.ConvocatoriaEnlace;
 import org.crue.hercules.sgi.csp.model.ConvocatoriaEntidadConvocante;
@@ -54,7 +51,6 @@ import org.crue.hercules.sgi.csp.service.ConvocatoriaHitoService;
 import org.crue.hercules.sgi.csp.service.ConvocatoriaPeriodoJustificacionService;
 import org.crue.hercules.sgi.csp.service.ConvocatoriaPeriodoSeguimientoCientificoService;
 import org.crue.hercules.sgi.csp.service.ConvocatoriaService;
-import org.crue.hercules.sgi.framework.data.search.QueryCriteria;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
@@ -113,6 +109,11 @@ public class ConvocatoriaControllerTest extends BaseControllerTest {
   private static final String PATH_PARAMETER_REACTIVAR = "/reactivar";
   private static final String PATH_PARAMETER_REGISTRAR = "/registrar";
   private static final String PATH_PARAMETER_TODOS = "/todos";
+  private static final String PATH_PARAMETER_VINCULACIONES = "/vinculaciones";
+  private static final String PATH_PARAMETER_MODIFICABLE = "/modificable";
+  private static final String PATH_PARAMETER_REGISTRABLE = "/registrable";
+  private static final String PATH_PARAMETER_UNIDAD_GESTION = "/unidadgestion";
+  private static final String PATH_PARAMETER_MODELO_EJECUCION = "/modeloejecucion";
   private static final String CONTROLLER_BASE_PATH = "/convocatorias";
   private static final String PATH_AREA_TEMATICA = "/convocatoriaareatematicas";
   private static final String PATH_ENTIDAD_DOCUMENTO = "/convocatoriadocumentos";
@@ -127,8 +128,6 @@ public class ConvocatoriaControllerTest extends BaseControllerTest {
   private static final String PATH_CONCEPTO_GASTO_PERMITIDO = "/convocatoriagastos/permitidos";
   private static final String PATH_CONCEPTO_GASTO_NO_PERMITIDO = "/convocatoriagastos/nopermitidos";
   private static final String PATH_PARAMETER_RESTRINGIDOS = "/restringidos";
-  private static final String PATH_CONCEPTO_GASTO_CODIGO_EC_PERMITIDO = "/convocatoriagastocodigoec/permitidos";
-  private static final String PATH_CONCEPTO_GASTO_CODIGO_EC_NO_PERMITIDO = "/convocatoriagastocodigoec/nopermitidos";
 
   @Test
   @WithMockUser(username = "user", authorities = { "CSP-CONV-C" })
@@ -189,14 +188,14 @@ public class ConvocatoriaControllerTest extends BaseControllerTest {
         .andExpect(MockMvcResultMatchers.jsonPath("finalidad.id").value(convocatoriaExistente.getFinalidad().getId()))
         .andExpect(MockMvcResultMatchers.jsonPath("regimenConcurrencia.id")
             .value(convocatoriaExistente.getRegimenConcurrencia().getId()))
-        .andExpect(MockMvcResultMatchers.jsonPath("destinatarios").value(TipoDestinatarioEnum.INDIVIDUAL.getValue()))
-        .andExpect(MockMvcResultMatchers.jsonPath("colaborativos").value(convocatoriaExistente.getColaborativos()))
         .andExpect(
-            MockMvcResultMatchers.jsonPath("estadoActual").value(TipoEstadoConvocatoriaEnum.REGISTRADA.getValue()))
+            MockMvcResultMatchers.jsonPath("destinatarios").value(Convocatoria.Destinatarios.INDIVIDUAL.toString()))
+        .andExpect(MockMvcResultMatchers.jsonPath("colaborativos").value(convocatoriaExistente.getColaborativos()))
+        .andExpect(MockMvcResultMatchers.jsonPath("estado").value(Convocatoria.Estado.REGISTRADA.toString()))
         .andExpect(MockMvcResultMatchers.jsonPath("duracion").value(convocatoriaExistente.getDuracion()))
         .andExpect(MockMvcResultMatchers.jsonPath("ambitoGeografico.id")
             .value(convocatoriaExistente.getAmbitoGeografico().getId()))
-        .andExpect(MockMvcResultMatchers.jsonPath("clasificacionCVN").value(ClasificacionCVNEnum.AYUDAS.getValue()))
+        .andExpect(MockMvcResultMatchers.jsonPath("clasificacionCVN").value(ClasificacionCVN.AYUDAS.toString()))
         .andExpect(MockMvcResultMatchers.jsonPath("activo").value(convocatoriaExistente.getActivo()));
   }
 
@@ -226,7 +225,7 @@ public class ConvocatoriaControllerTest extends BaseControllerTest {
   public void registrar_WithEstadoBorradorAnddExistingId_ReturnsConvocatoria() throws Exception {
     // given: existing Convocatoria with estado Borrador
     Convocatoria convocatoriaBorradorExistente = generarMockConvocatoria(1L, 1L, 1L, 1L, 1L, 1L, Boolean.TRUE);
-    convocatoriaBorradorExistente.setEstadoActual(TipoEstadoConvocatoriaEnum.BORRADOR);
+    convocatoriaBorradorExistente.setEstado(Convocatoria.Estado.BORRADOR);
     Convocatoria convocatoriaRegistrada = generarMockConvocatoria(1L, 1L, 1L, 1L, 1L, 1L, Boolean.TRUE);
 
     BDDMockito.given(service.findById(ArgumentMatchers.<Long>any())).willReturn(convocatoriaBorradorExistente);
@@ -257,15 +256,15 @@ public class ConvocatoriaControllerTest extends BaseControllerTest {
             MockMvcResultMatchers.jsonPath("finalidad.id").value(convocatoriaBorradorExistente.getFinalidad().getId()))
         .andExpect(MockMvcResultMatchers.jsonPath("regimenConcurrencia.id")
             .value(convocatoriaBorradorExistente.getRegimenConcurrencia().getId()))
-        .andExpect(MockMvcResultMatchers.jsonPath("destinatarios").value(TipoDestinatarioEnum.INDIVIDUAL.getValue()))
+        .andExpect(
+            MockMvcResultMatchers.jsonPath("destinatarios").value(Convocatoria.Destinatarios.INDIVIDUAL.toString()))
         .andExpect(
             MockMvcResultMatchers.jsonPath("colaborativos").value(convocatoriaBorradorExistente.getColaborativos()))
-        .andExpect(
-            MockMvcResultMatchers.jsonPath("estadoActual").value(TipoEstadoConvocatoriaEnum.REGISTRADA.getValue()))
+        .andExpect(MockMvcResultMatchers.jsonPath("estado").value(Convocatoria.Estado.REGISTRADA.toString()))
         .andExpect(MockMvcResultMatchers.jsonPath("duracion").value(convocatoriaBorradorExistente.getDuracion()))
         .andExpect(MockMvcResultMatchers.jsonPath("ambitoGeografico.id")
             .value(convocatoriaBorradorExistente.getAmbitoGeografico().getId()))
-        .andExpect(MockMvcResultMatchers.jsonPath("clasificacionCVN").value(ClasificacionCVNEnum.AYUDAS.getValue()))
+        .andExpect(MockMvcResultMatchers.jsonPath("clasificacionCVN").value(ClasificacionCVN.AYUDAS.toString()))
         .andExpect(MockMvcResultMatchers.jsonPath("activo").value(convocatoriaBorradorExistente.getActivo()));
   }
 
@@ -274,7 +273,7 @@ public class ConvocatoriaControllerTest extends BaseControllerTest {
   public void registrar_WithEstadoBorradorAndNoExistingId_Returns404() throws Exception {
     // given: a Convocatoria with non existing id
     Convocatoria convocatoriaBorradorExistente = generarMockConvocatoria(1L, 1L, 1L, 1L, 1L, 1L, Boolean.TRUE);
-    convocatoriaBorradorExistente.setEstadoActual(TipoEstadoConvocatoriaEnum.BORRADOR);
+    convocatoriaBorradorExistente.setEstado(Convocatoria.Estado.BORRADOR);
 
     BDDMockito.willThrow(new ConvocatoriaNotFoundException(convocatoriaBorradorExistente.getId())).given(service)
         .findById(ArgumentMatchers.<Long>any());
@@ -381,6 +380,216 @@ public class ConvocatoriaControllerTest extends BaseControllerTest {
 
   @Test
   @WithMockUser(username = "user", authorities = { "CSP-CONV-V" })
+  public void vinculaciones_ConvocatoriaIdWithVinculaciones_Returns200() throws Exception {
+    // given: Existing id with vinculaciones
+    Long id = 1L;
+    BDDMockito.given(service.tieneVinculaciones(ArgumentMatchers.anyLong())).willReturn(Boolean.TRUE);
+
+    // when: check vinculaciones by convocatoriaId
+    mockMvc
+        .perform(
+            MockMvcRequestBuilders.head(CONTROLLER_BASE_PATH + PATH_PARAMETER_ID + PATH_PARAMETER_VINCULACIONES, id)
+                .with(SecurityMockMvcRequestPostProcessors.csrf()))
+        .andDo(MockMvcResultHandlers.print())
+        // then: 200 OK
+        .andExpect(MockMvcResultMatchers.status().isOk());
+  }
+
+  @Test
+  @WithMockUser(username = "user", authorities = { "CSP-CONV-V" })
+  public void vinculaciones_ConvocatoriaIdWithoutVinculaciones_Returns204() throws Exception {
+    // given: Existing id without vinculaciones
+    Long id = 1L;
+    BDDMockito.given(service.tieneVinculaciones(ArgumentMatchers.anyLong())).willReturn(Boolean.FALSE);
+
+    // when: check vinculaciones by convocatoriaId
+    mockMvc
+        .perform(
+            MockMvcRequestBuilders.head(CONTROLLER_BASE_PATH + PATH_PARAMETER_ID + PATH_PARAMETER_VINCULACIONES, id)
+                .with(SecurityMockMvcRequestPostProcessors.csrf()))
+        .andDo(MockMvcResultHandlers.print())
+        // then: 204 No Content
+        .andExpect(MockMvcResultMatchers.status().isNoContent());
+  }
+
+  @Test
+  @WithMockUser(username = "user", authorities = { "CSP-CONV-V" })
+  public void modificable_ConvocatoriaRegistradaWithSolicitudesOrProyectosIsTrue_Returns204() throws Exception {
+    // given: Existing id convocatoria registrada with Solicitudes or Proyectos
+    Long id = 1L;
+    BDDMockito.given(service.modificable(ArgumentMatchers.<Long>any(), ArgumentMatchers.<String>any()))
+        .willReturn(Boolean.FALSE);
+
+    // when: check modificable by convocatoriaId
+    mockMvc
+        .perform(MockMvcRequestBuilders.head(CONTROLLER_BASE_PATH + PATH_PARAMETER_ID + PATH_PARAMETER_MODIFICABLE, id)
+            .with(SecurityMockMvcRequestPostProcessors.csrf()))
+        .andDo(MockMvcResultHandlers.print())
+        // then: 204 No Content
+        .andExpect(MockMvcResultMatchers.status().isNoContent());
+  }
+
+  @Test
+  @WithMockUser(username = "user", authorities = { "CSP-CONV-V" })
+  public void modificable_ConvocatoriaRegistradaOrWithSolicitudesOrProyectosIsFalse_Returns200() throws Exception {
+    // given: Existing id in any Estado without Solicitudes or Proyectos
+    Long id = 1L;
+    BDDMockito.given(service.modificable(ArgumentMatchers.<Long>any(), ArgumentMatchers.<String>any()))
+        .willReturn(Boolean.TRUE);
+
+    // when: check modificable by convocatoriaId
+    mockMvc
+        .perform(MockMvcRequestBuilders.head(CONTROLLER_BASE_PATH + PATH_PARAMETER_ID + PATH_PARAMETER_MODIFICABLE, id)
+            .with(SecurityMockMvcRequestPostProcessors.csrf()))
+        .andDo(MockMvcResultHandlers.print())
+        // then: 200 OK
+        .andExpect(MockMvcResultMatchers.status().isOk());
+  }
+
+  @Test
+  @WithMockUser(username = "user", authorities = { "CSP-CONV-V" })
+  public void registrable_ConvocatoriaRegistrable_Returns200() throws Exception {
+    // given: Existing id convocatoria registrable
+    Long id = 1L;
+    BDDMockito.given(service.registrable(ArgumentMatchers.<Long>any())).willReturn(Boolean.TRUE);
+
+    // when: check registrable by convocatoriaId
+    mockMvc
+        .perform(MockMvcRequestBuilders.head(CONTROLLER_BASE_PATH + PATH_PARAMETER_ID + PATH_PARAMETER_REGISTRABLE, id)
+            .with(SecurityMockMvcRequestPostProcessors.csrf()))
+        .andDo(MockMvcResultHandlers.print())
+        // then: 200 Ok
+        .andExpect(MockMvcResultMatchers.status().isOk());
+  }
+
+  @Test
+  @WithMockUser(username = "user", authorities = { "CSP-CONV-V" })
+  public void registrable_ConvocatoriaNoRegistrable_Returns204() throws Exception {
+    // given: Existing id convocatoria NO registrable
+    Long id = 1L;
+    BDDMockito.given(service.registrable(ArgumentMatchers.<Long>any())).willReturn(Boolean.FALSE);
+
+    // when: check registrable by convocatoriaId
+    mockMvc
+        .perform(MockMvcRequestBuilders.head(CONTROLLER_BASE_PATH + PATH_PARAMETER_ID + PATH_PARAMETER_REGISTRABLE, id)
+            .with(SecurityMockMvcRequestPostProcessors.csrf()))
+        .andDo(MockMvcResultHandlers.print())
+        // then: 204 No Content
+        .andExpect(MockMvcResultMatchers.status().isNoContent());
+  }
+
+  @Test
+  @WithMockUser(username = "user", authorities = { "CSP-CONV-V" })
+  public void existsById_WithExistingId_Returns200() throws Exception {
+    // given: existing id
+    Long id = 1L;
+    BDDMockito.given(service.existsById(ArgumentMatchers.anyLong())).willReturn(Boolean.TRUE);
+
+    // when: exists by id
+    mockMvc
+        .perform(MockMvcRequestBuilders.head(CONTROLLER_BASE_PATH + PATH_PARAMETER_ID, id)
+            .with(SecurityMockMvcRequestPostProcessors.csrf()))
+        .andDo(MockMvcResultHandlers.print())
+        // then: 200 OK
+        .andExpect(MockMvcResultMatchers.status().isOk());
+  }
+
+  @Test
+  @WithMockUser(username = "user", authorities = { "CSP-CONV-V" })
+  public void existsById_WithNoExistingId_Returns204() throws Exception {
+    // given: no existing id
+    Long id = 1L;
+    BDDMockito.given(service.existsById(ArgumentMatchers.anyLong())).willReturn(Boolean.FALSE);
+
+    // when: exists by id
+    mockMvc
+        .perform(MockMvcRequestBuilders.head(CONTROLLER_BASE_PATH + PATH_PARAMETER_ID, id)
+            .with(SecurityMockMvcRequestPostProcessors.csrf()))
+        .andDo(MockMvcResultHandlers.print())
+        // then: 204 No Content
+        .andExpect(MockMvcResultMatchers.status().isNoContent());
+  }
+
+  @Test
+  @WithMockUser(username = "user", authorities = { "CSP-CONV-V" })
+  public void getUnidadGestionRef_WithExistingId_ReturnsUnidadGestionRef() throws Exception {
+    // given: existing Convocatoria id
+    Convocatoria convocatoriaExistente = generarMockConvocatoria(1L, 1L, 1L, 1L, 1L, 1L, Boolean.TRUE);
+    convocatoriaExistente.setUnidadGestionRef("OPE");
+    BDDMockito.given(service.getUnidadGestionRef(ArgumentMatchers.<Long>any()))
+        .willReturn(convocatoriaExistente.getUnidadGestionRef());
+
+    // when: getUnidadGestionRef by existing Convocatoria id
+    mockMvc
+        .perform(
+            MockMvcRequestBuilders.get(CONTROLLER_BASE_PATH + PATH_PARAMETER_ID + PATH_PARAMETER_UNIDAD_GESTION, 1L)
+                .with(SecurityMockMvcRequestPostProcessors.csrf()).accept(MediaType.APPLICATION_JSON))
+        .andDo(MockMvcResultHandlers.print())
+        // then: response is OK
+        .andExpect(MockMvcResultMatchers.status().isOk())
+        // and the requested Convocatoria is resturned as JSON object
+        .andExpect(MockMvcResultMatchers.content().string(convocatoriaExistente.getUnidadGestionRef()));
+  }
+
+  @Test
+  @WithMockUser(username = "user", authorities = { "CSP-CONV-V" })
+  public void getUnidadGestionRef_WithNoExistingId_Returns404() throws Exception {
+    // given: no existing Convocatoria id
+    BDDMockito.given(service.getUnidadGestionRef(ArgumentMatchers.anyLong())).will((InvocationOnMock invocation) -> {
+      throw new ConvocatoriaNotFoundException(1L);
+    });
+
+    // when: getUnidadGestionRef by non existing Convocatoria id
+    mockMvc
+        .perform(
+            MockMvcRequestBuilders.get(CONTROLLER_BASE_PATH + PATH_PARAMETER_ID + PATH_PARAMETER_UNIDAD_GESTION, 1L)
+                .with(SecurityMockMvcRequestPostProcessors.csrf()).accept(MediaType.APPLICATION_JSON))
+        .andDo(MockMvcResultHandlers.print()).
+        // then: HTTP code 404 NotFound pressent
+        andExpect(MockMvcResultMatchers.status().isNotFound());
+  }
+
+  @Test
+  @WithMockUser(username = "user", authorities = { "CSP-CONV-V" })
+  public void getModeloEjecucion_WithExistingId_ReturnsModeloEjecucion() throws Exception {
+    // given: existing Convocatoria id
+    Convocatoria convocatoriaExistente = generarMockConvocatoria(1L, 1L, 1L, 1L, 1L, 1L, Boolean.TRUE);
+    convocatoriaExistente.getModeloEjecucion().setId(99L);
+    BDDMockito.given(service.getModeloEjecucion(ArgumentMatchers.<Long>any()))
+        .willReturn(convocatoriaExistente.getModeloEjecucion());
+
+    // when: getModeloEjecucion by existing Convocatoria id
+    mockMvc
+        .perform(
+            MockMvcRequestBuilders.get(CONTROLLER_BASE_PATH + PATH_PARAMETER_ID + PATH_PARAMETER_MODELO_EJECUCION, 1L)
+                .with(SecurityMockMvcRequestPostProcessors.csrf()).accept(MediaType.APPLICATION_JSON))
+        .andDo(MockMvcResultHandlers.print())
+        // then: response is OK
+        .andExpect(MockMvcResultMatchers.status().isOk())
+        // and the requested ModeloEjecucion is resturned as JSON object
+        .andExpect(MockMvcResultMatchers.jsonPath("id").value(99L));
+  }
+
+  @Test
+  @WithMockUser(username = "user", authorities = { "CSP-CONV-V" })
+  public void getModeloEjecucion_WithNoExistingId_Returns404() throws Exception {
+    // given: no existing Convocatoria id
+    BDDMockito.given(service.getModeloEjecucion(ArgumentMatchers.anyLong())).will((InvocationOnMock invocation) -> {
+      throw new ConvocatoriaNotFoundException(1L);
+    });
+
+    // when: getModeloEjecucion by non existing Convocatoria id
+    mockMvc
+        .perform(
+            MockMvcRequestBuilders.get(CONTROLLER_BASE_PATH + PATH_PARAMETER_ID + PATH_PARAMETER_MODELO_EJECUCION, 1L)
+                .with(SecurityMockMvcRequestPostProcessors.csrf()).accept(MediaType.APPLICATION_JSON))
+        .andDo(MockMvcResultHandlers.print()).
+        // then: HTTP code 404 NotFound pressent
+        andExpect(MockMvcResultMatchers.status().isNotFound());
+  }
+
+  @Test
+  @WithMockUser(username = "user", authorities = { "CSP-CONV-V" })
   public void findById_WithExistingId_ReturnsConvocatoria() throws Exception {
     // given: existing id
     Convocatoria convocatoriaExistente = generarMockConvocatoria(1L, 1L, 1L, 1L, 1L, 1L, Boolean.TRUE);
@@ -426,7 +635,7 @@ public class ConvocatoriaControllerTest extends BaseControllerTest {
       }
     }
 
-    BDDMockito.given(service.findAll(ArgumentMatchers.<List<QueryCriteria>>any(), ArgumentMatchers.<Pageable>any()))
+    BDDMockito.given(service.findAll(ArgumentMatchers.<String>any(), ArgumentMatchers.<Pageable>any()))
         .willAnswer(new Answer<Page<Convocatoria>>() {
           @Override
           public Page<Convocatoria> answer(InvocationOnMock invocation) throws Throwable {
@@ -478,8 +687,7 @@ public class ConvocatoriaControllerTest extends BaseControllerTest {
           generarMockConvocatoria(Long.valueOf(i), 1L, 1L, 1L, 1L, 1L, (i % 2 == 0) ? Boolean.TRUE : Boolean.FALSE));
     }
 
-    BDDMockito
-        .given(service.findAllTodos(ArgumentMatchers.<List<QueryCriteria>>any(), ArgumentMatchers.<Pageable>any()))
+    BDDMockito.given(service.findAllTodos(ArgumentMatchers.<String>any(), ArgumentMatchers.<Pageable>any()))
         .willAnswer(new Answer<Page<Convocatoria>>() {
           @Override
           public Page<Convocatoria> answer(InvocationOnMock invocation) throws Throwable {
@@ -532,10 +740,8 @@ public class ConvocatoriaControllerTest extends BaseControllerTest {
           generarMockConvocatoria(Long.valueOf(i), 1L, 1L, 1L, 1L, 1L, (i % 2 == 0) ? Boolean.TRUE : Boolean.FALSE));
     }
 
-    BDDMockito
-        .given(service.findAllTodosRestringidos(ArgumentMatchers.<List<QueryCriteria>>any(),
-            ArgumentMatchers.<Pageable>any(), ArgumentMatchers.<List<String>>any()))
-        .willAnswer(new Answer<Page<Convocatoria>>() {
+    BDDMockito.given(service.findAllTodosRestringidos(ArgumentMatchers.<String>any(), ArgumentMatchers.<Pageable>any(),
+        ArgumentMatchers.<List<String>>any())).willAnswer(new Answer<Page<Convocatoria>>() {
           @Override
           public Page<Convocatoria> answer(InvocationOnMock invocation) throws Throwable {
             Pageable pageable = invocation.getArgument(1, Pageable.class);
@@ -581,7 +787,7 @@ public class ConvocatoriaControllerTest extends BaseControllerTest {
   @WithMockUser(username = "user", authorities = { "CSP-CONV-V" })
   public void findAll_EmptyList_Returns204() throws Exception {
     // given: no data Convocatoria
-    BDDMockito.given(service.findAll(ArgumentMatchers.<List<QueryCriteria>>any(), ArgumentMatchers.<Pageable>any()))
+    BDDMockito.given(service.findAll(ArgumentMatchers.<String>any(), ArgumentMatchers.<Pageable>any()))
         .willAnswer(new Answer<Page<Convocatoria>>() {
           @Override
           public Page<Convocatoria> answer(InvocationOnMock invocation) throws Throwable {
@@ -594,6 +800,82 @@ public class ConvocatoriaControllerTest extends BaseControllerTest {
     mockMvc
         .perform(MockMvcRequestBuilders.get(CONTROLLER_BASE_PATH).with(SecurityMockMvcRequestPostProcessors.csrf())
             .header("X-Page", "3").header("X-Page-Size", "10").accept(MediaType.APPLICATION_JSON))
+        .andDo(MockMvcResultHandlers.print())
+        // then: returns 204
+        .andExpect(MockMvcResultMatchers.status().isNoContent());
+  }
+
+  @Test
+  @WithMockUser(username = "user", authorities = { "SYSADMIN" })
+  public void findAllRestringidos_WithPaging_ReturnsConvocatoriaSubList() throws Exception {
+    // given: One hundred Convocatoria
+    List<Convocatoria> convocatorias = new ArrayList<>();
+    for (int i = 1; i <= 100; i++) {
+      convocatorias.add(
+          generarMockConvocatoria(Long.valueOf(i), 1L, 1L, 1L, 1L, 1L, (i % 2 == 0) ? Boolean.TRUE : Boolean.FALSE));
+    }
+
+    BDDMockito.given(service.findAllRestringidos(ArgumentMatchers.<String>any(), ArgumentMatchers.<Pageable>any(),
+        ArgumentMatchers.<List<String>>any())).willAnswer(new Answer<Page<Convocatoria>>() {
+          @Override
+          public Page<Convocatoria> answer(InvocationOnMock invocation) throws Throwable {
+            Pageable pageable = invocation.getArgument(1, Pageable.class);
+            int size = pageable.getPageSize();
+            int index = pageable.getPageNumber();
+            int fromIndex = size * index;
+            int toIndex = fromIndex + size;
+            List<Convocatoria> content = convocatorias.subList(fromIndex, toIndex);
+            Page<Convocatoria> page = new PageImpl<>(content, pageable, convocatorias.size());
+            return page;
+          }
+        });
+
+    // when: get page=3 with pagesize=10
+    MvcResult requestResult = mockMvc
+        .perform(MockMvcRequestBuilders.get(CONTROLLER_BASE_PATH + PATH_PARAMETER_RESTRINGIDOS)
+            .with(SecurityMockMvcRequestPostProcessors.csrf()).header("X-Page", "3").header("X-Page-Size", "10")
+            .accept(MediaType.APPLICATION_JSON))
+        .andDo(MockMvcResultHandlers.print())
+        // then: the asked Convocatoria are returned with the right page information in
+        // headers
+        .andExpect(MockMvcResultMatchers.status().isOk())
+        .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(MockMvcResultMatchers.header().string("X-Page", "3"))
+        .andExpect(MockMvcResultMatchers.header().string("X-Page-Size", "10"))
+        .andExpect(MockMvcResultMatchers.header().string("X-Total-Count", "100"))
+        .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(10))).andReturn();
+
+    // this uses a TypeReference to inform Jackson about the Lists's generic type
+    List<Convocatoria> actual = mapper.readValue(requestResult.getResponse().getContentAsString(),
+        new TypeReference<List<Convocatoria>>() {
+        });
+
+    // containing Codigo='codigo-31' to 'codigo-40'
+    for (int i = 0, j = 31; i < 10; i++, j++) {
+      Convocatoria item = actual.get(i);
+      Assertions.assertThat(item.getCodigo()).isEqualTo("codigo-" + String.format("%03d", j));
+      Assertions.assertThat(item.getActivo()).isEqualTo((j % 2 == 0 ? Boolean.TRUE : Boolean.FALSE));
+    }
+  }
+
+  @Test
+  @WithMockUser(username = "user", authorities = { "CSP-CONV-V" })
+  public void findAllRestringidos_EmptyList_Returns204() throws Exception {
+    // given: no data Convocatoria
+    BDDMockito.given(service.findAllRestringidos(ArgumentMatchers.<String>any(), ArgumentMatchers.<Pageable>any(),
+        ArgumentMatchers.<List<String>>any())).willAnswer(new Answer<Page<Convocatoria>>() {
+          @Override
+          public Page<Convocatoria> answer(InvocationOnMock invocation) throws Throwable {
+            Page<Convocatoria> page = new PageImpl<>(Collections.emptyList());
+            return page;
+          }
+        });
+
+    // when: get page=3 with pagesize=10
+    mockMvc
+        .perform(MockMvcRequestBuilders.get(CONTROLLER_BASE_PATH + PATH_PARAMETER_RESTRINGIDOS)
+            .with(SecurityMockMvcRequestPostProcessors.csrf()).header("X-Page", "3").header("X-Page-Size", "10")
+            .accept(MediaType.APPLICATION_JSON))
         .andDo(MockMvcResultHandlers.print())
         // then: returns 204
         .andExpect(MockMvcResultMatchers.status().isNoContent());
@@ -621,7 +903,7 @@ public class ConvocatoriaControllerTest extends BaseControllerTest {
 
     BDDMockito
         .given(convocatoriaEntidadGestoraService.findAllByConvocatoria(ArgumentMatchers.<Long>any(),
-            ArgumentMatchers.<List<QueryCriteria>>any(), ArgumentMatchers.<Pageable>any()))
+            ArgumentMatchers.<String>any(), ArgumentMatchers.<Pageable>any()))
         .willAnswer(new Answer<Page<ConvocatoriaEntidadGestora>>() {
           @Override
           public Page<ConvocatoriaEntidadGestora> answer(InvocationOnMock invocation) throws Throwable {
@@ -677,7 +959,7 @@ public class ConvocatoriaControllerTest extends BaseControllerTest {
 
     BDDMockito
         .given(convocatoriaEntidadGestoraService.findAllByConvocatoria(ArgumentMatchers.<Long>any(),
-            ArgumentMatchers.<List<QueryCriteria>>any(), ArgumentMatchers.<Pageable>any()))
+            ArgumentMatchers.<String>any(), ArgumentMatchers.<Pageable>any()))
         .willAnswer(new Answer<Page<ConvocatoriaEntidadGestora>>() {
           @Override
           public Page<ConvocatoriaEntidadGestora> answer(InvocationOnMock invocation) throws Throwable {
@@ -720,7 +1002,7 @@ public class ConvocatoriaControllerTest extends BaseControllerTest {
 
     BDDMockito
         .given(convocatoriaFaseService.findAllByConvocatoria(ArgumentMatchers.<Long>any(),
-            ArgumentMatchers.<List<QueryCriteria>>any(), ArgumentMatchers.<Pageable>any()))
+            ArgumentMatchers.<String>any(), ArgumentMatchers.<Pageable>any()))
         .willAnswer(new Answer<Page<ConvocatoriaFase>>() {
           @Override
           public Page<ConvocatoriaFase> answer(InvocationOnMock invocation) throws Throwable {
@@ -773,7 +1055,7 @@ public class ConvocatoriaControllerTest extends BaseControllerTest {
 
     BDDMockito
         .given(convocatoriaFaseService.findAllByConvocatoria(ArgumentMatchers.<Long>any(),
-            ArgumentMatchers.<List<QueryCriteria>>any(), ArgumentMatchers.<Pageable>any()))
+            ArgumentMatchers.<String>any(), ArgumentMatchers.<Pageable>any()))
         .willAnswer(new Answer<Page<ConvocatoriaFase>>() {
           @Override
           public Page<ConvocatoriaFase> answer(InvocationOnMock invocation) throws Throwable {
@@ -805,8 +1087,8 @@ public class ConvocatoriaControllerTest extends BaseControllerTest {
     ConvocatoriaFase convocatoriaFase = new ConvocatoriaFase();
     convocatoriaFase.setId(id);
     convocatoriaFase.setConvocatoria(Convocatoria.builder().id(id).activo(Boolean.TRUE).codigo("codigo" + id).build());
-    convocatoriaFase.setFechaInicio(LocalDate.now());
-    convocatoriaFase.setFechaFin(LocalDate.now().plusDays(1L));
+    convocatoriaFase.setFechaInicio(LocalDateTime.now());
+    convocatoriaFase.setFechaFin(LocalDateTime.now().plusDays(1L));
     convocatoriaFase.setTipoFase(
         TipoFase.builder().nombre("tipoFase" + id).descripcion("descripcionFase" + id).activo(Boolean.TRUE).build());
     convocatoriaFase.setObservaciones("observaciones" + id);
@@ -836,7 +1118,7 @@ public class ConvocatoriaControllerTest extends BaseControllerTest {
 
     BDDMockito
         .given(convocatoriaEntidadFinanciadoraService.findAllByConvocatoria(ArgumentMatchers.<Long>any(),
-            ArgumentMatchers.<List<QueryCriteria>>any(), ArgumentMatchers.<Pageable>any()))
+            ArgumentMatchers.<String>any(), ArgumentMatchers.<Pageable>any()))
         .willAnswer((InvocationOnMock invocation) -> {
           Pageable pageable = invocation.getArgument(2, Pageable.class);
           int size = pageable.getPageSize();
@@ -892,7 +1174,7 @@ public class ConvocatoriaControllerTest extends BaseControllerTest {
 
     BDDMockito
         .given(convocatoriaEntidadFinanciadoraService.findAllByConvocatoria(ArgumentMatchers.<Long>any(),
-            ArgumentMatchers.<List<QueryCriteria>>any(), ArgumentMatchers.<Pageable>any()))
+            ArgumentMatchers.<String>any(), ArgumentMatchers.<Pageable>any()))
         .willAnswer((InvocationOnMock invocation) -> {
           Pageable pageable = invocation.getArgument(2, Pageable.class);
           Page<ConvocatoriaEntidadFinanciadora> pageResponse = new PageImpl<>(convocatoriaEntidadFinanciadoras,
@@ -933,7 +1215,7 @@ public class ConvocatoriaControllerTest extends BaseControllerTest {
 
     BDDMockito
         .given(convocatoriaDocumentoService.findAllByConvocatoria(ArgumentMatchers.<Long>any(),
-            ArgumentMatchers.<List<QueryCriteria>>any(), ArgumentMatchers.<Pageable>any()))
+            ArgumentMatchers.<String>any(), ArgumentMatchers.<Pageable>any()))
         .willAnswer(new Answer<Page<ConvocatoriaDocumento>>() {
           @Override
           public Page<ConvocatoriaDocumento> answer(InvocationOnMock invocation) throws Throwable {
@@ -987,7 +1269,7 @@ public class ConvocatoriaControllerTest extends BaseControllerTest {
 
     BDDMockito
         .given(convocatoriaDocumentoService.findAllByConvocatoria(ArgumentMatchers.<Long>any(),
-            ArgumentMatchers.<List<QueryCriteria>>any(), ArgumentMatchers.<Pageable>any()))
+            ArgumentMatchers.<String>any(), ArgumentMatchers.<Pageable>any()))
         .willAnswer(new Answer<Page<ConvocatoriaDocumento>>() {
           @Override
           public Page<ConvocatoriaDocumento> answer(InvocationOnMock invocation) throws Throwable {
@@ -1030,7 +1312,7 @@ public class ConvocatoriaControllerTest extends BaseControllerTest {
 
     BDDMockito
         .given(convocatoriaEnlaceService.findAllByConvocatoria(ArgumentMatchers.<Long>any(),
-            ArgumentMatchers.<List<QueryCriteria>>any(), ArgumentMatchers.<Pageable>any()))
+            ArgumentMatchers.<String>any(), ArgumentMatchers.<Pageable>any()))
         .willAnswer(new Answer<Page<ConvocatoriaEnlace>>() {
           @Override
           public Page<ConvocatoriaEnlace> answer(InvocationOnMock invocation) throws Throwable {
@@ -1084,7 +1366,7 @@ public class ConvocatoriaControllerTest extends BaseControllerTest {
 
     BDDMockito
         .given(convocatoriaEnlaceService.findAllByConvocatoria(ArgumentMatchers.<Long>any(),
-            ArgumentMatchers.<List<QueryCriteria>>any(), ArgumentMatchers.<Pageable>any()))
+            ArgumentMatchers.<String>any(), ArgumentMatchers.<Pageable>any()))
         .willAnswer(new Answer<Page<ConvocatoriaEnlace>>() {
           @Override
           public Page<ConvocatoriaEnlace> answer(InvocationOnMock invocation) throws Throwable {
@@ -1127,7 +1409,7 @@ public class ConvocatoriaControllerTest extends BaseControllerTest {
 
     BDDMockito
         .given(convocatoriaEntidadConvocanteService.findAllByConvocatoria(ArgumentMatchers.<Long>any(),
-            ArgumentMatchers.<List<QueryCriteria>>any(), ArgumentMatchers.<Pageable>any()))
+            ArgumentMatchers.<String>any(), ArgumentMatchers.<Pageable>any()))
         .willAnswer((InvocationOnMock invocation) -> {
           Pageable pageable = invocation.getArgument(2, Pageable.class);
           int size = pageable.getPageSize();
@@ -1181,7 +1463,7 @@ public class ConvocatoriaControllerTest extends BaseControllerTest {
 
     BDDMockito
         .given(convocatoriaEntidadConvocanteService.findAllByConvocatoria(ArgumentMatchers.<Long>any(),
-            ArgumentMatchers.<List<QueryCriteria>>any(), ArgumentMatchers.<Pageable>any()))
+            ArgumentMatchers.<String>any(), ArgumentMatchers.<Pageable>any()))
         .willAnswer((InvocationOnMock invocation) -> {
           Pageable pageable = invocation.getArgument(2, Pageable.class);
           Page<ConvocatoriaEntidadConvocante> pageResponse = new PageImpl<>(convocatoriasEntidadesConvocantes, pageable,
@@ -1238,14 +1520,14 @@ public class ConvocatoriaControllerTest extends BaseControllerTest {
         .andExpect(MockMvcResultMatchers.jsonPath("finalidad.id").value(newConvocatoria.getFinalidad().getId()))
         .andExpect(MockMvcResultMatchers.jsonPath("regimenConcurrencia.id")
             .value(newConvocatoria.getRegimenConcurrencia().getId()))
-        .andExpect(MockMvcResultMatchers.jsonPath("destinatarios").value(TipoDestinatarioEnum.INDIVIDUAL.getValue()))
-        .andExpect(MockMvcResultMatchers.jsonPath("colaborativos").value(newConvocatoria.getColaborativos()))
         .andExpect(
-            MockMvcResultMatchers.jsonPath("estadoActual").value(TipoEstadoConvocatoriaEnum.REGISTRADA.getValue()))
+            MockMvcResultMatchers.jsonPath("destinatarios").value(Convocatoria.Destinatarios.INDIVIDUAL.toString()))
+        .andExpect(MockMvcResultMatchers.jsonPath("colaborativos").value(newConvocatoria.getColaborativos()))
+        .andExpect(MockMvcResultMatchers.jsonPath("estado").value(Convocatoria.Estado.REGISTRADA.toString()))
         .andExpect(MockMvcResultMatchers.jsonPath("duracion").value(newConvocatoria.getDuracion()))
         .andExpect(
             MockMvcResultMatchers.jsonPath("ambitoGeografico.id").value(newConvocatoria.getAmbitoGeografico().getId()))
-        .andExpect(MockMvcResultMatchers.jsonPath("clasificacionCVN").value(ClasificacionCVNEnum.AYUDAS.getValue()))
+        .andExpect(MockMvcResultMatchers.jsonPath("clasificacionCVN").value(ClasificacionCVN.AYUDAS.toString()))
         .andExpect(MockMvcResultMatchers.jsonPath("activo").value(newConvocatoria.getActivo()));
   }
 
@@ -1271,7 +1553,7 @@ public class ConvocatoriaControllerTest extends BaseControllerTest {
 
     BDDMockito
         .given(convocatoriaPeriodoJustificacionService.findAllByConvocatoria(ArgumentMatchers.<Long>any(),
-            ArgumentMatchers.<List<QueryCriteria>>any(), ArgumentMatchers.<Pageable>any()))
+            ArgumentMatchers.<String>any(), ArgumentMatchers.<Pageable>any()))
         .willAnswer((InvocationOnMock invocation) -> {
           Pageable pageable = invocation.getArgument(2, Pageable.class);
           int size = pageable.getPageSize();
@@ -1327,7 +1609,7 @@ public class ConvocatoriaControllerTest extends BaseControllerTest {
 
     BDDMockito
         .given(convocatoriaPeriodoJustificacionService.findAllByConvocatoria(ArgumentMatchers.<Long>any(),
-            ArgumentMatchers.<List<QueryCriteria>>any(), ArgumentMatchers.<Pageable>any()))
+            ArgumentMatchers.<String>any(), ArgumentMatchers.<Pageable>any()))
         .willAnswer((InvocationOnMock invocation) -> {
           Pageable pageable = invocation.getArgument(2, Pageable.class);
           Page<ConvocatoriaPeriodoJustificacion> pageResponse = new PageImpl<>(convocatoriasPeriodoJustificaciones,
@@ -1378,7 +1660,7 @@ public class ConvocatoriaControllerTest extends BaseControllerTest {
 
     BDDMockito
         .given(convocatoriaPeriodoSeguimientoCientificoService.findAllByConvocatoria(ArgumentMatchers.<Long>any(),
-            ArgumentMatchers.<List<QueryCriteria>>any(), ArgumentMatchers.<Pageable>any()))
+            ArgumentMatchers.<String>any(), ArgumentMatchers.<Pageable>any()))
         .willAnswer((InvocationOnMock invocation) -> {
           Pageable pageable = invocation.getArgument(2, Pageable.class);
           int size = pageable.getPageSize();
@@ -1437,7 +1719,7 @@ public class ConvocatoriaControllerTest extends BaseControllerTest {
 
     BDDMockito
         .given(convocatoriaPeriodoSeguimientoCientificoService.findAllByConvocatoria(ArgumentMatchers.<Long>any(),
-            ArgumentMatchers.<List<QueryCriteria>>any(), ArgumentMatchers.<Pageable>any()))
+            ArgumentMatchers.<String>any(), ArgumentMatchers.<Pageable>any()))
         .willAnswer((InvocationOnMock invocation) -> {
           Pageable pageable = invocation.getArgument(2, Pageable.class);
           Page<ConvocatoriaPeriodoSeguimientoCientifico> pageResponse = new PageImpl<>(
@@ -1524,12 +1806,12 @@ public class ConvocatoriaControllerTest extends BaseControllerTest {
         .observaciones("observaciones-" + String.format("%03d", convocatoriaId))//
         .finalidad((modeloTipoFinalidad == null) ? null : modeloTipoFinalidad.getTipoFinalidad())//
         .regimenConcurrencia(tipoRegimenConcurrencia)//
-        .destinatarios(TipoDestinatarioEnum.INDIVIDUAL)//
+        .destinatarios(Convocatoria.Destinatarios.INDIVIDUAL)//
         .colaborativos(Boolean.TRUE)//
-        .estadoActual(TipoEstadoConvocatoriaEnum.REGISTRADA)//
+        .estado(Convocatoria.Estado.REGISTRADA)//
         .duracion(12)//
         .ambitoGeografico(tipoAmbitoGeografico)//
-        .clasificacionCVN(ClasificacionCVNEnum.AYUDAS)//
+        .clasificacionCVN(ClasificacionCVN.AYUDAS)//
         .activo(activo)//
         .build();
 
@@ -1574,7 +1856,7 @@ public class ConvocatoriaControllerTest extends BaseControllerTest {
 
     BDDMockito
         .given(convocatoriaAreaTematicaService.findAllByConvocatoria(ArgumentMatchers.<Long>any(),
-            ArgumentMatchers.<List<QueryCriteria>>any(), ArgumentMatchers.<Pageable>any()))
+            ArgumentMatchers.<String>any(), ArgumentMatchers.<Pageable>any()))
         .willAnswer(new Answer<Page<ConvocatoriaAreaTematica>>() {
           @Override
           public Page<ConvocatoriaAreaTematica> answer(InvocationOnMock invocation) throws Throwable {
@@ -1630,7 +1912,7 @@ public class ConvocatoriaControllerTest extends BaseControllerTest {
 
     BDDMockito
         .given(convocatoriaAreaTematicaService.findAllByConvocatoria(ArgumentMatchers.<Long>any(),
-            ArgumentMatchers.<List<QueryCriteria>>any(), ArgumentMatchers.<Pageable>any()))
+            ArgumentMatchers.<String>any(), ArgumentMatchers.<Pageable>any()))
         .willAnswer(new Answer<Page<ConvocatoriaAreaTematica>>() {
           @Override
           public Page<ConvocatoriaAreaTematica> answer(InvocationOnMock invocation) throws Throwable {
@@ -1673,7 +1955,7 @@ public class ConvocatoriaControllerTest extends BaseControllerTest {
 
     BDDMockito
         .given(convocatoriaHitoService.findAllByConvocatoria(ArgumentMatchers.<Long>any(),
-            ArgumentMatchers.<List<QueryCriteria>>any(), ArgumentMatchers.<Pageable>any()))
+            ArgumentMatchers.<String>any(), ArgumentMatchers.<Pageable>any()))
         .willAnswer(new Answer<Page<ConvocatoriaHito>>() {
           @Override
           public Page<ConvocatoriaHito> answer(InvocationOnMock invocation) throws Throwable {
@@ -1726,7 +2008,7 @@ public class ConvocatoriaControllerTest extends BaseControllerTest {
 
     BDDMockito
         .given(convocatoriaHitoService.findAllByConvocatoria(ArgumentMatchers.<Long>any(),
-            ArgumentMatchers.<List<QueryCriteria>>any(), ArgumentMatchers.<Pageable>any()))
+            ArgumentMatchers.<String>any(), ArgumentMatchers.<Pageable>any()))
         .willAnswer(new Answer<Page<ConvocatoriaHito>>() {
           @Override
           public Page<ConvocatoriaHito> answer(InvocationOnMock invocation) throws Throwable {
@@ -1871,146 +2153,6 @@ public class ConvocatoriaControllerTest extends BaseControllerTest {
         .perform(
             MockMvcRequestBuilders.get(CONTROLLER_BASE_PATH + PATH_PARAMETER_ID + PATH_CONCEPTO_GASTO_NO_PERMITIDO, 1L)
                 .with(SecurityMockMvcRequestPostProcessors.csrf()).accept(MediaType.APPLICATION_JSON))
-        .andDo(MockMvcResultHandlers.print())
-        // then: Devuelve un 204
-        .andExpect(MockMvcResultMatchers.status().isNoContent());
-  }
-
-  /**
-   * 
-   * CONVOCATORIA CÓDIGOS ECONÓMICOS
-   * 
-   */
-
-  @Test
-  @WithMockUser(username = "user", authorities = { "CSP-CONV-E" })
-  public void findAllConvocatoriaConceptoGastoCodigoEcPermitido_ReturnsPage() throws Exception {
-    // given: Una lista con 37 ConvocatoriaConceptoGastoCodigoEc para la
-    // Convocatoria
-    Long convocatoriaId = 1L;
-
-    List<ConvocatoriaConceptoGastoCodigoEc> convocatoriaConceptoGastoCodigoEcs = new ArrayList<>();
-    for (long i = 1; i <= 37; i++) {
-      convocatoriaConceptoGastoCodigoEcs.add(generarMockConvocatoriaConceptoGastoCodigoEc(i, true));
-    }
-
-    BDDMockito
-        .given(convocatoriaConceptoGastoCodigoEcService
-            .findAllByConvocatoriaAndPermitidoTrue(ArgumentMatchers.<Long>any(), ArgumentMatchers.<Pageable>any()))
-        .willAnswer(new Answer<Page<ConvocatoriaConceptoGastoCodigoEc>>() {
-          @Override
-          public Page<ConvocatoriaConceptoGastoCodigoEc> answer(InvocationOnMock invocation) throws Throwable {
-            List<ConvocatoriaConceptoGastoCodigoEc> content = new ArrayList<>();
-            for (ConvocatoriaConceptoGastoCodigoEc convocatoriaConceptoGastoCodigoEc : convocatoriaConceptoGastoCodigoEcs) {
-              content.add(convocatoriaConceptoGastoCodigoEc);
-            }
-            return new PageImpl<>(content);
-          }
-        });
-
-    // when: Get page=3 with pagesize=10
-    MvcResult requestResult = mockMvc
-        .perform(MockMvcRequestBuilders
-            .get(CONTROLLER_BASE_PATH + PATH_PARAMETER_ID + PATH_CONCEPTO_GASTO_CODIGO_EC_PERMITIDO, convocatoriaId)
-            .with(SecurityMockMvcRequestPostProcessors.csrf()).accept(MediaType.APPLICATION_JSON))
-        .andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.status().isOk())
-        .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(37))).andReturn();
-
-    List<ConvocatoriaConceptoGastoCodigoEc> convocatoriaConceptoGastoCodigoEcResponse = mapper.readValue(
-        requestResult.getResponse().getContentAsString(), new TypeReference<List<ConvocatoriaConceptoGastoCodigoEc>>() {
-        });
-
-    for (int i = 31; i <= 37; i++) {
-      ConvocatoriaConceptoGastoCodigoEc convocatoriaConceptoGastoCodigoEc = convocatoriaConceptoGastoCodigoEcResponse
-          .get(i - 1);
-      Assertions.assertThat(convocatoriaConceptoGastoCodigoEc.getCodigoEconomicoRef()).isEqualTo("cod-" + i);
-    }
-  }
-
-  @Test
-  @WithMockUser(username = "user", authorities = { "CSP-CONV-E" })
-  public void findAllConvocatoriaConceptoGastoCodigoEcPermitido_EmptyList_Returns204() throws Exception {
-    // given: Una lista vacia de ConvocatoriaConceptoGastoCodigoEc para la
-    // Convocatoria
-
-    BDDMockito
-        .given(convocatoriaConceptoGastoCodigoEcService
-            .findAllByConvocatoriaAndPermitidoTrue(ArgumentMatchers.<Long>any(), ArgumentMatchers.<Pageable>any()))
-        .willReturn(new PageImpl<>(Collections.emptyList()));
-
-    // when: Get page=0 with pagesize=10
-    mockMvc
-        .perform(MockMvcRequestBuilders
-            .get(CONTROLLER_BASE_PATH + PATH_PARAMETER_ID + PATH_CONCEPTO_GASTO_CODIGO_EC_PERMITIDO, 1L)
-            .with(SecurityMockMvcRequestPostProcessors.csrf()).accept(MediaType.APPLICATION_JSON))
-        .andDo(MockMvcResultHandlers.print())
-        // then: Devuelve un 204
-        .andExpect(MockMvcResultMatchers.status().isNoContent());
-  }
-
-  @Test
-  @WithMockUser(username = "user", authorities = { "CSP-CONV-E" })
-  public void findAllConvocatoriaConceptoGastoCodigoEcNoPermitido_ReturnsPage() throws Exception {
-    // given: Una lista con 37 ConvocatoriaConceptoGastoCodigoEc para la
-    // Convocatoria
-    Long convocatoriaId = 1L;
-
-    List<ConvocatoriaConceptoGastoCodigoEc> convocatoriaConceptoGastoCodigoEcs = new ArrayList<>();
-    for (long i = 1; i <= 37; i++) {
-      convocatoriaConceptoGastoCodigoEcs.add(generarMockConvocatoriaConceptoGastoCodigoEc(i, true));
-    }
-
-    BDDMockito
-        .given(convocatoriaConceptoGastoCodigoEcService
-            .findAllByConvocatoriaAndPermitidoFalse(ArgumentMatchers.<Long>any(), ArgumentMatchers.<Pageable>any()))
-        .willAnswer(new Answer<Page<ConvocatoriaConceptoGastoCodigoEc>>() {
-          @Override
-          public Page<ConvocatoriaConceptoGastoCodigoEc> answer(InvocationOnMock invocation) throws Throwable {
-            List<ConvocatoriaConceptoGastoCodigoEc> content = new ArrayList<>();
-            for (ConvocatoriaConceptoGastoCodigoEc convocatoriaConceptoGastoCodigoEc : convocatoriaConceptoGastoCodigoEcs) {
-              content.add(convocatoriaConceptoGastoCodigoEc);
-            }
-            return new PageImpl<>(content);
-          }
-        });
-
-    // when: Get page=3 with pagesize=10
-    MvcResult requestResult = mockMvc
-        .perform(MockMvcRequestBuilders
-            .get(CONTROLLER_BASE_PATH + PATH_PARAMETER_ID + PATH_CONCEPTO_GASTO_CODIGO_EC_NO_PERMITIDO, convocatoriaId)
-            .with(SecurityMockMvcRequestPostProcessors.csrf()).accept(MediaType.APPLICATION_JSON))
-        .andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.status().isOk())
-        .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(37))).andReturn();
-
-    List<ConvocatoriaConceptoGastoCodigoEc> convocatoriaConceptoGastoCodigoEcResponse = mapper.readValue(
-        requestResult.getResponse().getContentAsString(), new TypeReference<List<ConvocatoriaConceptoGastoCodigoEc>>() {
-        });
-
-    for (int i = 31; i <= 37; i++) {
-      ConvocatoriaConceptoGastoCodigoEc convocatoriaConceptoGastoCodigoEc = convocatoriaConceptoGastoCodigoEcResponse
-          .get(i - 1);
-      Assertions.assertThat(convocatoriaConceptoGastoCodigoEc.getCodigoEconomicoRef()).isEqualTo("cod-" + i);
-    }
-  }
-
-  @Test
-  @WithMockUser(username = "user", authorities = { "CSP-CONV-E" })
-  public void findAllConvocatoriaConceptoGastoCodigoEcNoPermitido_EmptyList_Returns204() throws Exception {
-    // given: Una lista vacia de ConvocatoriaConceptoGastoCodigoEc para la
-    // Convocatoria
-
-    BDDMockito
-        .given(convocatoriaConceptoGastoCodigoEcService
-            .findAllByConvocatoriaAndPermitidoFalse(ArgumentMatchers.<Long>any(), ArgumentMatchers.<Pageable>any()))
-        .willReturn(new PageImpl<>(Collections.emptyList()));
-
-    // when: Get page=0 with pagesize=10
-    mockMvc
-        .perform(MockMvcRequestBuilders
-            .get(CONTROLLER_BASE_PATH + PATH_PARAMETER_ID + PATH_CONCEPTO_GASTO_CODIGO_EC_NO_PERMITIDO, 1L)
-            .with(SecurityMockMvcRequestPostProcessors.csrf()).accept(MediaType.APPLICATION_JSON))
         .andDo(MockMvcResultHandlers.print())
         // then: Devuelve un 204
         .andExpect(MockMvcResultMatchers.status().isNoContent());
@@ -2175,7 +2317,7 @@ public class ConvocatoriaControllerTest extends BaseControllerTest {
     convocatoriaPeriodoJustificacion.setFechaInicioPresentacion(LocalDate.of(2020, 10, 10));
     convocatoriaPeriodoJustificacion.setFechaFinPresentacion(LocalDate.of(2020, 11, 20));
     convocatoriaPeriodoJustificacion.setObservaciones("observaciones-" + id);
-    convocatoriaPeriodoJustificacion.setTipoJustificacion(TipoJustificacionEnum.PERIODICA);
+    convocatoriaPeriodoJustificacion.setTipo(ConvocatoriaPeriodoJustificacion.Tipo.PERIODICO);
 
     return convocatoriaPeriodoJustificacion;
   }
@@ -2199,33 +2341,13 @@ public class ConvocatoriaControllerTest extends BaseControllerTest {
     convocatoriaConceptoGasto.setConceptoGasto(conceptoGasto);
     convocatoriaConceptoGasto.setConvocatoria(convocatoria);
     convocatoriaConceptoGasto.setImporteMaximo(20.0);
-    convocatoriaConceptoGasto.setNumMeses(3);
+    convocatoriaConceptoGasto.setMesInicial(1);
+    convocatoriaConceptoGasto.setMesFinal(4);
     convocatoriaConceptoGasto.setObservaciones("Obs-" + id);
     convocatoriaConceptoGasto.setPermitido(permitido);
     convocatoriaConceptoGasto.setPorcentajeCosteIndirecto(2);
 
     return convocatoriaConceptoGasto;
-  }
-
-  /**
-   * Función que devuelve un objeto ConvocatoriaConceptoGastoCodigoEc
-   * 
-   * @param id id del ConvocatoriaConceptoGastoCodigoEc
-   * @return el objeto ConvocatoriaConceptoGastoCodigoEc
-   */
-  private ConvocatoriaConceptoGastoCodigoEc generarMockConvocatoriaConceptoGastoCodigoEc(Long id, Boolean permitido) {
-
-    ConvocatoriaConceptoGasto convocatoriaConceptoGasto = generarMockConvocatoriaConceptoGasto(id == null ? 1 : id,
-        permitido);
-
-    ConvocatoriaConceptoGastoCodigoEc convocatoriaConceptoGastoCodigoEc = new ConvocatoriaConceptoGastoCodigoEc();
-    convocatoriaConceptoGastoCodigoEc.setId(id);
-    convocatoriaConceptoGastoCodigoEc.setCodigoEconomicoRef("cod-" + id);
-    convocatoriaConceptoGastoCodigoEc.setConvocatoriaConceptoGasto(convocatoriaConceptoGasto);
-    convocatoriaConceptoGastoCodigoEc.setFechaInicio(LocalDate.now());
-    convocatoriaConceptoGastoCodigoEc.setFechaFin(LocalDate.now());
-
-    return convocatoriaConceptoGastoCodigoEc;
   }
 
 }

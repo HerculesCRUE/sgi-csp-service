@@ -1,14 +1,11 @@
 package org.crue.hercules.sgi.csp.service.impl;
 
-import java.util.List;
-
 import org.crue.hercules.sgi.csp.exceptions.ModeloEjecucionNotFoundException;
 import org.crue.hercules.sgi.csp.model.ModeloEjecucion;
 import org.crue.hercules.sgi.csp.repository.ModeloEjecucionRepository;
 import org.crue.hercules.sgi.csp.repository.specification.ModeloEjecucionSpecifications;
 import org.crue.hercules.sgi.csp.service.ModeloEjecucionService;
-import org.crue.hercules.sgi.framework.data.jpa.domain.QuerySpecification;
-import org.crue.hercules.sgi.framework.data.search.QueryCriteria;
+import org.crue.hercules.sgi.framework.rsql.SgiRSQLJPASupport;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -44,8 +41,8 @@ public class ModeloEjecucionServiceImpl implements ModeloEjecucionService {
     log.debug("create(ModeloEjecucion modeloEjecucion) - start");
 
     Assert.isNull(modeloEjecucion.getId(), "ModeloEjecucion id tiene que ser null para crear un nuevo ModeloEjecucion");
-    Assert.isTrue(!(modeloEjecucionRepository.findByNombre(modeloEjecucion.getNombre()).isPresent()),
-        "Ya existe ModeloEjecucion con el nombre " + modeloEjecucion.getNombre());
+    Assert.isTrue(!(modeloEjecucionRepository.findByNombreAndActivoIsTrue(modeloEjecucion.getNombre()).isPresent()),
+        "Ya existe un ModeloEjecucion activo con el nombre '" + modeloEjecucion.getNombre() + "'");
 
     modeloEjecucion.setActivo(true);
 
@@ -69,21 +66,48 @@ public class ModeloEjecucionServiceImpl implements ModeloEjecucionService {
 
     Assert.notNull(modeloEjecucionActualizar.getId(),
         "ModeloEjecucion id no puede ser null para actualizar un ModeloEjecucion");
-    modeloEjecucionRepository.findByNombre(modeloEjecucionActualizar.getNombre())
+    modeloEjecucionRepository.findByNombreAndActivoIsTrue(modeloEjecucionActualizar.getNombre())
         .ifPresent((modeloEjecucionExistente) -> {
           Assert.isTrue(modeloEjecucionActualizar.getId() == modeloEjecucionExistente.getId(),
-              "Ya existe un ModeloEjecucion con el nombre " + modeloEjecucionExistente.getNombre());
+              "Ya existe un ModeloEjecucion activo con el nombre '" + modeloEjecucionExistente.getNombre() + "'");
         });
 
     return modeloEjecucionRepository.findById(modeloEjecucionActualizar.getId()).map(modeloEjecucion -> {
       modeloEjecucion.setNombre(modeloEjecucionActualizar.getNombre());
       modeloEjecucion.setDescripcion(modeloEjecucionActualizar.getDescripcion());
-      modeloEjecucion.setActivo(modeloEjecucionActualizar.getActivo());
 
       ModeloEjecucion returnValue = modeloEjecucionRepository.save(modeloEjecucion);
       log.debug("update(ModeloEjecucion modeloEjecucionActualizar) - end");
       return returnValue;
     }).orElseThrow(() -> new ModeloEjecucionNotFoundException(modeloEjecucionActualizar.getId()));
+  }
+
+  /**
+   * Reactiva el {@link ModeloEjecucion}.
+   *
+   * @param id Id del {@link ModeloEjecucion}.
+   * @return la entidad {@link ModeloEjecucion} persistida.
+   */
+  @Override
+  @Transactional
+  public ModeloEjecucion enable(Long id) {
+    log.debug("enable(Long id) - start");
+
+    Assert.notNull(id, "ModeloEjecucion id no puede ser null para reactivar un ModeloEjecucion");
+
+    return modeloEjecucionRepository.findById(id).map(modeloEjecucion -> {
+      if (modeloEjecucion.getActivo()) {
+        return modeloEjecucion;
+      }
+
+      Assert.isTrue(!(modeloEjecucionRepository.findByNombreAndActivoIsTrue(modeloEjecucion.getNombre()).isPresent()),
+          "Ya existe un ModeloEjecucion activo con el nombre '" + modeloEjecucion.getNombre() + "'");
+
+      modeloEjecucion.setActivo(true);
+      ModeloEjecucion returnValue = modeloEjecucionRepository.save(modeloEjecucion);
+      log.debug("enable(Long id) - end");
+      return returnValue;
+    }).orElseThrow(() -> new ModeloEjecucionNotFoundException(id));
   }
 
   /**
@@ -100,8 +124,11 @@ public class ModeloEjecucionServiceImpl implements ModeloEjecucionService {
     Assert.notNull(id, "ModeloEjecucion id no puede ser null para desactivar un ModeloEjecucion");
 
     return modeloEjecucionRepository.findById(id).map(modeloEjecucion -> {
-      modeloEjecucion.setActivo(false);
+      if (!modeloEjecucion.getActivo()) {
+        return modeloEjecucion;
+      }
 
+      modeloEjecucion.setActivo(false);
       ModeloEjecucion returnValue = modeloEjecucionRepository.save(modeloEjecucion);
       log.debug("disable(Long id) - end");
       return returnValue;
@@ -118,15 +145,13 @@ public class ModeloEjecucionServiceImpl implements ModeloEjecucionService {
    *         filtradas.
    */
   @Override
-  public Page<ModeloEjecucion> findAll(List<QueryCriteria> query, Pageable pageable) {
-    log.debug("findAll(List<QueryCriteria> query, Pageable pageable) - start");
-    Specification<ModeloEjecucion> specByQuery = new QuerySpecification<ModeloEjecucion>(query);
-    Specification<ModeloEjecucion> specActivos = ModeloEjecucionSpecifications.activos();
-
-    Specification<ModeloEjecucion> specs = Specification.where(specActivos).and(specByQuery);
+  public Page<ModeloEjecucion> findAll(String query, Pageable pageable) {
+    log.debug("findAll(String query, Pageable pageable) - start");
+    Specification<ModeloEjecucion> specs = ModeloEjecucionSpecifications.activos()
+        .and(SgiRSQLJPASupport.toSpecification(query));
 
     Page<ModeloEjecucion> returnValue = modeloEjecucionRepository.findAll(specs, pageable);
-    log.debug("findAll(List<QueryCriteria> query, Pageable pageable) - end");
+    log.debug("findAll(String query, Pageable pageable) - end");
     return returnValue;
   }
 
@@ -139,12 +164,12 @@ public class ModeloEjecucionServiceImpl implements ModeloEjecucionService {
    *         filtradas.
    */
   @Override
-  public Page<ModeloEjecucion> findAllTodos(List<QueryCriteria> query, Pageable pageable) {
-    log.debug("findAllTodos(List<QueryCriteria> query, Pageable pageable) - start");
-    Specification<ModeloEjecucion> spec = new QuerySpecification<ModeloEjecucion>(query);
+  public Page<ModeloEjecucion> findAllTodos(String query, Pageable pageable) {
+    log.debug("findAllTodos(String query, Pageable pageable) - start");
+    Specification<ModeloEjecucion> specs = SgiRSQLJPASupport.toSpecification(query);
 
-    Page<ModeloEjecucion> returnValue = modeloEjecucionRepository.findAll(spec, pageable);
-    log.debug("findAllTodos(List<QueryCriteria> query, Pageable pageable) - end");
+    Page<ModeloEjecucion> returnValue = modeloEjecucionRepository.findAll(specs, pageable);
+    log.debug("findAllTodos(String query, Pageable pageable) - end");
     return returnValue;
   }
 

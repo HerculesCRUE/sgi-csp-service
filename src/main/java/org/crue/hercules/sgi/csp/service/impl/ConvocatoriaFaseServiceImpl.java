@@ -2,20 +2,23 @@ package org.crue.hercules.sgi.csp.service.impl;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.crue.hercules.sgi.csp.exceptions.ConvocatoriaFaseNotFoundException;
 import org.crue.hercules.sgi.csp.exceptions.ConvocatoriaNotFoundException;
+import org.crue.hercules.sgi.csp.model.ConfiguracionSolicitud;
 import org.crue.hercules.sgi.csp.model.Convocatoria;
 import org.crue.hercules.sgi.csp.model.ConvocatoriaFase;
 import org.crue.hercules.sgi.csp.model.ModeloTipoFase;
 import org.crue.hercules.sgi.csp.model.TipoFase;
+import org.crue.hercules.sgi.csp.repository.ConfiguracionSolicitudRepository;
 import org.crue.hercules.sgi.csp.repository.ConvocatoriaFaseRepository;
 import org.crue.hercules.sgi.csp.repository.ConvocatoriaRepository;
 import org.crue.hercules.sgi.csp.repository.ModeloTipoFaseRepository;
 import org.crue.hercules.sgi.csp.repository.specification.ConvocatoriaFaseSpecifications;
 import org.crue.hercules.sgi.csp.service.ConvocatoriaFaseService;
-import org.crue.hercules.sgi.framework.data.jpa.domain.QuerySpecification;
-import org.crue.hercules.sgi.framework.data.search.QueryCriteria;
+import org.crue.hercules.sgi.csp.service.ConvocatoriaService;
+import org.crue.hercules.sgi.framework.rsql.SgiRSQLJPASupport;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -35,13 +38,18 @@ public class ConvocatoriaFaseServiceImpl implements ConvocatoriaFaseService {
 
   private final ConvocatoriaFaseRepository repository;
   private final ConvocatoriaRepository convocatoriaRepository;
+  private final ConfiguracionSolicitudRepository configuracionSolicitudRepository;
   private final ModeloTipoFaseRepository modeloTipoFaseRepository;
+  private final ConvocatoriaService convocatoriaService;
 
   public ConvocatoriaFaseServiceImpl(ConvocatoriaFaseRepository repository,
-      ConvocatoriaRepository convocatoriaRepository, ModeloTipoFaseRepository modeloTipoFaseRepository) {
+      ConvocatoriaRepository convocatoriaRepository, ConfiguracionSolicitudRepository configuracionSolicitudRepository,
+      ModeloTipoFaseRepository modeloTipoFaseRepository, ConvocatoriaService convocatoriaService) {
     this.repository = repository;
     this.convocatoriaRepository = convocatoriaRepository;
+    this.configuracionSolicitudRepository = configuracionSolicitudRepository;
     this.modeloTipoFaseRepository = modeloTipoFaseRepository;
+    this.convocatoriaService = convocatoriaService;
   }
 
   /**
@@ -74,14 +82,22 @@ public class ConvocatoriaFaseServiceImpl implements ConvocatoriaFaseService {
     convocatoriaFase.setConvocatoria(convocatoriaRepository.findById(convocatoriaFase.getConvocatoria().getId())
         .orElseThrow(() -> new ConvocatoriaNotFoundException(convocatoriaFase.getConvocatoria().getId())));
 
+    // Se recupera el Id de ModeloEjecucion para las siguientes validaciones
+    Long modeloEjecucionId = (convocatoriaFase.getConvocatoria().getModeloEjecucion() != null
+        && convocatoriaFase.getConvocatoria().getModeloEjecucion().getId() != null)
+            ? convocatoriaFase.getConvocatoria().getModeloEjecucion().getId()
+            : null;
+
     // TipoFase
-    Optional<ModeloTipoFase> modeloTipoFase = modeloTipoFaseRepository.findByModeloEjecucionIdAndTipoFaseId(
-        convocatoriaFase.getConvocatoria().getModeloEjecucion().getId(), convocatoriaFase.getTipoFase().getId());
+    Optional<ModeloTipoFase> modeloTipoFase = modeloTipoFaseRepository
+        .findByModeloEjecucionIdAndTipoFaseId(modeloEjecucionId, convocatoriaFase.getTipoFase().getId());
 
     // Está asignado al ModeloEjecucion
     Assert.isTrue(modeloTipoFase.isPresent(),
         "TipoFase '" + convocatoriaFase.getTipoFase().getNombre() + "' no disponible para el ModeloEjecucion '"
-            + convocatoriaFase.getConvocatoria().getModeloEjecucion().getNombre() + "'");
+            + ((modeloEjecucionId != null) ? convocatoriaFase.getConvocatoria().getModeloEjecucion().getNombre()
+                : "Convocatoria sin modelo asignado")
+            + "'");
 
     // La asignación al ModeloEjecucion está activa
     Assert.isTrue(modeloTipoFase.get().getActivo(), "ModeloTipoFase '" + modeloTipoFase.get().getTipoFase().getNombre()
@@ -137,16 +153,28 @@ public class ConvocatoriaFaseServiceImpl implements ConvocatoriaFaseService {
 
     return repository.findById(convocatoriaFaseActualizar.getId()).map(convocatoriaFase -> {
 
+      // Si la fase es la asignada a la ConfiguracionSolicitud comprobar si
+      // convocatoria es modificable
+      Assert.isTrue(isModificable(convocatoriaFase.getConvocatoria().getId(), convocatoriaFase.getId()),
+          "No se puede modificar ConvocatoriaFase. No tiene los permisos necesarios o se encuentra asignada a la ConfiguracionSolicitud de una convocatoria que está registrada y cuenta con solicitudes o proyectos asociados");
+
+      // Se recupera el Id de ModeloEjecucion para las siguientes validaciones
+      Long modeloEjecucionId = (convocatoriaFase.getConvocatoria().getModeloEjecucion() != null
+          && convocatoriaFase.getConvocatoria().getModeloEjecucion().getId() != null)
+              ? convocatoriaFase.getConvocatoria().getModeloEjecucion().getId()
+              : null;
+
       // TipoFase
-      Optional<ModeloTipoFase> modeloTipoFase = modeloTipoFaseRepository.findByModeloEjecucionIdAndTipoFaseId(
-          convocatoriaFase.getConvocatoria().getModeloEjecucion().getId(),
-          convocatoriaFaseActualizar.getTipoFase().getId());
+      Optional<ModeloTipoFase> modeloTipoFase = modeloTipoFaseRepository
+          .findByModeloEjecucionIdAndTipoFaseId(modeloEjecucionId, convocatoriaFaseActualizar.getTipoFase().getId());
 
       // Está asignado al ModeloEjecucion
       Assert.isTrue(modeloTipoFase.isPresent(),
           "TipoFase '" + convocatoriaFaseActualizar.getTipoFase().getNombre()
               + "' no disponible para el ModeloEjecucion '"
-              + convocatoriaFase.getConvocatoria().getModeloEjecucion().getNombre() + "'");
+              + ((modeloEjecucionId != null) ? convocatoriaFase.getConvocatoria().getModeloEjecucion().getNombre()
+                  : "Convocatoria sin modelo asignado")
+              + "'");
 
       // La asignación al ModeloEjecucion está activa
       Assert.isTrue(
@@ -190,9 +218,26 @@ public class ConvocatoriaFaseServiceImpl implements ConvocatoriaFaseService {
     log.debug("delete(Long id) - start");
 
     Assert.notNull(id, "ConvocatoriaFase id no puede ser null para eliminar un ConvocatoriaFase");
-    if (!repository.existsById(id)) {
-      throw new ConvocatoriaFaseNotFoundException(id);
-    }
+
+    repository.findById(id).map(convocatoriaFase -> {
+
+      // Si la fase es la asignada a la ConfiguracionSolicitud comprobar si
+      // convocatoria es modificable
+      Assert.isTrue(isModificable(convocatoriaFase.getConvocatoria().getId(), convocatoriaFase.getId()),
+          "No se puede eliminar ConvocatoriaFase. No tiene los permisos necesarios o se encuentra asignada a la ConfiguracionSolicitud de una convocatoria que está registrada y cuenta con solicitudes o proyectos asociados");
+
+      return convocatoriaFase;
+    }).orElseThrow(() -> new ConvocatoriaFaseNotFoundException(id));
+
+    Page<ConfiguracionSolicitud> configuracionesSolicitud = configuracionSolicitudRepository
+        .findByFasePresentacionSolicitudesId(id, null);
+    List<ConfiguracionSolicitud> configuracionesSolicitudModificadas = configuracionesSolicitud.getContent().stream()
+        .map(configuracionSolicitud -> {
+          configuracionSolicitud.setFasePresentacionSolicitudes(null);
+          return configuracionSolicitud;
+        }).collect(Collectors.toList());
+
+    configuracionSolicitudRepository.saveAll(configuracionesSolicitudModificadas);
 
     repository.deleteById(id);
     log.debug("delete(Long id) - end");
@@ -223,17 +268,13 @@ public class ConvocatoriaFaseServiceImpl implements ConvocatoriaFaseService {
    *         {@link Convocatoria} paginadas.
    */
   @Override
-  public Page<ConvocatoriaFase> findAllByConvocatoria(Long convocatoriaId, List<QueryCriteria> query,
-      Pageable pageable) {
-    log.debug("findAllByConvocatoria(Long idConvocatoria, List<QueryCriteria> query, Pageable pageable) - start");
-    Specification<ConvocatoriaFase> specByQuery = new QuerySpecification<ConvocatoriaFase>(query);
-    Specification<ConvocatoriaFase> specByConvocatoria = ConvocatoriaFaseSpecifications
-        .byConvocatoriaId(convocatoriaId);
-
-    Specification<ConvocatoriaFase> specs = Specification.where(specByConvocatoria).and(specByQuery);
+  public Page<ConvocatoriaFase> findAllByConvocatoria(Long convocatoriaId, String query, Pageable pageable) {
+    log.debug("findAllByConvocatoria(Long idConvocatoria, String query, Pageable pageable) - start");
+    Specification<ConvocatoriaFase> specs = ConvocatoriaFaseSpecifications.byConvocatoriaId(convocatoriaId)
+        .and(SgiRSQLJPASupport.toSpecification(query));
 
     Page<ConvocatoriaFase> returnValue = repository.findAll(specs, pageable);
-    log.debug("findAllByConvocatoria(Long idConvocatoria, List<QueryCriteria> query, Pageable pageable) - end");
+    log.debug("findAllByConvocatoria(Long idConvocatoria, String query, Pageable pageable) - end");
     return returnValue;
   }
 
@@ -268,5 +309,33 @@ public class ConvocatoriaFaseServiceImpl implements ConvocatoriaFaseService {
 
     return returnValue;
 
+  }
+
+  /**
+   * Comprueba si la {@link ConvocatoriaFase} está la asignada a la
+   * {@link ConfiguracionSolicitud} y si la {@link Convocatoria} correspondiente
+   * es modificable para permitir la modificación o eliminación de la
+   * {@link ConvocatoriaFase}
+   * 
+   * @param convocatoriaId     id de la {@link Convocatoria}
+   * @param convocatoriaFaseId id de la {@link ConvocatoriaFase}
+   * @return
+   */
+  private Boolean isModificable(Long convocatoriaId, Long convocatoriaFaseId) {
+    log.debug("Boolean isModificable(Long convocatoriaId, Long convocatoriaFaseId) - start");
+
+    Boolean returnValue = Boolean.TRUE;
+    Optional<ConfiguracionSolicitud> configuraciSolicitud = configuracionSolicitudRepository
+        .findByConvocatoriaId(convocatoriaId);
+    if (configuraciSolicitud.isPresent()) {
+      if (configuraciSolicitud.get().getFasePresentacionSolicitudes() != null
+          && configuraciSolicitud.get().getFasePresentacionSolicitudes().getId() == convocatoriaFaseId) {
+
+        returnValue = convocatoriaService.modificable(convocatoriaId,
+            configuraciSolicitud.get().getConvocatoria().getUnidadGestionRef());
+      }
+    }
+    log.debug("Boolean isModificable(Long convocatoriaId, Long convocatoriaFaseId) - end");
+    return returnValue;
   }
 }

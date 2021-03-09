@@ -24,29 +24,29 @@ INSERT INTO csp.tipo_ambito_geografico (id, nombre, activo) VALUES (2, 'nombre-0
 
 -- CONVOCATORIA
 INSERT INTO csp.convocatoria
-(id, unidad_gestion_ref, modelo_ejecucion_id, codigo, anio, titulo, objeto, observaciones, tipo_finalidad_id, tipo_regimen_concurrencia_id, destinatarios, colaborativos, estado_actual, duracion, tipo_ambito_geografico_id, clasificacion_cvn, activo)
-VALUES(1, 'unidad-001', 1, 'codigo-001', 2020, 'titulo-001', 'objeto-001', 'observaciones-001', 1, 1, 'Individual', true, 'Registrada', 12, 1, 'Ayudas y becas', true);
+(id, unidad_gestion_ref, modelo_ejecucion_id, codigo, anio, titulo, objeto, observaciones, tipo_finalidad_id, tipo_regimen_concurrencia_id, destinatarios, colaborativos, estado, duracion, tipo_ambito_geografico_id, clasificacion_cvn, activo)
+VALUES(1, 'unidad-001', 1, 'codigo-001', 2020, 'titulo-001', 'objeto-001', 'observaciones-001', 1, 1, 'INDIVIDUAL', true, 'REGISTRADA', 12, 1, 'AYUDAS', true);
 INSERT INTO csp.convocatoria
-(id, unidad_gestion_ref, modelo_ejecucion_id, codigo, anio, titulo, objeto, observaciones, tipo_finalidad_id, tipo_regimen_concurrencia_id, destinatarios, colaborativos, estado_actual, duracion, tipo_ambito_geografico_id, clasificacion_cvn, activo)
-VALUES(2, 'unidad-002', 1, 'codigo-002', 2020, 'titulo-002', 'objeto-002', 'observaciones-002', 1, 1, 'Equipo de proyecto', true, 'Borrador', 12, 1, 'Proyectos competitivos', true);
+(id, unidad_gestion_ref, modelo_ejecucion_id, codigo, anio, titulo, objeto, observaciones, tipo_finalidad_id, tipo_regimen_concurrencia_id, destinatarios, colaborativos, estado, duracion, tipo_ambito_geografico_id, clasificacion_cvn, activo)
+VALUES(2, 'unidad-002', 1, 'codigo-002', 2020, 'titulo-002', 'objeto-002', 'observaciones-002', 1, 1, 'EQUIPO_PROYECTO', true, 'BORRADOR', 12, 1, 'COMPETITIVOS', true);
 
 
 -- CONVOCATORIA PERIODO JUSTIFICACION
-INSERT INTO csp.convocatoria_periodo_justificacion (id, convocatoria_id, num_periodo, mes_inicial, mes_final, fecha_inicio_presentacion, fecha_fin_presentacion, observaciones, tipo_justificacion) 
-  VALUES (1, 1, 1, 1, 2, '2020-10-10', '2020-11-20', 'observaciones-001', 'periodica');
-INSERT INTO csp.convocatoria_periodo_justificacion (id, convocatoria_id, num_periodo, mes_inicial, mes_final, fecha_inicio_presentacion, fecha_fin_presentacion, observaciones, tipo_justificacion) 
-  VALUES (2, 1, 2, 10, 21, '2020-10-10', '2020-11-20', 'observaciones-002', 'periodica');
-INSERT INTO csp.convocatoria_periodo_justificacion (id, convocatoria_id, num_periodo, mes_inicial, mes_final, fecha_inicio_presentacion, fecha_fin_presentacion, observaciones, tipo_justificacion) 
-  VALUES (3, 1, 3, 23, 24, null, null, 'observaciones-003', 'periodica');
-INSERT INTO csp.convocatoria_periodo_justificacion (id, convocatoria_id, num_periodo, mes_inicial, mes_final, fecha_inicio_presentacion, fecha_fin_presentacion, observaciones, tipo_justificacion) 
-  VALUES (4, 1, 4, 25, 28, null, null, 'observaciones-4', 'final');
-INSERT INTO csp.convocatoria_periodo_justificacion (id, convocatoria_id, num_periodo, mes_inicial, mes_final, fecha_inicio_presentacion, fecha_fin_presentacion, observaciones, tipo_justificacion) 
-  VALUES (5, 2, 1, 3, 10, null, null,'observaciones-5', 'periodica');
-INSERT INTO csp.convocatoria_periodo_justificacion (id, convocatoria_id, num_periodo, mes_inicial, mes_final, fecha_inicio_presentacion, fecha_fin_presentacion, observaciones, tipo_justificacion) 
-  VALUES (6, 2, 2, 15, 18, '2020-09-10', '2020-10-01', 'observaciones-6', 'periodica');
-INSERT INTO csp.convocatoria_periodo_justificacion (id, convocatoria_id, num_periodo, mes_inicial, mes_final, fecha_inicio_presentacion, fecha_fin_presentacion, observaciones, tipo_justificacion) 
-  VALUES (7, 2, 3, 20, 24, '2020-10-10', '2020-11-20', 'observaciones-7', 'periodica');
-INSERT INTO csp.convocatoria_periodo_justificacion (id, convocatoria_id, num_periodo, mes_inicial, mes_final, fecha_inicio_presentacion, fecha_fin_presentacion, observaciones, tipo_justificacion) 
-  VALUES (8, 2, 4, 25, 28, null, null, 'observaciones-8', 'final');
+INSERT INTO csp.convocatoria_periodo_justificacion (id, convocatoria_id, num_periodo, mes_inicial, mes_final, fecha_inicio_presentacion, fecha_fin_presentacion, observaciones, tipo) 
+  VALUES (1, 1, 1, 1, 2, '2020-10-10', '2020-11-20', 'observaciones-001', 'PERIODICO');
+INSERT INTO csp.convocatoria_periodo_justificacion (id, convocatoria_id, num_periodo, mes_inicial, mes_final, fecha_inicio_presentacion, fecha_fin_presentacion, observaciones, tipo) 
+  VALUES (2, 1, 2, 10, 21, '2020-10-10', '2020-11-20', 'observaciones-002', 'PERIODICO');
+INSERT INTO csp.convocatoria_periodo_justificacion (id, convocatoria_id, num_periodo, mes_inicial, mes_final, fecha_inicio_presentacion, fecha_fin_presentacion, observaciones, tipo) 
+  VALUES (3, 1, 3, 23, 24, null, null, 'observaciones-003', 'PERIODICO');
+INSERT INTO csp.convocatoria_periodo_justificacion (id, convocatoria_id, num_periodo, mes_inicial, mes_final, fecha_inicio_presentacion, fecha_fin_presentacion, observaciones, tipo) 
+  VALUES (4, 1, 4, 25, 28, null, null, 'observaciones-4', 'FINAL');
+INSERT INTO csp.convocatoria_periodo_justificacion (id, convocatoria_id, num_periodo, mes_inicial, mes_final, fecha_inicio_presentacion, fecha_fin_presentacion, observaciones, tipo) 
+  VALUES (5, 2, 1, 3, 10, null, null,'observaciones-5', 'PERIODICO');
+INSERT INTO csp.convocatoria_periodo_justificacion (id, convocatoria_id, num_periodo, mes_inicial, mes_final, fecha_inicio_presentacion, fecha_fin_presentacion, observaciones, tipo) 
+  VALUES (6, 2, 2, 15, 18, '2020-09-10', '2020-10-01', 'observaciones-6', 'PERIODICO');
+INSERT INTO csp.convocatoria_periodo_justificacion (id, convocatoria_id, num_periodo, mes_inicial, mes_final, fecha_inicio_presentacion, fecha_fin_presentacion, observaciones, tipo) 
+  VALUES (7, 2, 3, 20, 24, '2020-10-10', '2020-11-20', 'observaciones-7', 'PERIODICO');
+INSERT INTO csp.convocatoria_periodo_justificacion (id, convocatoria_id, num_periodo, mes_inicial, mes_final, fecha_inicio_presentacion, fecha_fin_presentacion, observaciones, tipo) 
+  VALUES (8, 2, 4, 25, 28, null, null, 'observaciones-8', 'FINAL');
 
 

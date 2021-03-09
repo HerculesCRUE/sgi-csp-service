@@ -31,6 +31,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 public class ModeloEjecucionIT extends BaseIT {
 
   private static final String PATH_PARAMETER_ID = "/{id}";
+  private static final String PATH_PARAMETER_DESACTIVAR = "/desactivar";
+  private static final String PATH_PARAMETER_REACTIVAR = "/reactivar";
   private static final String MODELO_EJECUCION_CONTROLLER_BASE_PATH = "/modeloejecuciones";
 
   private HttpEntity<ModeloEjecucion> buildRequest(HttpHeaders headers, ModeloEjecucion entity) throws Exception {
@@ -88,14 +90,37 @@ public class ModeloEjecucionIT extends BaseIT {
   @Sql
   @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:cleanup.sql")
   @Test
-  public void delete_Return204() throws Exception {
+  public void reactivar_ReturnModeloEjecucion() throws Exception {
     Long idModeloEjecucion = 1L;
 
     final ResponseEntity<ModeloEjecucion> response = restTemplate.exchange(
-        MODELO_EJECUCION_CONTROLLER_BASE_PATH + PATH_PARAMETER_ID, HttpMethod.DELETE, buildRequest(null, null),
-        ModeloEjecucion.class, idModeloEjecucion);
+        MODELO_EJECUCION_CONTROLLER_BASE_PATH + PATH_PARAMETER_ID + PATH_PARAMETER_REACTIVAR, HttpMethod.PATCH,
+        buildRequest(null, null), ModeloEjecucion.class, idModeloEjecucion);
 
-    Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+    Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    ModeloEjecucion modeloEjecucionDisabled = response.getBody();
+    Assertions.assertThat(modeloEjecucionDisabled.getId()).as("getId()").isEqualTo(idModeloEjecucion);
+    Assertions.assertThat(modeloEjecucionDisabled.getNombre()).as("getNombre()").isEqualTo("nombre-1");
+    Assertions.assertThat(modeloEjecucionDisabled.getDescripcion()).as("getDescripcion()").isEqualTo("descripcion-1");
+    Assertions.assertThat(modeloEjecucionDisabled.getActivo()).as("getActivo()").isEqualTo(Boolean.TRUE);
+  }
+
+  @Sql
+  @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:cleanup.sql")
+  @Test
+  public void desactivar_ReturnModeloEjecucion() throws Exception {
+    Long idModeloEjecucion = 1L;
+
+    final ResponseEntity<ModeloEjecucion> response = restTemplate.exchange(
+        MODELO_EJECUCION_CONTROLLER_BASE_PATH + PATH_PARAMETER_ID + PATH_PARAMETER_DESACTIVAR, HttpMethod.PATCH,
+        buildRequest(null, null), ModeloEjecucion.class, idModeloEjecucion);
+
+    Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    ModeloEjecucion modeloEjecucionDisabled = response.getBody();
+    Assertions.assertThat(modeloEjecucionDisabled.getId()).as("getId()").isEqualTo(idModeloEjecucion);
+    Assertions.assertThat(modeloEjecucionDisabled.getNombre()).as("getNombre()").isEqualTo("nombre-1");
+    Assertions.assertThat(modeloEjecucionDisabled.getDescripcion()).as("getDescripcion()").isEqualTo("descripcion-1");
+    Assertions.assertThat(modeloEjecucionDisabled.getActivo()).as("getActivo()").isEqualTo(Boolean.FALSE);
   }
 
   @Sql
@@ -124,8 +149,8 @@ public class ModeloEjecucionIT extends BaseIT {
     headers.set("Authorization", String.format("bearer %s", tokenBuilder.buildToken("user", "CSP-ME-V")));
     headers.add("X-Page", "0");
     headers.add("X-Page-Size", "10");
-    String sort = "nombre-";
-    String filter = "descripcion~%00%";
+    String sort = "nombre,desc";
+    String filter = "descripcion=ke=00";
 
     URI uri = UriComponentsBuilder.fromUriString(MODELO_EJECUCION_CONTROLLER_BASE_PATH).queryParam("s", sort)
         .queryParam("q", filter).build(false).toUri();
@@ -158,8 +183,8 @@ public class ModeloEjecucionIT extends BaseIT {
     headers.set("Authorization", String.format("bearer %s", tokenBuilder.buildToken("user", "CSP-ME-V")));
     headers.add("X-Page", "0");
     headers.add("X-Page-Size", "10");
-    String sort = "nombre-";
-    String filter = "descripcion~%00%";
+    String sort = "nombre,desc";
+    String filter = "descripcion=ke=00";
 
     URI uri = UriComponentsBuilder.fromUriString(MODELO_EJECUCION_CONTROLLER_BASE_PATH + "/todos").queryParam("s", sort)
         .queryParam("q", filter).build(false).toUri();
@@ -198,8 +223,8 @@ public class ModeloEjecucionIT extends BaseIT {
     headers.set("Authorization", String.format("bearer %s", tokenBuilder.buildToken("user", "CSP-ME-V")));
     headers.add("X-Page", "0");
     headers.add("X-Page-Size", "10");
-    String sort = "tipoEnlace.nombre-";
-    String filter = "tipoEnlace.descripcion~%00%";
+    String sort = "tipoEnlace.nombre,desc";
+    String filter = "tipoEnlace.descripcion=ke=00";
 
     Long idModeloEjecucion = 1L;
 
@@ -241,8 +266,8 @@ public class ModeloEjecucionIT extends BaseIT {
     headers.set("Authorization", String.format("bearer %s", tokenBuilder.buildToken("user", "CSP-ME-V")));
     headers.add("X-Page", "0");
     headers.add("X-Page-Size", "10");
-    String sort = "tipoFase.nombre-";
-    String filter = "tipoFase.descripcion~%00%";
+    String sort = "tipoFase.nombre,desc";
+    String filter = "tipoFase.descripcion=ke=00";
 
     Long idModeloEjecucion = 1L;
 
@@ -279,8 +304,8 @@ public class ModeloEjecucionIT extends BaseIT {
     headers.set("Authorization", String.format("bearer %s", tokenBuilder.buildToken("user", "CSP-ME-V")));
     headers.add("X-Page", "0");
     headers.add("X-Page-Size", "10");
-    String sort = "tipoFase.nombre-";
-    String filter = "tipoFase.descripcion~%00%";
+    String sort = "tipoFase.nombre,desc";
+    String filter = "tipoFase.descripcion=ke=00";
 
     Long idModeloEjecucion = 1L;
 
@@ -317,8 +342,8 @@ public class ModeloEjecucionIT extends BaseIT {
     headers.set("Authorization", String.format("bearer %s", tokenBuilder.buildToken("user", "CSP-ME-V")));
     headers.add("X-Page", "0");
     headers.add("X-Page-Size", "10");
-    String sort = "tipoFase.nombre-";
-    String filter = "tipoFase.descripcion~%00%";
+    String sort = "tipoFase.nombre,desc";
+    String filter = "tipoFase.descripcion=ke=00";
 
     Long idModeloEjecucion = 1L;
 
@@ -361,8 +386,8 @@ public class ModeloEjecucionIT extends BaseIT {
     headers.set("Authorization", String.format("bearer %s", tokenBuilder.buildToken("user", "CSP-ME-V")));
     headers.add("X-Page", "0");
     headers.add("X-Page-Size", "10");
-    String sort = "tipoDocumento.nombre-";
-    String filter = "tipoDocumento.descripcion~%00%";
+    String sort = "tipoDocumento.nombre,desc";
+    String filter = "tipoDocumento.descripcion=ke=00";
 
     Long idModeloEjecucion = 1L;
 
@@ -405,8 +430,8 @@ public class ModeloEjecucionIT extends BaseIT {
     headers.set("Authorization", String.format("bearer %s", tokenBuilder.buildToken("user", "CSP-ME-V")));
     headers.add("X-Page", "0");
     headers.add("X-Page-Size", "10");
-    String sort = "tipoFinalidad.nombre-";
-    String filter = "tipoFinalidad.descripcion~%00%";
+    String sort = "tipoFinalidad.nombre,desc";
+    String filter = "tipoFinalidad.descripcion=ke=00";
 
     Long idModeloEjecucion = 1L;
 
@@ -448,8 +473,8 @@ public class ModeloEjecucionIT extends BaseIT {
     headers.set("Authorization", String.format("bearer %s", tokenBuilder.buildToken("user", "CSP-ME-V")));
     headers.add("X-Page", "0");
     headers.add("X-Page-Size", "10");
-    String sort = "tipoHito.nombre-";
-    String filter = "tipoHito.descripcion~%00%";
+    String sort = "tipoHito.nombre,desc";
+    String filter = "tipoHito.descripcion=ke=00";
 
     Long idModeloEjecucion = 1L;
 
@@ -486,8 +511,8 @@ public class ModeloEjecucionIT extends BaseIT {
     headers.set("Authorization", String.format("bearer %s", tokenBuilder.buildToken("user", "CSP-ME-V")));
     headers.add("X-Page", "0");
     headers.add("X-Page-Size", "10");
-    String sort = "tipoHito.nombre-";
-    String filter = "tipoHito.descripcion~%00%";
+    String sort = "tipoHito.nombre,desc";
+    String filter = "tipoHito.descripcion=ke=00";
 
     Long idModeloEjecucion = 1L;
 
@@ -524,8 +549,8 @@ public class ModeloEjecucionIT extends BaseIT {
     headers.set("Authorization", String.format("bearer %s", tokenBuilder.buildToken("user", "CSP-ME-V")));
     headers.add("X-Page", "0");
     headers.add("X-Page-Size", "10");
-    String sort = "tipoHito.nombre-";
-    String filter = "tipoHito.descripcion~%00%";
+    String sort = "tipoHito.nombre,desc";
+    String filter = "tipoHito.descripcion=ke=00";
 
     Long idModeloEjecucion = 1L;
 
@@ -562,8 +587,8 @@ public class ModeloEjecucionIT extends BaseIT {
     headers.set("Authorization", String.format("bearer %s", tokenBuilder.buildToken("user", "CSP-ME-V")));
     headers.add("X-Page", "0");
     headers.add("X-Page-Size", "10");
-    String sort = "tipoHito.nombre-";
-    String filter = "tipoHito.descripcion~%00%";
+    String sort = "tipoHito.nombre,desc";
+    String filter = "tipoHito.descripcion=ke=00";
 
     Long idModeloEjecucion = 1L;
 
@@ -605,8 +630,8 @@ public class ModeloEjecucionIT extends BaseIT {
     headers.set("Authorization", String.format("bearer %s", tokenBuilder.buildToken("user", "CSP-ME-V")));
     headers.add("X-Page", "0");
     headers.add("X-Page-Size", "10");
-    String sort = "unidadGestionRef-";
-    String filter = "unidadGestionRef~%00%";
+    String sort = "unidadGestionRef,desc";
+    String filter = "unidadGestionRef=ke=00";
 
     Long idModeloEjecucion = 1L;
 

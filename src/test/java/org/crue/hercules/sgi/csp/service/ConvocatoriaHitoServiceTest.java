@@ -6,9 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.assertj.core.api.Assertions;
-import org.crue.hercules.sgi.csp.enums.ClasificacionCVNEnum;
-import org.crue.hercules.sgi.csp.enums.TipoDestinatarioEnum;
-import org.crue.hercules.sgi.csp.enums.TipoEstadoConvocatoriaEnum;
+import org.crue.hercules.sgi.csp.enums.ClasificacionCVN;
 import org.crue.hercules.sgi.csp.exceptions.ConvocatoriaHitoNotFoundException;
 import org.crue.hercules.sgi.csp.exceptions.ConvocatoriaNotFoundException;
 import org.crue.hercules.sgi.csp.model.Convocatoria;
@@ -26,12 +24,10 @@ import org.crue.hercules.sgi.csp.repository.ModeloTipoHitoRepository;
 import org.crue.hercules.sgi.csp.service.impl.ConvocatoriaHitoServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.BDDMockito;
 import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -41,7 +37,6 @@ import org.springframework.data.jpa.domain.Specification;
 /**
  * ConvocatoriaHitoServiceTest
  */
-@ExtendWith(MockitoExtension.class)
 
 public class ConvocatoriaHitoServiceTest extends BaseServiceTest {
 
@@ -171,8 +166,8 @@ public class ConvocatoriaHitoServiceTest extends BaseServiceTest {
             ArgumentMatchers.anyLong()))
         .willReturn(Optional.of(generarMockModeloTipoHito(1L, convocatoriaHito, Boolean.TRUE)));
 
-    BDDMockito.given(repository.findByFechaAndTipoHitoId(ArgumentMatchers.any(), ArgumentMatchers.anyLong()))
-        .willReturn(Optional.of(convocatoriaHito));
+    BDDMockito.given(repository.findByConvocatoriaIdAndFechaAndTipoHitoId(ArgumentMatchers.anyLong(),
+        ArgumentMatchers.any(), ArgumentMatchers.anyLong())).willReturn(Optional.of(convocatoriaHito));
 
     Assertions.assertThatThrownBy(
         // when: create ConvocatoriaHito
@@ -207,6 +202,25 @@ public class ConvocatoriaHitoServiceTest extends BaseServiceTest {
         // then: throw exception as tipoHitoId is null
         .isInstanceOf(IllegalArgumentException.class)
         .hasMessage("Id Hito no puede ser null para crear ConvocatoriaHito");
+  }
+
+  @Test
+  public void create_WithoutModeloEjecucion_ThrowsIllegalArgumentException() {
+    // given: ConvocatoriaHito con Convocatoria sin Modelo de Ejecucion
+    ConvocatoriaHito convocatoriaHito = generarMockConvocatoriaHito(null);
+    convocatoriaHito.getConvocatoria().setEstado(Convocatoria.Estado.BORRADOR);
+    convocatoriaHito.getConvocatoria().setModeloEjecucion(null);
+
+    BDDMockito.given(convocatoriaRepository.findById(ArgumentMatchers.anyLong()))
+        .willReturn(Optional.of(convocatoriaHito.getConvocatoria()));
+
+    Assertions.assertThatThrownBy(
+        // when: create ConvocatoriaHito
+        () -> service.create(convocatoriaHito))
+        // then: throw exception as ModeloEjecucion not found
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessage("TipoHito '%s' no disponible para el ModeloEjecucion '%s'",
+            convocatoriaHito.getTipoHito().getNombre(), "Convocatoria sin modelo asignado");
   }
 
   @Test
@@ -353,8 +367,8 @@ public class ConvocatoriaHitoServiceTest extends BaseServiceTest {
             ArgumentMatchers.anyLong()))
         .willReturn(Optional.of(generarMockModeloTipoHito(1L, convocatoriaHitoActualizado, Boolean.TRUE)));
 
-    BDDMockito.given(repository.findByFechaAndTipoHitoId(ArgumentMatchers.any(), ArgumentMatchers.anyLong()))
-        .willReturn(Optional.of(generarMockConvocatoriaHito(2L)));
+    BDDMockito.given(repository.findByConvocatoriaIdAndFechaAndTipoHitoId(ArgumentMatchers.anyLong(),
+        ArgumentMatchers.any(), ArgumentMatchers.anyLong())).willReturn(Optional.of(generarMockConvocatoriaHito(2L)));
 
     // when: Actualizamos el ConvocatoriaHito
     // then: Lanza una excepcion porque la fecha no existe
@@ -373,6 +387,28 @@ public class ConvocatoriaHitoServiceTest extends BaseServiceTest {
     // then: Lanza una excepcion porque el ConvocatoriaHito no existe
     Assertions.assertThatThrownBy(() -> service.update(convocatoriaHito))
         .isInstanceOf(ConvocatoriaHitoNotFoundException.class);
+  }
+
+  @Test
+  public void update_WithoutModeloEjecucion_ThrowsIllegalArgumentException() {
+    // given: ConvocatoriaHito con Convocatoria sin Modelo de Ejecucion
+    ConvocatoriaHito convocatoriaHito = generarMockConvocatoriaHito(1L);
+    convocatoriaHito.getConvocatoria().setEstado(Convocatoria.Estado.BORRADOR);
+    convocatoriaHito.getConvocatoria().setModeloEjecucion(null);
+    ConvocatoriaHito convocatoriaHitoActualizado = generarMockConvocatoriaHito(1L);
+    convocatoriaHitoActualizado.setTipoHito(generarMockTipoHito(2L, Boolean.TRUE));
+    convocatoriaHito.getConvocatoria().setEstado(Convocatoria.Estado.BORRADOR);
+    convocatoriaHito.getConvocatoria().setModeloEjecucion(null);
+
+    BDDMockito.given(repository.findById(ArgumentMatchers.<Long>any())).willReturn(Optional.of(convocatoriaHito));
+
+    Assertions.assertThatThrownBy(
+        // when: update ConvocatoriaHito
+        () -> service.update(convocatoriaHitoActualizado))
+        // then: throw exception as ModeloTipoHito not found
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessage("TipoHito '%s' no disponible para el ModeloEjecucion '%s'",
+            convocatoriaHitoActualizado.getTipoHito().getNombre(), "Convocatoria sin modelo asignado");
   }
 
   @Test
@@ -603,12 +639,12 @@ public class ConvocatoriaHitoServiceTest extends BaseServiceTest {
         .observaciones("observaciones-" + String.format("%03d", convocatoriaId))//
         .finalidad((modeloTipoFinalidad == null) ? null : modeloTipoFinalidad.getTipoFinalidad())//
         .regimenConcurrencia(tipoRegimenConcurrencia)//
-        .destinatarios(TipoDestinatarioEnum.INDIVIDUAL)//
+        .destinatarios(Convocatoria.Destinatarios.INDIVIDUAL)//
         .colaborativos(Boolean.TRUE)//
-        .estadoActual(TipoEstadoConvocatoriaEnum.REGISTRADA)//
+        .estado(Convocatoria.Estado.REGISTRADA)//
         .duracion(12)//
         .ambitoGeografico(tipoAmbitoGeografico)//
-        .clasificacionCVN(ClasificacionCVNEnum.AYUDAS)//
+        .clasificacionCVN(ClasificacionCVN.AYUDAS)//
         .activo(activo)//
         .build();
 

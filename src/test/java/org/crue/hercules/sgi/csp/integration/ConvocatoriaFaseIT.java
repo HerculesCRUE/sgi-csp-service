@@ -1,6 +1,6 @@
 package org.crue.hercules.sgi.csp.integration;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collections;
 
 import org.assertj.core.api.Assertions;
@@ -31,7 +31,7 @@ public class ConvocatoriaFaseIT extends BaseIT {
     headers.setContentType(MediaType.APPLICATION_JSON);
     headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
     headers.set("Authorization",
-        String.format("bearer %s", tokenBuilder.buildToken("user", "CSP-CENTGES-C", "CSP-CENTGES-V")));
+        String.format("bearer %s", tokenBuilder.buildToken("user", "CSP-CENTGES-C", "CSP-CENTGES-V", "CSP-CONV-C")));
 
     HttpEntity<ConvocatoriaFase> request = new HttpEntity<>(entity, headers);
     return request;
@@ -115,9 +115,8 @@ public class ConvocatoriaFaseIT extends BaseIT {
     ConvocatoriaFase convocatoriaFase = response.getBody();
     Assertions.assertThat(convocatoriaFase.getId()).as("getId()").isEqualTo(idConvocatoriaFase);
     Assertions.assertThat(convocatoriaFase.getConvocatoria().getId()).as("getConvocatoria().getId()").isEqualTo(1L);
-    Assertions.assertThat(convocatoriaFase.getFechaInicio()).as("getFechaIncio()")
-        .isEqualTo(LocalDate.of(2020, 10, 18));
-    Assertions.assertThat(convocatoriaFase.getFechaFin()).as("getFechaFin()").isEqualTo(LocalDate.of(2020, 11, 01));
+    Assertions.assertThat(convocatoriaFase.getFechaInicio()).as("getFechaInicio()").isEqualTo("2020-10-18T00:00");
+    Assertions.assertThat(convocatoriaFase.getFechaFin()).as("getFechaFin()").isEqualTo("2020-11-01T00:00");
     Assertions.assertThat(convocatoriaFase.getTipoFase().getId()).as("getTipoFase().getId()").isEqualTo(1L);
 
   }
@@ -139,8 +138,8 @@ public class ConvocatoriaFaseIT extends BaseIT {
     ConvocatoriaFase convocatoriaFase = new ConvocatoriaFase();
     convocatoriaFase.setId(id);
     convocatoriaFase.setConvocatoria(convocatoria);
-    convocatoriaFase.setFechaInicio(LocalDate.of(2020, 10, 19));
-    convocatoriaFase.setFechaFin(LocalDate.of(2020, 10, 28));
+    convocatoriaFase.setFechaInicio(LocalDateTime.of(2020, 10, 19, 17, 18, 19));
+    convocatoriaFase.setFechaFin(LocalDateTime.of(2020, 10, 28, 17, 18, 19));
     convocatoriaFase.setTipoFase(tipoFase);
     convocatoriaFase.setObservaciones("observaciones" + id);
 

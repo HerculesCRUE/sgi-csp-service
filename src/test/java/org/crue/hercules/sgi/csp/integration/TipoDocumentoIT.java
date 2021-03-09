@@ -25,6 +25,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 public class TipoDocumentoIT extends BaseIT {
 
   private static final String PATH_PARAMETER_ID = "/{id}";
+  private static final String PATH_PARAMETER_DESACTIVAR = "/desactivar";
+  private static final String PATH_PARAMETER_REACTIVAR = "/reactivar";
   private static final String TIPO_DOCUMENTO_CONTROLLER_BASE_PATH = "/tipodocumentos";
 
   private HttpEntity<TipoDocumento> buildRequest(HttpHeaders headers, TipoDocumento entity) throws Exception {
@@ -81,14 +83,37 @@ public class TipoDocumentoIT extends BaseIT {
   @Sql
   @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:cleanup.sql")
   @Test
-  public void delete_Return204() throws Exception {
+  public void reactivar_ReturnTipoDocumento() throws Exception {
     Long idTipoDocumento = 1L;
 
     final ResponseEntity<TipoDocumento> response = restTemplate.exchange(
-        TIPO_DOCUMENTO_CONTROLLER_BASE_PATH + PATH_PARAMETER_ID, HttpMethod.DELETE, buildRequest(null, null),
-        TipoDocumento.class, idTipoDocumento);
+        TIPO_DOCUMENTO_CONTROLLER_BASE_PATH + PATH_PARAMETER_ID + PATH_PARAMETER_REACTIVAR, HttpMethod.PATCH,
+        buildRequest(null, null), TipoDocumento.class, idTipoDocumento);
 
-    Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+    Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    TipoDocumento tipoDocumentoDisabled = response.getBody();
+    Assertions.assertThat(tipoDocumentoDisabled.getId()).as("getId()").isEqualTo(idTipoDocumento);
+    Assertions.assertThat(tipoDocumentoDisabled.getNombre()).as("getNombre()").isEqualTo("nombre-1");
+    Assertions.assertThat(tipoDocumentoDisabled.getDescripcion()).as("getDescripcion()").isEqualTo("descripcion-1");
+    Assertions.assertThat(tipoDocumentoDisabled.getActivo()).as("getActivo()").isEqualTo(Boolean.TRUE);
+  }
+
+  @Sql
+  @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:cleanup.sql")
+  @Test
+  public void desactivar_ReturnTipoDocumento() throws Exception {
+    Long idTipoDocumento = 1L;
+
+    final ResponseEntity<TipoDocumento> response = restTemplate.exchange(
+        TIPO_DOCUMENTO_CONTROLLER_BASE_PATH + PATH_PARAMETER_ID + PATH_PARAMETER_DESACTIVAR, HttpMethod.PATCH,
+        buildRequest(null, null), TipoDocumento.class, idTipoDocumento);
+
+    Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    TipoDocumento tipoDocumentoDisabled = response.getBody();
+    Assertions.assertThat(tipoDocumentoDisabled.getId()).as("getId()").isEqualTo(idTipoDocumento);
+    Assertions.assertThat(tipoDocumentoDisabled.getNombre()).as("getNombre()").isEqualTo("nombre-1");
+    Assertions.assertThat(tipoDocumentoDisabled.getDescripcion()).as("getDescripcion()").isEqualTo("descripcion-1");
+    Assertions.assertThat(tipoDocumentoDisabled.getActivo()).as("getActivo()").isEqualTo(Boolean.FALSE);
   }
 
   @Sql
@@ -117,8 +142,8 @@ public class TipoDocumentoIT extends BaseIT {
     headers.set("Authorization", String.format("bearer %s", tokenBuilder.buildToken("user", "CSP-TDOC-V")));
     headers.add("X-Page", "0");
     headers.add("X-Page-Size", "3");
-    String sort = "nombre-";
-    String filter = "descripcion~%00%";
+    String sort = "nombre,desc";
+    String filter = "descripcion=ke=00";
 
     URI uri = UriComponentsBuilder.fromUriString(TIPO_DOCUMENTO_CONTROLLER_BASE_PATH).queryParam("s", sort)
         .queryParam("q", filter).build(false).toUri();
@@ -151,8 +176,8 @@ public class TipoDocumentoIT extends BaseIT {
     headers.set("Authorization", String.format("bearer %s", tokenBuilder.buildToken("user", "CSP-TDOC-V")));
     headers.add("X-Page", "0");
     headers.add("X-Page-Size", "3");
-    String sort = "nombre-";
-    String filter = "descripcion~%00%";
+    String sort = "nombre,desc";
+    String filter = "descripcion=ke=00";
 
     URI uri = UriComponentsBuilder.fromUriString(TIPO_DOCUMENTO_CONTROLLER_BASE_PATH + "/todos").queryParam("s", sort)
         .queryParam("q", filter).build(false).toUri();

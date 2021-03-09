@@ -1,17 +1,17 @@
 package org.crue.hercules.sgi.csp.service;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import org.assertj.core.api.Assertions;
-import org.crue.hercules.sgi.csp.enums.ClasificacionCVNEnum;
-import org.crue.hercules.sgi.csp.enums.TipoDestinatarioEnum;
-import org.crue.hercules.sgi.csp.enums.TipoEstadoConvocatoriaEnum;
+import org.crue.hercules.sgi.csp.enums.ClasificacionCVN;
 import org.crue.hercules.sgi.csp.exceptions.ConvocatoriaFaseNotFoundException;
 import org.crue.hercules.sgi.csp.exceptions.ConvocatoriaNotFoundException;
+import org.crue.hercules.sgi.csp.model.ConfiguracionSolicitud;
 import org.crue.hercules.sgi.csp.model.Convocatoria;
 import org.crue.hercules.sgi.csp.model.ConvocatoriaFase;
 import org.crue.hercules.sgi.csp.model.ModeloEjecucion;
@@ -21,18 +21,17 @@ import org.crue.hercules.sgi.csp.model.TipoAmbitoGeografico;
 import org.crue.hercules.sgi.csp.model.TipoFase;
 import org.crue.hercules.sgi.csp.model.TipoFinalidad;
 import org.crue.hercules.sgi.csp.model.TipoRegimenConcurrencia;
+import org.crue.hercules.sgi.csp.repository.ConfiguracionSolicitudRepository;
 import org.crue.hercules.sgi.csp.repository.ConvocatoriaFaseRepository;
 import org.crue.hercules.sgi.csp.repository.ConvocatoriaRepository;
 import org.crue.hercules.sgi.csp.repository.ModeloTipoFaseRepository;
 import org.crue.hercules.sgi.csp.service.impl.ConvocatoriaFaseServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.BDDMockito;
 import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -42,24 +41,26 @@ import org.springframework.data.jpa.domain.Specification;
 /**
  * ConvocatoriaFaseServiceTest
  */
-@ExtendWith(MockitoExtension.class)
 
 public class ConvocatoriaFaseServiceTest extends BaseServiceTest {
 
   @Mock
   private ConvocatoriaFaseRepository repository;
-
   @Mock
   private ConvocatoriaRepository convocatoriaRepository;
-
+  @Mock
+  private ConfiguracionSolicitudRepository configuracionSolicitudRepository;
   @Mock
   private ModeloTipoFaseRepository modeloTipoFaseRepository;
+  @Mock
+  private ConvocatoriaService convocatoriaService;
 
   private ConvocatoriaFaseService service;
 
   @BeforeEach
   public void setUp() throws Exception {
-    service = new ConvocatoriaFaseServiceImpl(repository, convocatoriaRepository, modeloTipoFaseRepository);
+    service = new ConvocatoriaFaseServiceImpl(repository, convocatoriaRepository, configuracionSolicitudRepository,
+        modeloTipoFaseRepository, convocatoriaService);
   }
 
   @Test
@@ -155,6 +156,25 @@ public class ConvocatoriaFaseServiceTest extends BaseServiceTest {
         // then: throw exception as tipoFaseId is null
         .isInstanceOf(IllegalArgumentException.class)
         .hasMessage("Id Fase no puede ser null para crear ConvocatoriaFase");
+  }
+
+  @Test
+  public void create_WithoutModeloEjecucion_ThrowsIllegalArgumentException() {
+    // given: ConvocatoriaFase con Convocatoria sin Modelo de Ejecucion
+    ConvocatoriaFase convocatoriaFase = generarMockConvocatoriaFase(null);
+    convocatoriaFase.getConvocatoria().setEstado(Convocatoria.Estado.BORRADOR);
+    convocatoriaFase.getConvocatoria().setModeloEjecucion(null);
+
+    BDDMockito.given(convocatoriaRepository.findById(ArgumentMatchers.anyLong()))
+        .willReturn(Optional.of(convocatoriaFase.getConvocatoria()));
+
+    Assertions.assertThatThrownBy(
+        // when: create ConvocatoriaFase
+        () -> service.create(convocatoriaFase))
+        // then: throw exception as ModeloEjecucion not found
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessage("TipoFase '%s' no disponible para el ModeloEjecucion '%s'",
+            convocatoriaFase.getTipoFase().getNombre(), "Convocatoria sin modelo asignado");
   }
 
   @Test
@@ -304,6 +324,28 @@ public class ConvocatoriaFaseServiceTest extends BaseServiceTest {
   }
 
   @Test
+  public void update_WithoutModeloEjecucion_ThrowsIllegalArgumentException() {
+    // given: ConvocatoriaFase con Convocatoria sin Modelo de Ejecucion
+    ConvocatoriaFase convocatoriaFase = generarMockConvocatoriaFase(1L);
+    convocatoriaFase.getConvocatoria().setEstado(Convocatoria.Estado.BORRADOR);
+    convocatoriaFase.getConvocatoria().setModeloEjecucion(null);
+    ConvocatoriaFase convocatoriaFaseActualizado = generarMockConvocatoriaFase(1L);
+    convocatoriaFaseActualizado.setTipoFase(generarMockTipoFase(2L, Boolean.TRUE));
+    convocatoriaFase.getConvocatoria().setEstado(Convocatoria.Estado.BORRADOR);
+    convocatoriaFase.getConvocatoria().setModeloEjecucion(null);
+
+    BDDMockito.given(repository.findById(ArgumentMatchers.<Long>any())).willReturn(Optional.of(convocatoriaFase));
+
+    Assertions.assertThatThrownBy(
+        // when: update ConvocatoriaFase
+        () -> service.update(convocatoriaFaseActualizado))
+        // then: throw exception as ModeloTipoFase not found
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessage("TipoFase '%s' no disponible para el ModeloEjecucion '%s'",
+            convocatoriaFaseActualizado.getTipoFase().getNombre(), "Convocatoria sin modelo asignado");
+  }
+
+  @Test
   public void update_WithoutModeloTipoFase_ThrowsIllegalArgumentException() {
     // given: ConvocatoriaFase con TipoFase no asignado al Modelo de Ejecucion de la
     // convocatoria
@@ -405,11 +447,38 @@ public class ConvocatoriaFaseServiceTest extends BaseServiceTest {
   }
 
   @Test
+  public void update_SelectedInConfiguracionSolicitudWhenModificableReturnsFalse_ThrowsIllegalArgumentException() {
+    // given: a ConvocatoriaFase selected in ConfiguracionSolicitud when
+    // modificable return false
+    ConvocatoriaFase convocatoriaFase = generarMockConvocatoriaFase(1L);
+    ConfiguracionSolicitud configuracionSolicitud = ConfiguracionSolicitud.builder()
+        .fasePresentacionSolicitudes(convocatoriaFase).convocatoria(convocatoriaFase.getConvocatoria()).build();
+
+    BDDMockito.given(repository.findById(ArgumentMatchers.<Long>any())).willReturn(Optional.of(convocatoriaFase));
+    BDDMockito.given(configuracionSolicitudRepository.findByConvocatoriaId(ArgumentMatchers.<Long>any()))
+        .willReturn(Optional.of(configuracionSolicitud));
+    BDDMockito.given(convocatoriaService.modificable(ArgumentMatchers.anyLong(), ArgumentMatchers.<String>any()))
+        .willReturn(Boolean.FALSE);
+
+    Assertions.assertThatThrownBy(
+        // when: update ConvocatoriaFase
+        () -> service.update(convocatoriaFase))
+        // then: throw exception as Convocatoria is not modificable
+        .isInstanceOf(IllegalArgumentException.class).hasMessage(
+            "No se puede modificar ConvocatoriaFase. No tiene los permisos necesarios o se encuentra asignada a la ConfiguracionSolicitud de una convocatoria que está registrada y cuenta con solicitudes o proyectos asociados");
+  }
+
+  @Test
   public void delete_WithExistingId_NoReturnsAnyException() {
     // given: existing ConvocatoriaFase
     Long id = 1L;
 
-    BDDMockito.given(repository.existsById(ArgumentMatchers.anyLong())).willReturn(Boolean.TRUE);
+    BDDMockito.given(repository.findById(ArgumentMatchers.anyLong()))
+        .willReturn(Optional.of(generarMockConvocatoriaFase(1L)));
+
+    BDDMockito.given(configuracionSolicitudRepository.findByFasePresentacionSolicitudesId(ArgumentMatchers.anyLong(),
+        ArgumentMatchers.<Pageable>any())).willReturn(new PageImpl<>(Collections.emptyList()));
+
     BDDMockito.doNothing().when(repository).deleteById(ArgumentMatchers.anyLong());
 
     Assertions.assertThatCode(
@@ -424,13 +493,36 @@ public class ConvocatoriaFaseServiceTest extends BaseServiceTest {
     // given: no existing id
     Long id = 1L;
 
-    BDDMockito.given(repository.existsById(ArgumentMatchers.anyLong())).willReturn(Boolean.FALSE);
+    BDDMockito.given(repository.findById(ArgumentMatchers.anyLong())).willReturn(Optional.empty());
 
     Assertions.assertThatThrownBy(
         // when: delete
         () -> service.delete(id))
         // then: NotFoundException is thrown
         .isInstanceOf(ConvocatoriaFaseNotFoundException.class);
+  }
+
+  @Test
+  public void delete_SelectedInConfiguracionSolicitudWhenModificableReturnsFalse_ThrowsIllegalArgumentException() {
+    // given: existing ConvocatoriaFase when modificable returns false
+    Long id = 1L;
+    ConvocatoriaFase convocatoriaFase = generarMockConvocatoriaFase(id);
+    ConfiguracionSolicitud configuracionSolicitud = ConfiguracionSolicitud.builder()
+        .fasePresentacionSolicitudes(convocatoriaFase).convocatoria(convocatoriaFase.getConvocatoria()).build();
+
+    BDDMockito.given(repository.findById(ArgumentMatchers.anyLong()))
+        .willReturn(Optional.of(generarMockConvocatoriaFase(id)));
+    BDDMockito.given(configuracionSolicitudRepository.findByConvocatoriaId(ArgumentMatchers.<Long>any()))
+        .willReturn(Optional.of(configuracionSolicitud));
+    BDDMockito.given(convocatoriaService.modificable(ArgumentMatchers.<Long>any(), ArgumentMatchers.<String>any()))
+        .willReturn(Boolean.FALSE);
+
+    Assertions.assertThatCode(
+        // when: delete by existing id
+        () -> service.delete(id))
+        // then: throw exception as Convocatoria is not modificable
+        .isInstanceOf(IllegalArgumentException.class).hasMessage(
+            "No se puede eliminar ConvocatoriaFase. No tiene los permisos necesarios o se encuentra asignada a la ConfiguracionSolicitud de una convocatoria que está registrada y cuenta con solicitudes o proyectos asociados");
   }
 
   @Test
@@ -562,12 +654,12 @@ public class ConvocatoriaFaseServiceTest extends BaseServiceTest {
         .observaciones("observaciones-" + String.format("%03d", convocatoriaId))//
         .finalidad((modeloTipoFinalidad == null) ? null : modeloTipoFinalidad.getTipoFinalidad())//
         .regimenConcurrencia(tipoRegimenConcurrencia)//
-        .destinatarios(TipoDestinatarioEnum.INDIVIDUAL)//
+        .destinatarios(Convocatoria.Destinatarios.INDIVIDUAL)//
         .colaborativos(Boolean.TRUE)//
-        .estadoActual(TipoEstadoConvocatoriaEnum.REGISTRADA)//
+        .estado(Convocatoria.Estado.REGISTRADA)//
         .duracion(12)//
         .ambitoGeografico(tipoAmbitoGeografico)//
-        .clasificacionCVN(ClasificacionCVNEnum.AYUDAS)//
+        .clasificacionCVN(ClasificacionCVN.AYUDAS)//
         .activo(activo)//
         .build();
 
@@ -621,8 +713,8 @@ public class ConvocatoriaFaseServiceTest extends BaseServiceTest {
     return ConvocatoriaFase.builder()//
         .id(id)//
         .convocatoria(generarMockConvocatoria(1L, 1L, 1L, 1L, 1L, 1L, Boolean.TRUE))//
-        .fechaInicio(LocalDate.of(2020, 10, 19))//
-        .fechaFin(LocalDate.of(2020, 10, 28))//
+        .fechaInicio(LocalDateTime.of(2020, 10, 19, 17, 18, 19))//
+        .fechaFin(LocalDateTime.of(2020, 10, 28, 17, 18, 19))//
         .tipoFase(generarMockTipoFase(1L, Boolean.TRUE))//
         .observaciones("observaciones" + id)//
         .build();

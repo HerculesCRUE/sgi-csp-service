@@ -1,14 +1,11 @@
 package org.crue.hercules.sgi.csp.service.impl;
 
-import java.util.List;
-
 import org.crue.hercules.sgi.csp.exceptions.TipoHitoNotFoundException;
 import org.crue.hercules.sgi.csp.model.TipoHito;
 import org.crue.hercules.sgi.csp.repository.TipoHitoRepository;
 import org.crue.hercules.sgi.csp.repository.specification.TipoHitoSpecifications;
 import org.crue.hercules.sgi.csp.service.TipoHitoService;
-import org.crue.hercules.sgi.framework.data.jpa.domain.QuerySpecification;
-import org.crue.hercules.sgi.framework.data.search.QueryCriteria;
+import org.crue.hercules.sgi.framework.rsql.SgiRSQLJPASupport;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -40,9 +37,9 @@ public class TipoHitoServiceImpl implements TipoHitoService {
   public TipoHito create(TipoHito tipoHito) {
     log.debug("create(TipoHito tipoHito) - start");
 
-    Assert.isNull(tipoHito.getId(), "tipoHito id tiene que ser null para crear un nuevo tipoHito");
-    Assert.isTrue(!(tipoHitoRepository.findByNombre(tipoHito.getNombre()).isPresent()),
-        "Ya existe TipoHito con el nombre " + tipoHito.getNombre());
+    Assert.isNull(tipoHito.getId(), "TipoHito id tiene que ser null para crear un nuevo tipoHito");
+    Assert.isTrue(!(tipoHitoRepository.findByNombreAndActivoIsTrue(tipoHito.getNombre()).isPresent()),
+        "Ya existe un TipoHito activo con el nombre '" + tipoHito.getNombre() + "'");
 
     tipoHito.setActivo(Boolean.TRUE);
     TipoHito returnValue = tipoHitoRepository.save(tipoHito);
@@ -63,15 +60,15 @@ public class TipoHitoServiceImpl implements TipoHitoService {
     log.debug("update(TipoHito tipoHitoActualizar) - start");
 
     Assert.notNull(tipoHitoActualizar.getId(), "TipoHito id no puede ser null para actualizar");
-    tipoHitoRepository.findByNombre(tipoHitoActualizar.getNombre()).ifPresent((tipoHitoExistente) -> {
+    tipoHitoRepository.findByNombreAndActivoIsTrue(tipoHitoActualizar.getNombre()).ifPresent((tipoHitoExistente) -> {
       Assert.isTrue(tipoHitoActualizar.getId() == tipoHitoExistente.getId(),
-          "Ya existe un TipoHito con el nombre " + tipoHitoExistente.getNombre());
+          "Ya existe un TipoHito activo con el nombre '" + tipoHitoExistente.getNombre() + "'");
     });
 
     return tipoHitoRepository.findById(tipoHitoActualizar.getId()).map(tipoHito -> {
       tipoHito.setNombre(tipoHitoActualizar.getNombre());
       tipoHito.setDescripcion(tipoHitoActualizar.getDescripcion());
-      tipoHito.setActivo(tipoHitoActualizar.getActivo());
+
       TipoHito returnValue = tipoHitoRepository.save(tipoHito);
       log.debug("update(TipoHito tipoHitoActualizar) - end");
       return returnValue;
@@ -87,16 +84,13 @@ public class TipoHitoServiceImpl implements TipoHitoService {
    * @return la lista de entidades {@link TipoHito} paginadas
    */
   @Override
-  public Page<TipoHito> findAll(List<QueryCriteria> query, Pageable pageable) {
-    log.debug("findAll(List<QueryCriteria> query, Pageable pageable) - start");
-    Specification<TipoHito> specByQuery = new QuerySpecification<TipoHito>(query);
-    Specification<TipoHito> specActivos = TipoHitoSpecifications.activos();
-
-    Specification<TipoHito> specs = Specification.where(specActivos).and(specByQuery);
+  public Page<TipoHito> findAll(String query, Pageable pageable) {
+    log.debug("findAll(String query, Pageable pageable) - start");
+    Specification<TipoHito> specs = TipoHitoSpecifications.activos().and(SgiRSQLJPASupport.toSpecification(query));
 
     Page<TipoHito> returnValue = tipoHitoRepository.findAll(specs, pageable);
 
-    log.debug("findAll(List<QueryCriteria> query, Pageable pageable) - end");
+    log.debug("findAll(String query, Pageable pageable) - end");
     return returnValue;
   }
 
@@ -108,13 +102,13 @@ public class TipoHitoServiceImpl implements TipoHitoService {
    * @return la lista de entidades {@link TipoHito} paginadas
    */
   @Override
-  public Page<TipoHito> findAllTodos(List<QueryCriteria> query, Pageable pageable) {
-    log.debug("findAll(List<QueryCriteria> query, Pageable pageable) - start");
-    Specification<TipoHito> spec = new QuerySpecification<TipoHito>(query);
+  public Page<TipoHito> findAllTodos(String query, Pageable pageable) {
+    log.debug("findAll(String query, Pageable pageable) - start");
+    Specification<TipoHito> specs = SgiRSQLJPASupport.toSpecification(query);
 
-    Page<TipoHito> returnValue = tipoHitoRepository.findAll(spec, pageable);
+    Page<TipoHito> returnValue = tipoHitoRepository.findAll(specs, pageable);
 
-    log.debug("findAll(List<QueryCriteria> query, Pageable pageable) - end");
+    log.debug("findAll(String query, Pageable pageable) - end");
     return returnValue;
   }
 
@@ -133,24 +127,56 @@ public class TipoHitoServiceImpl implements TipoHitoService {
   }
 
   /**
-   * Elimina el {@link TipoHito} por id.
+   * Reactiva el {@link TipoHito}.
    *
-   * @param id el id de la entidad {@link TipoHito}.
+   * @param id Id del {@link TipoHito}.
+   * @return la entidad {@link TipoHito} persistida.
    */
   @Override
   @Transactional
-  public TipoHito disable(Long id) throws TipoHitoNotFoundException {
-    log.debug("disable(Long id) start");
-    Assert.notNull(id, "El id no puede ser nulo");
+  public TipoHito enable(Long id) {
+    log.debug("enable(Long id) - start");
+
+    Assert.notNull(id, "TipoHito id no puede ser null para reactivar un TipoHito");
 
     return tipoHitoRepository.findById(id).map(tipoHito -> {
-      tipoHito.setActivo(false);
+      if (tipoHito.getActivo()) {
+        return tipoHito;
+      }
 
+      Assert.isTrue(!(tipoHitoRepository.findByNombreAndActivoIsTrue(tipoHito.getNombre()).isPresent()),
+          "Ya existe un TipoHito activo con el nombre '" + tipoHito.getNombre() + "'");
+
+      tipoHito.setActivo(true);
+      TipoHito returnValue = tipoHitoRepository.save(tipoHito);
+      log.debug("enable(Long id) - end");
+      return returnValue;
+    }).orElseThrow(() -> new TipoHitoNotFoundException(id));
+  }
+
+  /**
+   * Desactiva el {@link TipoHito}.
+   *
+   * @param id Id del {@link TipoHito}.
+   * @return la entidad {@link TipoHito} persistida.
+   */
+  @Override
+  @Transactional
+  public TipoHito disable(Long id) {
+    log.debug("disable(Long id) - start");
+
+    Assert.notNull(id, "TipoHito id no puede ser null para desactivar un TipoHito");
+
+    return tipoHitoRepository.findById(id).map(tipoHito -> {
+      if (!tipoHito.getActivo()) {
+        return tipoHito;
+      }
+
+      tipoHito.setActivo(false);
       TipoHito returnValue = tipoHitoRepository.save(tipoHito);
       log.debug("disable(Long id) - end");
       return returnValue;
     }).orElseThrow(() -> new TipoHitoNotFoundException(id));
-
   }
 
 }

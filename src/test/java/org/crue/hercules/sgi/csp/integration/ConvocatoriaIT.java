@@ -5,9 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.assertj.core.api.Assertions;
-import org.crue.hercules.sgi.csp.enums.ClasificacionCVNEnum;
-import org.crue.hercules.sgi.csp.enums.TipoDestinatarioEnum;
-import org.crue.hercules.sgi.csp.enums.TipoEstadoConvocatoriaEnum;
+import org.crue.hercules.sgi.csp.enums.ClasificacionCVN;
 import org.crue.hercules.sgi.csp.model.Convocatoria;
 import org.crue.hercules.sgi.csp.model.ConvocatoriaAreaTematica;
 import org.crue.hercules.sgi.csp.model.ConvocatoriaConceptoGasto;
@@ -48,6 +46,11 @@ public class ConvocatoriaIT extends BaseIT {
   private static final String PATH_PARAMETER_REACTIVAR = "/reactivar";
   private static final String PATH_PARAMETER_REGISTRAR = "/registrar";
   private static final String PATH_PARAMETER_TODOS = "/todos";
+  private static final String PATH_PARAMETER_VINCULACIONES = "/vinculaciones";
+  private static final String PATH_PARAMETER_MODIFICABLE = "/modificable";
+  private static final String PATH_PARAMETER_REGISTRABLE = "/registrable";
+  private static final String PATH_PARAMETER_UNIDAD_GESTION = "/unidadgestion";
+  private static final String PATH_PARAMETER_MODELO_EJECUCION = "/modeloejecucion";
   private static final String CONTROLLER_BASE_PATH = "/convocatorias";
   private static final String PATH_AREA_TEMATICA = "/convocatoriaareatematicas";
   private static final String PATH_ENTIDAD_DOCUMENTO = "/convocatoriadocumentos";
@@ -68,7 +71,7 @@ public class ConvocatoriaIT extends BaseIT {
     headers.setContentType(MediaType.APPLICATION_JSON);
     headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
     headers.set("Authorization", String.format("bearer %s", tokenBuilder.buildToken("user", "SYSADMIN", "CSP-TFAS-B",
-        "CSP-TFAS-C", "CSP-TFAS-E", "CSP-TFAS-V", "CSP-CENTGES-V", "CSP-CATEM-V", "CSP-CENL-V_OPE")));
+        "CSP-TFAS-C", "CSP-TFAS-E", "CSP-TFAS-V", "CSP-CENTGES-V", "CSP-CATEM-V", "CSP-CENL-V_OPE", "CSP-CONV-C")));
 
     HttpEntity<Convocatoria> request = new HttpEntity<>(entity, headers);
     return request;
@@ -82,6 +85,7 @@ public class ConvocatoriaIT extends BaseIT {
     // given: new Convocatoria
     Convocatoria convocatoria = generarMockConvocatoria(1L, 1L, 1L, 1L, 1L, 1L, Boolean.TRUE);
     convocatoria.setId(null);
+    convocatoria.setEstado(Convocatoria.Estado.BORRADOR);
 
     // when: create Convocatoria
     final ResponseEntity<Convocatoria> response = restTemplate.exchange(CONTROLLER_BASE_PATH, HttpMethod.POST,
@@ -109,8 +113,7 @@ public class ConvocatoriaIT extends BaseIT {
         .isEqualTo(convocatoria.getDestinatarios());
     Assertions.assertThat(responseData.getColaborativos()).as("getColaborativos()")
         .isEqualTo(convocatoria.getColaborativos());
-    Assertions.assertThat(responseData.getEstadoActual()).as("getEstadoActual()")
-        .isEqualTo(TipoEstadoConvocatoriaEnum.BORRADOR);
+    Assertions.assertThat(responseData.getEstado()).as("getEstado()").isEqualTo(Convocatoria.Estado.BORRADOR);
     Assertions.assertThat(responseData.getDuracion()).as("getDuracion()").isEqualTo(convocatoria.getDuracion());
     Assertions.assertThat(responseData.getAmbitoGeografico().getId()).as("getAmbitoGeografico().getId()")
         .isEqualTo(convocatoria.getAmbitoGeografico().getId());
@@ -129,7 +132,7 @@ public class ConvocatoriaIT extends BaseIT {
     Convocatoria convocatoria = generarMockConvocatoria(1L, 1L, 1L, 1L, 1L, 1L, Boolean.TRUE);
     convocatoria.setCodigo("codigo-modificado");
     convocatoria.setTitulo("titulo-modificado");
-    convocatoria.setObservaciones("observaciones-modifcadas");
+    convocatoria.setObservaciones("observaciones-modificadas");
 
     // when: update Convocatoria
     final ResponseEntity<Convocatoria> response = restTemplate.exchange(CONTROLLER_BASE_PATH + PATH_PARAMETER_ID,
@@ -157,8 +160,7 @@ public class ConvocatoriaIT extends BaseIT {
         .isEqualTo(convocatoria.getDestinatarios());
     Assertions.assertThat(responseData.getColaborativos()).as("getColaborativos()")
         .isEqualTo(convocatoria.getColaborativos());
-    Assertions.assertThat(responseData.getEstadoActual()).as("getEstadoActual()")
-        .isEqualTo(convocatoria.getEstadoActual());
+    Assertions.assertThat(responseData.getEstado()).as("getEstado()").isEqualTo(convocatoria.getEstado());
     Assertions.assertThat(responseData.getDuracion()).as("getDuracion()").isEqualTo(convocatoria.getDuracion());
     Assertions.assertThat(responseData.getAmbitoGeografico().getId()).as("getAmbitoGeografico().getId()")
         .isEqualTo(convocatoria.getAmbitoGeografico().getId());
@@ -183,8 +185,8 @@ public class ConvocatoriaIT extends BaseIT {
     Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     Convocatoria convocatoriaRegistrada = response.getBody();
     Assertions.assertThat(convocatoriaRegistrada.getId()).as("getId()").isEqualTo(convocatoriaId);
-    Assertions.assertThat(convocatoriaRegistrada.getEstadoActual()).as("getEstadoActual()")
-        .isEqualTo(TipoEstadoConvocatoriaEnum.REGISTRADA);
+    Assertions.assertThat(convocatoriaRegistrada.getEstado()).as("getEstado()")
+        .isEqualTo(Convocatoria.Estado.REGISTRADA);
   }
 
   @Sql
@@ -234,6 +236,175 @@ public class ConvocatoriaIT extends BaseIT {
   @Sql
   @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:cleanup.sql")
   @Test
+  public void convocatoria_WithVinculaciones_Returns200() throws Exception {
+
+    // given: existing Convocatoria with vinculaciones enlaces, hitos, fases or
+    // documentos
+    Long id = 1L;
+
+    // when: check vinculaciones
+    final ResponseEntity<Convocatoria> response = restTemplate.exchange(
+        CONTROLLER_BASE_PATH + PATH_PARAMETER_ID + PATH_PARAMETER_VINCULACIONES, HttpMethod.HEAD,
+        buildRequest(null, null), Convocatoria.class, id);
+
+    // then: Response is 200 OK
+    Assertions.assertThat(response).isNotNull();
+    Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+  }
+
+  @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:cleanup.sql")
+  @Test
+  public void convocatoria_WithoutVinculaciones_Returns204() throws Exception {
+
+    // given: existing Convocatoria without vinculaciones enlaces, hitos, fases or
+    // documentos
+    Long id = 1L;
+
+    // when: check vinculaciones
+    final ResponseEntity<Convocatoria> response = restTemplate.exchange(
+        CONTROLLER_BASE_PATH + PATH_PARAMETER_ID + PATH_PARAMETER_VINCULACIONES, HttpMethod.HEAD,
+        buildRequest(null, null), Convocatoria.class, id);
+
+    // then: Response is 204 No Content
+    Assertions.assertThat(response).isNotNull();
+    Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+  }
+
+  @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:cleanup.sql")
+  @Test
+  public void modificable_WhenModificableReturnsTrue_Returns200() throws Exception {
+
+    // given: existing Convocatoria When modificable returns true
+    Long id = 1L;
+
+    // when: check modificable
+    final ResponseEntity<Convocatoria> response = restTemplate.exchange(
+        CONTROLLER_BASE_PATH + PATH_PARAMETER_ID + PATH_PARAMETER_MODIFICABLE, HttpMethod.HEAD,
+        buildRequest(null, null), Convocatoria.class, id);
+
+    // then: Response is 200 OK
+    Assertions.assertThat(response).isNotNull();
+    Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+  }
+
+  @Sql
+  @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:cleanup.sql")
+  @Test
+  public void modificable_ConvocatoriaRegistradaWithSolicitudesOrProyectosIsTrue_Returns204() throws Exception {
+
+    // given: existing Convocatoria registrada with Solicitudes or Proyectos
+    Long id = 1L;
+
+    // when: check vinculaciones
+    final ResponseEntity<Convocatoria> response = restTemplate.exchange(
+        CONTROLLER_BASE_PATH + PATH_PARAMETER_ID + PATH_PARAMETER_MODIFICABLE, HttpMethod.HEAD,
+        buildRequest(null, null), Convocatoria.class, id);
+
+    // then: Response is 204 No Content
+    Assertions.assertThat(response).isNotNull();
+    Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+  }
+
+  @Sql
+  @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:cleanup.sql")
+  @Test
+  public void registrable_WhenRegistrableReturnsTrue_Returns200() throws Exception {
+
+    // given: existing Convocatoria When registrable returns true
+    Long id = 1L;
+
+    // when: check registrable
+    final ResponseEntity<Convocatoria> response = restTemplate.exchange(
+        CONTROLLER_BASE_PATH + PATH_PARAMETER_ID + PATH_PARAMETER_REGISTRABLE, HttpMethod.HEAD,
+        buildRequest(null, null), Convocatoria.class, id);
+
+    // then: Response is 200 OK
+    Assertions.assertThat(response).isNotNull();
+    Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+  }
+
+  @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:cleanup.sql")
+  @Test
+  public void registrable_WhenRegistrableReturnsFalse_Returns204() throws Exception {
+
+    // given: existing Convocatoria When registrable returns false
+    Long id = 1L;
+
+    // when: check registrable
+    final ResponseEntity<Convocatoria> response = restTemplate.exchange(
+        CONTROLLER_BASE_PATH + PATH_PARAMETER_ID + PATH_PARAMETER_REGISTRABLE, HttpMethod.HEAD,
+        buildRequest(null, null), Convocatoria.class, id);
+
+    // then: Response is 204 No Content
+    Assertions.assertThat(response).isNotNull();
+    Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+  }
+
+  @Sql
+  @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:cleanup.sql")
+  @Test
+  public void existsById_Returns200() throws Exception {
+    // given: existing id
+    Long id = 1L;
+    // when: exists by id
+    final ResponseEntity<Convocatoria> response = restTemplate.exchange(CONTROLLER_BASE_PATH + PATH_PARAMETER_ID,
+        HttpMethod.HEAD, buildRequest(null, null), Convocatoria.class, id);
+    // then: 200 OK
+    Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+  }
+
+  @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:cleanup.sql")
+  @Test
+  public void existsById_Returns204() throws Exception {
+    // given: no existing id
+    Long id = 1L;
+    // when: exists by id
+    final ResponseEntity<Convocatoria> response = restTemplate.exchange(CONTROLLER_BASE_PATH + PATH_PARAMETER_ID,
+        HttpMethod.HEAD, buildRequest(null, null), Convocatoria.class, id);
+    // then: 204 No Content
+    Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+  }
+
+  @Sql
+  @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:cleanup.sql")
+  @Test
+  public void getUnidadGestionRef_ReturnsUnidadGestionRef() throws Exception {
+
+    // given: Convocatoria id
+    Long id = 1L;
+    // when: getUnidadGestionRef by Convocatoria id
+    final ResponseEntity<String> response = restTemplate.exchange(
+        CONTROLLER_BASE_PATH + PATH_PARAMETER_ID + PATH_PARAMETER_UNIDAD_GESTION, HttpMethod.GET,
+        buildRequest(null, null), String.class, id);
+
+    // then: returns UnidadGestionRef assigned to Convocatoria
+    Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    String responseData = response.getBody();
+    Assertions.assertThat(responseData).as("getUnidadGestionRef()").isEqualTo("OPE");
+  }
+
+  @Sql
+  @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:cleanup.sql")
+  @Test
+  public void getModeloEjecucion_ReturnsModeloEjecucion() throws Exception {
+
+    // given: Convocatoria id
+    Long id = 1L;
+    // when: getModeloEjecucion by Convocatoria id
+    final ResponseEntity<ModeloEjecucion> response = restTemplate.exchange(
+        CONTROLLER_BASE_PATH + PATH_PARAMETER_ID + PATH_PARAMETER_MODELO_EJECUCION, HttpMethod.GET,
+        buildRequest(null, null), ModeloEjecucion.class, id);
+
+    // then: returns ModeloEjecucion assigned to Convocatoria
+    Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    ModeloEjecucion responseData = response.getBody();
+    Assertions.assertThat(responseData).isNotNull();
+    Assertions.assertThat(responseData.getId()).as("getId()").isEqualTo(1L);
+  }
+
+  @Sql
+  @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:cleanup.sql")
+  @Test
   public void findById_ReturnsConvocatoria() throws Exception {
     Long id = 1L;
 
@@ -255,14 +426,13 @@ public class ConvocatoriaIT extends BaseIT {
     Assertions.assertThat(responseData.getRegimenConcurrencia().getId()).as("getRegimenConcurrencia().getId()")
         .isEqualTo(1L);
     Assertions.assertThat(responseData.getDestinatarios()).as("getDestinatarios()")
-        .isEqualTo(TipoDestinatarioEnum.INDIVIDUAL);
+        .isEqualTo(Convocatoria.Destinatarios.INDIVIDUAL);
     Assertions.assertThat(responseData.getColaborativos()).as("getColaborativos()").isEqualTo(Boolean.TRUE);
-    Assertions.assertThat(responseData.getEstadoActual()).as("getEstadoActual()")
-        .isEqualTo(TipoEstadoConvocatoriaEnum.REGISTRADA);
+    Assertions.assertThat(responseData.getEstado()).as("getEstado()").isEqualTo(Convocatoria.Estado.REGISTRADA);
     Assertions.assertThat(responseData.getDuracion()).as("getDuracion()").isEqualTo(12);
     Assertions.assertThat(responseData.getAmbitoGeografico().getId()).as("getAmbitoGeografico().getId()").isEqualTo(1L);
     Assertions.assertThat(responseData.getClasificacionCVN()).as("getClasificacionCVN()")
-        .isEqualTo(ClasificacionCVNEnum.AYUDAS);
+        .isEqualTo(ClasificacionCVN.AYUDAS);
     Assertions.assertThat(responseData.getActivo()).as("getActivo()").isEqualTo(Boolean.TRUE);
 
   }
@@ -279,8 +449,8 @@ public class ConvocatoriaIT extends BaseIT {
     headers.set("Authorization", String.format("bearer %s", tokenBuilder.buildToken("user", "CSP-CONV-V")));
     headers.add("X-Page", "0");
     headers.add("X-Page-Size", "3");
-    String sort = "codigo-";
-    String filter = "titulo~%00%";
+    String sort = "codigo,desc";
+    String filter = "titulo=ke=00";
 
     // when: find Convocatoria
     URI uri = UriComponentsBuilder.fromUriString(CONTROLLER_BASE_PATH).queryParam("s", sort).queryParam("q", filter)
@@ -318,8 +488,8 @@ public class ConvocatoriaIT extends BaseIT {
     headers.set("Authorization", String.format("bearer %s", tokenBuilder.buildToken("user", "CSP-CONV-V_OPE")));
     headers.add("X-Page", "0");
     headers.add("X-Page-Size", "3");
-    String sort = "codigo-";
-    String filter = "titulo~%00%";
+    String sort = "codigo,desc";
+    String filter = "titulo=ke=00";
 
     // when: find Convocatoria
     URI uri = UriComponentsBuilder.fromUriString(CONTROLLER_BASE_PATH + PATH_PARAMETER_TODOS).queryParam("s", sort)
@@ -355,8 +525,8 @@ public class ConvocatoriaIT extends BaseIT {
     headers.set("Authorization", String.format("bearer %s", tokenBuilder.buildToken("user", "CSP-CONV-V")));
     headers.add("X-Page", "0");
     headers.add("X-Page-Size", "3");
-    String sort = "codigo-";
-    String filter = "titulo~%00%";
+    String sort = "codigo,desc";
+    String filter = "titulo=ke=00";
 
     URI uri = UriComponentsBuilder.fromUriString(CONTROLLER_BASE_PATH + PATH_PARAMETER_TODOS).queryParam("s", sort)
         .queryParam("q", filter).build(false).toUri();
@@ -372,6 +542,45 @@ public class ConvocatoriaIT extends BaseIT {
   @Sql
   @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:cleanup.sql")
   @Test
+  public void findAllRestringidos_WithPagingSortingAndFiltering_ReturnsConvocatoriaSubList() throws Exception {
+
+    // given: data for Convocatoria
+
+    // first page, 3 elements per page sorted by nombre desc
+    HttpHeaders headers = new HttpHeaders();
+    headers.set("Authorization", String.format("bearer %s", tokenBuilder.buildToken("user", "CSP-CONV-V_OPE")));
+    headers.add("X-Page", "0");
+    headers.add("X-Page-Size", "3");
+    String sort = "codigo,desc";
+    String filter = "titulo=ke=00";
+
+    // when: find Convocatoria
+    URI uri = UriComponentsBuilder.fromUriString(CONTROLLER_BASE_PATH + PATH_PARAMETER_RESTRINGIDOS)
+        .queryParam("s", sort).queryParam("q", filter).build(false).toUri();
+    final ResponseEntity<List<Convocatoria>> response = restTemplate.exchange(uri, HttpMethod.GET,
+        buildRequest(headers, null), new ParameterizedTypeReference<List<Convocatoria>>() {
+        });
+
+    // given: Convocatoria data filtered and sorted
+    Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    final List<Convocatoria> responseData = response.getBody();
+    Assertions.assertThat(responseData.size()).isEqualTo(3);
+    HttpHeaders responseHeaders = response.getHeaders();
+    Assertions.assertThat(responseHeaders.getFirst("X-Page")).as("X-Page").isEqualTo("0");
+    Assertions.assertThat(responseHeaders.getFirst("X-Page-Size")).as("X-Page-Size").isEqualTo("3");
+    Assertions.assertThat(responseHeaders.getFirst("X-Total-Count")).as("X-Total-Count").isEqualTo("3");
+
+    Assertions.assertThat(responseData.get(0).getCodigo()).as("get(0).getCodigo())")
+        .isEqualTo("codigo-" + String.format("%03d", 3));
+    Assertions.assertThat(responseData.get(1).getCodigo()).as("get(1).getCodigo())")
+        .isEqualTo("codigo-" + String.format("%03d", 2));
+    Assertions.assertThat(responseData.get(2).getCodigo()).as("get(2).getCodigo())")
+        .isEqualTo("codigo-" + String.format("%03d", 1));
+  }
+
+  @Sql
+  @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:cleanup.sql")
+  @Test
   public void findAllTodosRestringidos_WithPagingSortingAndFiltering_ReturnsConvocatoriaSubList() throws Exception {
 
     // given: data for Convocatoria
@@ -381,8 +590,8 @@ public class ConvocatoriaIT extends BaseIT {
     headers.set("Authorization", String.format("bearer %s", tokenBuilder.buildToken("user", "CSP-CONV-V_OPE")));
     headers.add("X-Page", "0");
     headers.add("X-Page-Size", "3");
-    String sort = "codigo-";
-    String filter = "titulo~%00%";
+    String sort = "codigo,desc";
+    String filter = "titulo=ke=00";
 
     // when: find Convocatoria
     URI uri = UriComponentsBuilder
@@ -419,8 +628,8 @@ public class ConvocatoriaIT extends BaseIT {
     headers.set("Authorization", String.format("bearer %s", tokenBuilder.buildToken("user", "CSP-CONV-V")));
     headers.add("X-Page", "0");
     headers.add("X-Page-Size", "3");
-    String sort = "codigo-";
-    String filter = "titulo~%00%";
+    String sort = "codigo,desc";
+    String filter = "titulo=ke=00";
 
     URI uri = UriComponentsBuilder
         .fromUriString(CONTROLLER_BASE_PATH + PATH_PARAMETER_TODOS + PATH_PARAMETER_RESTRINGIDOS).queryParam("s", sort)
@@ -449,8 +658,8 @@ public class ConvocatoriaIT extends BaseIT {
     headers.set("Authorization", String.format("bearer %s", tokenBuilder.buildToken("user", "CSP-CENTGES-V")));
     headers.add("X-Page", "0");
     headers.add("X-Page-Size", "10");
-    String sort = "id-";
-    String filter = "entidadRef~%-0%";
+    String sort = "id,desc";
+    String filter = "entidadRef=ke=-0";
 
     Long convocatoriaId = 1L;
 
@@ -492,8 +701,8 @@ public class ConvocatoriaIT extends BaseIT {
     headers.set("Authorization", String.format("bearer %s", tokenBuilder.buildToken("user", "CSP-CENTGES-V")));
     headers.add("X-Page", "0");
     headers.add("X-Page-Size", "10");
-    String sort = "id-";
-    String filter = "entidadRef~%-0%";
+    String sort = "id,desc";
+    String filter = "entidadRef=ke=-0";
 
     Long convocatoriaId = 1L;
 
@@ -535,8 +744,8 @@ public class ConvocatoriaIT extends BaseIT {
     headers.set("Authorization", String.format("bearer %s", tokenBuilder.buildToken("user", "CSP-CENTGES-V")));
     headers.add("X-Page", "0");
     headers.add("X-Page-Size", "10");
-    String sort = "id-";
-    String filter = "entidadRef~%-0%";
+    String sort = "id,desc";
+    String filter = "entidadRef=ke=-0";
 
     Long convocatoriaId = 1L;
 
@@ -578,8 +787,8 @@ public class ConvocatoriaIT extends BaseIT {
     headers.set("Authorization", String.format("bearer %s", tokenBuilder.buildToken("user", "CSP-CATEM-V")));
     headers.add("X-Page", "0");
     headers.add("X-Page-Size", "10");
-    String sort = "id-";
-    String filter = "convocatoria.id:1,observaciones~%-0%";
+    String sort = "id,desc";
+    String filter = "convocatoria.id==1;observaciones=ke=-0";
 
     Long convocatoriaId = 1L;
 
@@ -621,8 +830,8 @@ public class ConvocatoriaIT extends BaseIT {
     headers.set("Authorization", String.format("bearer %s", tokenBuilder.buildToken("user", "CSP-CONV-V")));
     headers.add("X-Page", "0");
     headers.add("X-Page-Size", "10");
-    String sort = "id-";
-    String filter = "observaciones~%-00%";
+    String sort = "id,desc";
+    String filter = "observaciones=ke=-00";
 
     Long convocatoriaId = 1L;
 
@@ -664,8 +873,8 @@ public class ConvocatoriaIT extends BaseIT {
     headers.set("Authorization", String.format("bearer %s", tokenBuilder.buildToken("user", "CSP-CENL-V")));
     headers.add("X-Page", "0");
     headers.add("X-Page-Size", "10");
-    String sort = "id-";
-    String filter = "descripcion~%-00%";
+    String sort = "id,desc";
+    String filter = "descripcion=ke=-00";
 
     Long convocatoriaId = 1L;
 
@@ -705,8 +914,8 @@ public class ConvocatoriaIT extends BaseIT {
     headers.set("Authorization", String.format("bearer %s", tokenBuilder.buildToken("user", "CSP-CENL-V")));
     headers.add("X-Page", "0");
     headers.add("X-Page-Size", "10");
-    String sort = "id-";
-    String filter = "observaciones~%-00%";
+    String sort = "id,desc";
+    String filter = "observaciones=ke=-00";
 
     Long convocatoriaId = 1L;
 
@@ -741,8 +950,8 @@ public class ConvocatoriaIT extends BaseIT {
     headers.set("Authorization", String.format("bearer %s", tokenBuilder.buildToken("user", "CSP-CHIT-V")));
     headers.add("X-Page", "0");
     headers.add("X-Page-Size", "10");
-    String sort = "id-";
-    String filter = "comentario~%-00%";
+    String sort = "id,desc";
+    String filter = "comentario=ke=-00";
 
     Long convocatoriaId = 1L;
 
@@ -785,8 +994,8 @@ public class ConvocatoriaIT extends BaseIT {
     headers.set("Authorization", String.format("bearer %s", tokenBuilder.buildToken("user", "CSP-CENL-V")));
     headers.add("X-Page", "0");
     headers.add("X-Page-Size", "10");
-    String sort = "id-";
-    String filter = "observaciones~%-00%";
+    String sort = "id,desc";
+    String filter = "observaciones=ke=-00";
 
     Long convocatoriaId = 1L;
 
@@ -828,8 +1037,8 @@ public class ConvocatoriaIT extends BaseIT {
     headers.set("Authorization", String.format("bearer %s", tokenBuilder.buildToken("user", "CSP-CPSCI-V")));
     headers.add("X-Page", "0");
     headers.add("X-Page-Size", "10");
-    String sort = "numPeriodo-";
-    String filter = "observaciones~%-00%";
+    String sort = "numPeriodo,desc";
+    String filter = "observaciones=ke=-00";
 
     Long convocatoriaId = 1L;
 
@@ -874,8 +1083,8 @@ public class ConvocatoriaIT extends BaseIT {
     headers.set("Authorization", String.format("bearer %s", tokenBuilder.buildToken("user", "CSP-CGAS-V")));
     headers.add("X-Page", "0");
     headers.add("X-Page-Size", "10");
-    String sort = "id-";
-    String filter = "obs~%-00%";
+    String sort = "id,desc";
+    String filter = "obs=ke=-00";
 
     Long convocatoriaId = 1L;
 
@@ -912,8 +1121,8 @@ public class ConvocatoriaIT extends BaseIT {
     headers.set("Authorization", String.format("bearer %s", tokenBuilder.buildToken("user", "CSP-CGAS-V")));
     headers.add("X-Page", "0");
     headers.add("X-Page-Size", "10");
-    String sort = "id-";
-    String filter = "obs~%-00%";
+    String sort = "id,desc";
+    String filter = "obs=ke=-00";
 
     Long convocatoriaId = 1L;
 
@@ -1008,12 +1217,12 @@ public class ConvocatoriaIT extends BaseIT {
         .observaciones("observaciones-" + String.format("%03d", convocatoriaId))//
         .finalidad((modeloTipoFinalidad == null) ? null : modeloTipoFinalidad.getTipoFinalidad())//
         .regimenConcurrencia(tipoRegimenConcurrencia)//
-        .destinatarios(TipoDestinatarioEnum.INDIVIDUAL)//
+        .destinatarios(Convocatoria.Destinatarios.INDIVIDUAL)//
         .colaborativos(Boolean.TRUE)//
-        .estadoActual(TipoEstadoConvocatoriaEnum.REGISTRADA)//
+        .estado(Convocatoria.Estado.REGISTRADA)//
         .duracion(12)//
         .ambitoGeografico(tipoAmbitoGeografico)//
-        .clasificacionCVN(ClasificacionCVNEnum.AYUDAS)//
+        .clasificacionCVN(ClasificacionCVN.AYUDAS)//
         .activo(activo)//
         .build();
 

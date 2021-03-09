@@ -11,12 +11,10 @@ import org.crue.hercules.sgi.csp.repository.TipoFaseRepository;
 import org.crue.hercules.sgi.csp.service.impl.TipoFaseServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.BDDMockito;
 import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
@@ -28,7 +26,6 @@ import org.springframework.data.jpa.domain.Specification;
 /**
  * TipoFaseServiceTest
  */
-@ExtendWith(MockitoExtension.class)
 public class TipoFaseServiceTest extends BaseServiceTest {
 
   @Mock
@@ -64,7 +61,7 @@ public class TipoFaseServiceTest extends BaseServiceTest {
     // given: Un nuevo TipoFase
     TipoFase tipoFase = generarMockTipoFase(null);
 
-    BDDMockito.given(tipoFaseRepository.findByNombre(tipoFase.getNombre())).willReturn(Optional.empty());
+    BDDMockito.given(tipoFaseRepository.findByNombreAndActivoIsTrue(tipoFase.getNombre())).willReturn(Optional.empty());
 
     BDDMockito.given(tipoFaseRepository.save(tipoFase)).will((InvocationOnMock invocation) -> {
       TipoFase tipoFaseCreado = invocation.getArgument(0);
@@ -113,13 +110,101 @@ public class TipoFaseServiceTest extends BaseServiceTest {
   }
 
   @Test
-  public void delete_WithoutId_ThrowsIllegalArgumentException() {
-    // given: Sin id
-    Assertions.assertThatThrownBy(
-        // when: Delete sin id
-        () -> tipoFaseService.disable(null))
-        // then: Lanza una excepción
-        .isInstanceOf(IllegalArgumentException.class);
+  public void enable_ReturnsTipoFase() {
+    // given: Un nuevo TipoFase inactivo
+    TipoFase tipoFase = generarMockTipoFase(1L);
+    tipoFase.setActivo(Boolean.FALSE);
+
+    BDDMockito.given(tipoFaseRepository.findById(ArgumentMatchers.<Long>any())).willReturn(Optional.of(tipoFase));
+    BDDMockito.given(tipoFaseRepository.save(ArgumentMatchers.<TipoFase>any())).willAnswer(new Answer<TipoFase>() {
+      @Override
+      public TipoFase answer(InvocationOnMock invocation) throws Throwable {
+        TipoFase givenData = invocation.getArgument(0, TipoFase.class);
+        givenData.setActivo(Boolean.TRUE);
+        return givenData;
+      }
+    });
+
+    // when: activamos el TipoFase
+    TipoFase tipoFaseActualizado = tipoFaseService.enable(tipoFase.getId());
+
+    // then: El TipoFase se activa correctamente.
+    Assertions.assertThat(tipoFaseActualizado).as("isNotNull()").isNotNull();
+    Assertions.assertThat(tipoFaseActualizado.getId()).as("getId()").isEqualTo(1L);
+    Assertions.assertThat(tipoFaseActualizado.getNombre()).as("getNombre()").isEqualTo(tipoFase.getNombre());
+    Assertions.assertThat(tipoFaseActualizado.getDescripcion()).as("getDescripcion()")
+        .isEqualTo(tipoFase.getDescripcion());
+    Assertions.assertThat(tipoFaseActualizado.getActivo()).as("getActivo()").isEqualTo(Boolean.TRUE);
+
+  }
+
+  @Test
+  public void enable_WithIdNotExist_ThrowsTipoFinanciacionNotFoundException() {
+    // given: Un id de un TipoFase que no existe
+    Long idNoExiste = 1L;
+    BDDMockito.given(tipoFaseRepository.findById(ArgumentMatchers.<Long>any())).willReturn(Optional.empty());
+    // when: activamos el TipoFase
+    // then: Lanza una excepcion porque el TipoFase no existe
+    Assertions.assertThatThrownBy(() -> tipoFaseService.enable(idNoExiste))
+        .isInstanceOf(TipoFaseNotFoundException.class);
+  }
+
+  @Test
+  public void enable_WithDuplicatedNombre_ThrowsIllegalArgumentException() {
+    // given: Un TipoFase inactivo con nombre existente
+    TipoFase tipoFaseExistente = generarMockTipoFase(2L);
+    TipoFase tipoFase = generarMockTipoFase(1L);
+    tipoFase.setActivo(Boolean.FALSE);
+
+    BDDMockito.given(tipoFaseRepository.findById(ArgumentMatchers.<Long>any())).willReturn(Optional.of(tipoFase));
+    BDDMockito.given(tipoFaseRepository.findByNombreAndActivoIsTrue(ArgumentMatchers.<String>any()))
+        .willReturn(Optional.of(tipoFaseExistente));
+
+    // when: activamos el TipoFase
+    // then: Lanza una excepcion porque el TipoFase no existe
+    Assertions.assertThatThrownBy(() -> tipoFaseService.enable(tipoFase.getId()))
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessage("Ya existe un TipoFase activo con el nombre '%s'", tipoFase.getNombre());
+
+  }
+
+  @Test
+  public void disable_ReturnsTipoFase() {
+    // given: Un nuevo TipoFase activo
+    TipoFase tipoFase = generarMockTipoFase(1L);
+
+    BDDMockito.given(tipoFaseRepository.findById(ArgumentMatchers.<Long>any())).willReturn(Optional.of(tipoFase));
+    BDDMockito.given(tipoFaseRepository.save(ArgumentMatchers.<TipoFase>any())).willAnswer(new Answer<TipoFase>() {
+      @Override
+      public TipoFase answer(InvocationOnMock invocation) throws Throwable {
+        TipoFase givenData = invocation.getArgument(0, TipoFase.class);
+        givenData.setActivo(Boolean.FALSE);
+        return givenData;
+      }
+    });
+
+    // when: Desactivamos el TipoFase
+    TipoFase tipoFaseActualizado = tipoFaseService.disable(tipoFase.getId());
+
+    // then: El TipoFase se desactiva correctamente.
+    Assertions.assertThat(tipoFaseActualizado).as("isNotNull()").isNotNull();
+    Assertions.assertThat(tipoFaseActualizado.getId()).as("getId()").isEqualTo(1L);
+    Assertions.assertThat(tipoFaseActualizado.getNombre()).as("getNombre()").isEqualTo(tipoFase.getNombre());
+    Assertions.assertThat(tipoFaseActualizado.getDescripcion()).as("getDescripcion()")
+        .isEqualTo(tipoFase.getDescripcion());
+    Assertions.assertThat(tipoFaseActualizado.getActivo()).as("getActivo()").isEqualTo(false);
+
+  }
+
+  @Test
+  public void disable_WithIdNotExist_ThrowsTipoFaseNotFoundException() {
+    // given: Un id de un TipoFase que no existe
+    Long idNoExiste = 1L;
+    BDDMockito.given(tipoFaseRepository.findById(ArgumentMatchers.<Long>any())).willReturn(Optional.empty());
+    // when: desactivamos el TipoFase
+    // then: Lanza una excepcion porque el TipoFase no existe
+    Assertions.assertThatThrownBy(() -> tipoFaseService.disable(idNoExiste))
+        .isInstanceOf(TipoFaseNotFoundException.class);
   }
 
   @Test
@@ -211,13 +296,15 @@ public class TipoFaseServiceTest extends BaseServiceTest {
     BeanUtils.copyProperties(givenData, newTFase);
     newTFase.setId(null);
 
-    BDDMockito.given(tipoFaseRepository.findByNombre(ArgumentMatchers.anyString())).willReturn(Optional.of(givenData));
+    BDDMockito.given(tipoFaseRepository.findByNombreAndActivoIsTrue(ArgumentMatchers.anyString()))
+        .willReturn(Optional.of(givenData));
 
     Assertions.assertThatThrownBy(
         // when: create TipoFase
         () -> tipoFaseService.create(newTFase))
         // then: throw exception as Nombre already exists
-        .isInstanceOf(IllegalArgumentException.class);
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessage("Ya existe un TipoFase activo con el nombre '%s'", newTFase.getNombre());
   }
 
   @Test
@@ -226,12 +313,14 @@ public class TipoFaseServiceTest extends BaseServiceTest {
     TipoFase tipoFaseUpdated = generarMockTipoFase(1L, "nombreRepetido");
     TipoFase tipoFase = generarMockTipoFase(2L, "nombreRepetido");
 
-    BDDMockito.given(tipoFaseRepository.findByNombre(tipoFaseUpdated.getNombre())).willReturn(Optional.of(tipoFase));
+    BDDMockito.given(tipoFaseRepository.findByNombreAndActivoIsTrue(tipoFaseUpdated.getNombre()))
+        .willReturn(Optional.of(tipoFase));
 
     // when: Actualizamos el TipoFase
     // then: Lanza una excepcion porque ya existe otro TipoFase con ese nombre
     Assertions.assertThatThrownBy(() -> tipoFaseService.update(tipoFaseUpdated))
-        .isInstanceOf(IllegalArgumentException.class);
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessage("Ya existe un TipoFase activo con el nombre '%s'", tipoFaseUpdated.getNombre());
   }
 
   /**

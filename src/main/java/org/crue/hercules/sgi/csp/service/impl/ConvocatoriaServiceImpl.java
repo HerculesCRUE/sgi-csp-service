@@ -1,19 +1,25 @@
 package org.crue.hercules.sgi.csp.service.impl;
 
 import java.time.LocalDate;
-
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
-import org.crue.hercules.sgi.csp.enums.TipoEstadoConvocatoriaEnum;
+import org.apache.commons.lang3.StringUtils;
+import org.crue.hercules.sgi.csp.exceptions.ConfiguracionSolicitudNotFoundException;
 import org.crue.hercules.sgi.csp.exceptions.ConvocatoriaNotFoundException;
+import org.crue.hercules.sgi.csp.model.ConfiguracionSolicitud;
 import org.crue.hercules.sgi.csp.model.Convocatoria;
 import org.crue.hercules.sgi.csp.model.ConvocatoriaPeriodoSeguimientoCientifico;
+import org.crue.hercules.sgi.csp.model.ModeloEjecucion;
 import org.crue.hercules.sgi.csp.model.ModeloTipoFinalidad;
 import org.crue.hercules.sgi.csp.model.ModeloUnidad;
 import org.crue.hercules.sgi.csp.model.TipoAmbitoGeografico;
+import org.crue.hercules.sgi.csp.model.TipoDocumento;
+import org.crue.hercules.sgi.csp.model.TipoEnlace;
+import org.crue.hercules.sgi.csp.model.TipoFase;
+import org.crue.hercules.sgi.csp.model.TipoHito;
 import org.crue.hercules.sgi.csp.model.TipoRegimenConcurrencia;
+import org.crue.hercules.sgi.csp.repository.ConfiguracionSolicitudRepository;
 import org.crue.hercules.sgi.csp.repository.ConvocatoriaPeriodoJustificacionRepository;
 import org.crue.hercules.sgi.csp.repository.ConvocatoriaPeriodoSeguimientoCientificoRepository;
 import org.crue.hercules.sgi.csp.repository.ConvocatoriaRepository;
@@ -21,13 +27,16 @@ import org.crue.hercules.sgi.csp.repository.ModeloTipoFinalidadRepository;
 import org.crue.hercules.sgi.csp.repository.ModeloUnidadRepository;
 import org.crue.hercules.sgi.csp.repository.TipoAmbitoGeograficoRepository;
 import org.crue.hercules.sgi.csp.repository.TipoRegimenConcurrenciaRepository;
+import org.crue.hercules.sgi.csp.repository.predicate.ConvocatoriaPredicateResolver;
 import org.crue.hercules.sgi.csp.repository.specification.ConvocatoriaSpecifications;
 import org.crue.hercules.sgi.csp.service.ConvocatoriaService;
-import org.crue.hercules.sgi.framework.data.jpa.domain.QuerySpecification;
-import org.crue.hercules.sgi.framework.data.search.QueryCriteria;
+import org.crue.hercules.sgi.framework.rsql.SgiRSQLJPASupport;
+import org.crue.hercules.sgi.framework.security.access.expression.SgiMethodSecurityExpressionRoot;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -50,13 +59,15 @@ public class ConvocatoriaServiceImpl implements ConvocatoriaService {
   private final TipoRegimenConcurrenciaRepository tipoRegimenConcurrenciaRepository;
   private final TipoAmbitoGeograficoRepository tipoAmbitoGeograficoRepository;
   private final ConvocatoriaPeriodoSeguimientoCientificoRepository convocatoriaPeriodoSeguimientoCientificoRepository;
+  private final ConfiguracionSolicitudRepository configuracionSolicitudRepository;
 
   public ConvocatoriaServiceImpl(ConvocatoriaRepository repository,
       ConvocatoriaPeriodoJustificacionRepository convocatoriaPeriodoJustificacionRepository,
       ModeloUnidadRepository modeloUnidadRepository, ModeloTipoFinalidadRepository modeloTipoFinalidadRepository,
       TipoRegimenConcurrenciaRepository tipoRegimenConcurrenciaRepository,
       TipoAmbitoGeograficoRepository tipoAmbitoGeograficoRepository,
-      ConvocatoriaPeriodoSeguimientoCientificoRepository convocatoriaPeriodoSeguimientoCientificoRepository) {
+      ConvocatoriaPeriodoSeguimientoCientificoRepository convocatoriaPeriodoSeguimientoCientificoRepository,
+      ConfiguracionSolicitudRepository configuracionSolicitudRepository) {
     this.repository = repository;
     this.convocatoriaPeriodoJustificacionRepository = convocatoriaPeriodoJustificacionRepository;
     this.modeloUnidadRepository = modeloUnidadRepository;
@@ -64,6 +75,7 @@ public class ConvocatoriaServiceImpl implements ConvocatoriaService {
     this.tipoRegimenConcurrenciaRepository = tipoRegimenConcurrenciaRepository;
     this.tipoAmbitoGeograficoRepository = tipoAmbitoGeograficoRepository;
     this.convocatoriaPeriodoSeguimientoCientificoRepository = convocatoriaPeriodoSeguimientoCientificoRepository;
+    this.configuracionSolicitudRepository = configuracionSolicitudRepository;
   }
 
   /**
@@ -79,9 +91,9 @@ public class ConvocatoriaServiceImpl implements ConvocatoriaService {
 
     Assert.isNull(convocatoria.getId(), "Id tiene que ser null para crear la Convocatoria");
 
+    convocatoria.setEstado(Convocatoria.Estado.BORRADOR);
+    convocatoria.setActivo(Boolean.TRUE);
     Convocatoria validConvocatoria = validarDatosConvocatoria(convocatoria, null, acronimosUnidadGestion);
-    validConvocatoria.setEstadoActual(TipoEstadoConvocatoriaEnum.BORRADOR);
-    validConvocatoria.setActivo(Boolean.TRUE);
     Convocatoria returnValue = repository.save(validConvocatoria);
 
     log.debug("create(Convocatoria convocatoria) - end");
@@ -101,8 +113,6 @@ public class ConvocatoriaServiceImpl implements ConvocatoriaService {
     log.debug("update(Convocatoria convocatoria) - start");
 
     Assert.notNull(convocatoria.getId(), "Id no puede ser null para actualizar Convocatoria");
-    // TODO: FALTA AÑADIR VALIDACIÓN DE QUE NO EXISTAN SOLICITUDES ASOCIADAS O
-    // PROYECTOS (update y delete)
 
     return repository.findById(convocatoria.getId()).map((data) -> {
 
@@ -147,13 +157,13 @@ public class ConvocatoriaServiceImpl implements ConvocatoriaService {
 
     return repository.findById(id).map((data) -> {
 
-      Assert.isTrue(data.getEstadoActual().equals(TipoEstadoConvocatoriaEnum.BORRADOR),
+      Assert.isTrue(data.getEstado() == Convocatoria.Estado.BORRADOR,
           "Convocatoria deber estar en estado 'Borrador' para pasar a 'Registrada'");
 
       // Campos obligatorios en estado Registrada
       validarRequeridosConvocatoriaRegistrada(data);
 
-      data.setEstadoActual(TipoEstadoConvocatoriaEnum.REGISTRADA);
+      data.setEstado(Convocatoria.Estado.REGISTRADA);
       Convocatoria returnValue = repository.save(data);
 
       log.debug("registrar(Long id) - end");
@@ -197,18 +207,181 @@ public class ConvocatoriaServiceImpl implements ConvocatoriaService {
     log.debug("disable(Long id) - start");
 
     Assert.notNull(id, "Convocatoria id no puede ser null para desactivar un Convocatoria");
-    // TODO: FALTA AÑADIR VALIDACIÓN DE QUE NO EXISTAN SOLICITUDES ASOCIADAS O
-    // PROYECTOS (update y delete)
 
     return repository.findById(id).map(convocatoria -> {
       if (!convocatoria.getActivo()) {
         return convocatoria;
       }
+
+      // comprobar si convocatoria es modificable
+      Assert.isTrue(this.modificable(convocatoria.getId(), convocatoria.getUnidadGestionRef()),
+          "No se puede eliminar Convocatoria. No tiene los permisos necesarios o está registrada y cuenta con solicitudes o proyectos asociados");
+
       convocatoria.setActivo(Boolean.FALSE);
       Convocatoria returnValue = repository.save(convocatoria);
       log.debug("disable(Long id) - end");
       return returnValue;
     }).orElseThrow(() -> new ConvocatoriaNotFoundException(id));
+  }
+
+  /**
+   * Comprueba si existen datos vinculados a la {@link Convocatoria} de
+   * {@link TipoFase}, {@link TipoHito}, {@link TipoEnlace} y
+   * {@link TipoDocumento}
+   *
+   * @param id Id del {@link Convocatoria}.
+   * @return true existen datos vinculados/false no existen datos vinculados.
+   */
+  @Override
+  public Boolean tieneVinculaciones(Long id) {
+    log.debug("vinculaciones(Long id) - start");
+    boolean returnValue = repository.tieneVinculaciones(id);
+    log.debug("vinculaciones(Long id) - end");
+    return returnValue;
+  }
+
+  /**
+   * Hace las comprobaciones necesarias para determinar si la {@link Convocatoria}
+   * puede ser modificada. También se utilizará para permitir la creación,
+   * modificación o eliminación de ciertas entidades relacionadas con la propia
+   * {@link Convocatoria}.
+   *
+   * @param id                 Id del {@link Convocatoria}.
+   * @param unidadConvocatoria unidadGestionRef {@link Convocatoria}.
+   * @return true si puede ser modificada / false si no puede ser modificada
+   */
+  @Override
+  public Boolean modificable(Long id, String unidadConvocatoria) {
+    log.debug("modificable(Long id, String unidadConvocatoria) - start");
+
+    // permiso para operar con convocatorias
+    final String authority = "CSP-CONV-C";
+    boolean returnValue = Boolean.FALSE;
+
+    // Se comprueba si el usuario tiene el permiso correspondiente
+    if (checkAuthority(authority, unidadConvocatoria)) {
+      // Será modificable si no tiene solicitudes o proyectos asociados
+      returnValue = !(repository.esRegistradaConSolicitudesOProyectos(id));
+    } else {
+      // Recupera la UnidadGestionRef si fuera necesario
+      if (StringUtils.isBlank(unidadConvocatoria)) {
+        Optional<String> unidadGestionRef = repository.findById(id).map(mapper -> mapper.getUnidadGestionRef());
+        if (unidadGestionRef.isPresent()) {
+          unidadConvocatoria = unidadGestionRef.get();
+          // Se comprueba si el usuario tiene el permiso para la UnidadGestionRef
+          if (checkAuthority(authority, unidadConvocatoria)) {
+            // Será modificable si no tiene solicitudes o proyectos asociados
+            returnValue = !(repository.esRegistradaConSolicitudesOProyectos(id));
+          }
+        }
+      }
+    }
+    log.debug("modificable(Long id, String unidadConvocatoria) - end");
+    return returnValue;
+  }
+
+  /**
+   * Hace las comprobaciones necesarias para determinar si la {@link Convocatoria}
+   * puede pasar a estado 'Registrada'.
+   *
+   * @param id Id del {@link Convocatoria}.
+   * @return true si puede ser registrada / false si no puede ser registrada
+   */
+  @Override
+  public Boolean registrable(Long id) {
+    log.debug("registrable(Long id) - start");
+
+    boolean returnValue = Boolean.FALSE;
+
+    // id convocatoria presente
+    if (id != null) {
+
+      Optional<Convocatoria> convocatoria = repository.findById(id);
+
+      // convocatoria existe y su estado actual es 'Borrador'
+      if (convocatoria.isPresent() && convocatoria.get().getEstado() == Convocatoria.Estado.BORRADOR) {
+
+        // Campos requeridos a nivel de convocatoria
+        if (convocatoria.get().getUnidadGestionRef() != null && convocatoria.get().getModeloEjecucion() != null
+            && convocatoria.get().getCodigo() != null && convocatoria.get().getAnio() != null
+            && convocatoria.get().getTitulo() != null && convocatoria.get().getFinalidad() != null
+            && convocatoria.get().getDestinatarios() != null && convocatoria.get().getAmbitoGeografico() != null) {
+
+          Optional<ConfiguracionSolicitud> configuracionSolicitud = configuracionSolicitudRepository
+              .findByConvocatoriaId(convocatoria.get().getId());
+
+          // tiene configuración solicitud
+          if (configuracionSolicitud.isPresent()) {
+
+            // campos requeridos a nivel de configuración solicitud
+            if (configuracionSolicitud.get().getTramitacionSGI() != null
+                && configuracionSolicitud.get().getFormularioSolicitud() != null) {
+
+              // con tramitación SGI debe tener una fase asignada
+              if (!(configuracionSolicitud.get().getFasePresentacionSolicitudes() == null
+                  && configuracionSolicitud.get().getTramitacionSGI() == Boolean.TRUE)) {
+                returnValue = Boolean.TRUE;
+              }
+            }
+          }
+        }
+      }
+    }
+    log.debug("registrable(Long id) - end");
+    return returnValue;
+  }
+
+  /**
+   * Comprueba la existencia del {@link Convocatoria} por id.
+   *
+   * @param id el id de la entidad {@link Convocatoria}.
+   * @return true si existe y false en caso contrario.
+   */
+  @Override
+  public boolean existsById(final Long id) {
+    log.debug("existsById(final Long id)  - start", id);
+    final boolean existe = repository.existsById(id);
+    log.debug("existsById(final Long id)  - end", id);
+    return existe;
+  }
+
+  /**
+   * Obtiene la Unidad de Gestión asignada a la {@link Convocatoria}.
+   * 
+   * @param id Id del {@link Convocatoria}.
+   * @return unidadGestionRef asignada
+   */
+  @Override
+  public String getUnidadGestionRef(Long id) {
+    log.debug("getUnidadGestionRef(Long id) - start");
+    Optional<String> returnValue = null;
+    if (repository.existsById(id)) {
+      returnValue = repository.getUnidadGestionRef(id);
+    } else {
+      throw (new ConvocatoriaNotFoundException(id));
+    }
+    log.debug("getUnidadGestionRef(Long id) - end");
+    return returnValue.isPresent() ? returnValue.get() : null;
+  }
+
+  /**
+   * Obtiene el {@link ModeloEjecucion} asignada a la {@link Convocatoria}.
+   * 
+   * @param id Id de la {@link Convocatoria}.
+   * @return {@link ModeloEjecucion} asignado
+   */
+  @Override
+  public ModeloEjecucion getModeloEjecucion(Long id) {
+    log.debug("getModeloEjecucion(Long id) - start");
+
+    Optional<ModeloEjecucion> returnValue = null;
+    if (repository.existsById(id)) {
+      returnValue = repository.getModeloEjecucion(id);
+    } else {
+      throw (new ConvocatoriaNotFoundException(id));
+    }
+    log.debug("getModeloEjecucion(Long id) - end");
+    return returnValue.isPresent() ? returnValue.get() : null;
   }
 
   /**
@@ -235,13 +408,35 @@ public class ConvocatoriaServiceImpl implements ConvocatoriaService {
    *         filtradas.
    */
   @Override
-  public Page<Convocatoria> findAll(List<QueryCriteria> query, Pageable paging) {
-    log.debug("findAll(List<QueryCriteria> query, Pageable paging) - start");
-    Specification<Convocatoria> specByQuery = new QuerySpecification<Convocatoria>(query);
-    Specification<Convocatoria> specActivos = ConvocatoriaSpecifications.activos();
-    Specification<Convocatoria> specs = Specification.where(specByQuery).and(specActivos);
+  public Page<Convocatoria> findAll(String query, Pageable paging) {
+    log.debug("findAll(String query, Pageable paging) - start");
+    Specification<Convocatoria> specs = ConvocatoriaSpecifications.activos()
+        .and(SgiRSQLJPASupport.toSpecification(query));
+
     Page<Convocatoria> returnValue = repository.findAll(specs, paging);
-    log.debug("findAll(List<QueryCriteria> query, Pageable paging) - end");
+    log.debug("findAll(String query, Pageable paging) - end");
+    return returnValue;
+  }
+
+  /**
+   * Obtiene todas las entidades {@link Convocatoria} que puede visualizar un
+   * investigador paginadas y filtradas.
+   *
+   * @param query  información del filtro.
+   * @param paging información de paginación.
+   * @return el listado de entidades {@link Convocatoria} que puede visualizar un
+   *         investigador paginadas y filtradas.
+   */
+  @Override
+  public Page<Convocatoria> findAllInvestigador(String query, Pageable paging) {
+    log.debug("findAll(String query, Pageable paging) - start");
+    Specification<Convocatoria> specs = ConvocatoriaSpecifications.activos()
+        .and(ConvocatoriaSpecifications.registradas())
+        .and(ConvocatoriaSpecifications.configuracionSolicitudTramitacionSGI())
+        .and(SgiRSQLJPASupport.toSpecification(query, ConvocatoriaPredicateResolver.getInstance()));
+
+    Page<Convocatoria> returnValue = repository.findAll(specs, paging);
+    log.debug("findAll(String query, Pageable paging) - end");
     return returnValue;
   }
 
@@ -253,35 +448,92 @@ public class ConvocatoriaServiceImpl implements ConvocatoriaService {
    * @return el listado de entidades {@link Convocatoria} paginadas y filtradas.
    */
   @Override
-  public Page<Convocatoria> findAllTodos(List<QueryCriteria> query, Pageable paging) {
-    log.debug("findAllTodos(List<QueryCriteria> query, Pageable paging) - start");
+  public Page<Convocatoria> findAllTodos(String query, Pageable paging) {
+    log.debug("findAllTodos(String query, Pageable paging) - start");
 
-    Specification<Convocatoria> spec = getFiltroAplicado(query);
+    Specification<Convocatoria> specs = SgiRSQLJPASupport.toSpecification(query,
+        ConvocatoriaPredicateResolver.getInstance());
 
-    Page<Convocatoria> returnValue = repository.findAll(spec, paging);
-    log.debug("findAllTodos(List<QueryCriteria> query, Pageable paging) - end");
+    Page<Convocatoria> returnValue = repository.findAll(specs, paging);
+    log.debug("findAllTodos(String query, Pageable paging) - end");
     return returnValue;
   }
 
+  /**
+   * Devuelve todas las convocatorias activas registradas que se encuentren dentro
+   * de la unidad de gestión del usuario logueado.
+   * 
+   * @param query                  información del filtro.
+   * @param paging                 información de paginación.
+   * @param acronimosUnidadGestion lista de acronimos de unidad de gestion a los
+   *                               que se restringe la busqueda.
+   * @return el listado de entidades {@link Convocatoria} paginadas y filtradas.
+   */
   @Override
-  public Page<Convocatoria> findAllTodosRestringidos(List<QueryCriteria> query, Pageable paging,
+  public Page<Convocatoria> findAllRestringidos(String query, Pageable paging, List<String> acronimosUnidadGestion) {
+    log.debug("findAllRestringidos(String query, Pageable paging, List<String> acronimosUnidadGestion) - start");
+
+    Specification<Convocatoria> specs = ConvocatoriaSpecifications.activos()
+        .and(ConvocatoriaSpecifications.registradas())
+        .and(ConvocatoriaSpecifications.acronimosIn(acronimosUnidadGestion))
+        .and(SgiRSQLJPASupport.toSpecification(query, ConvocatoriaPredicateResolver.getInstance()));
+
+    Page<Convocatoria> returnValue = repository.findAll(specs, paging);
+
+    log.debug("findAllRestringidos(String query, Pageable paging, List<String> acronimosUnidadGestion) - end");
+    return returnValue;
+  }
+
+  /**
+   * Devuelve todas las convocatorias activas que se encuentren dentro de la
+   * unidad de gestión del usuario logueado.
+   * 
+   * @param query                  información del filtro.
+   * @param paging                 información de paginación.
+   * @param acronimosUnidadGestion lista de acronimos de unidad de gestion a los
+   *                               que se restringe la busqueda.
+   * @return el listado de entidades {@link Convocatoria} paginadas y filtradas.
+   */
+  @Override
+  public Page<Convocatoria> findAllTodosRestringidos(String query, Pageable paging,
       List<String> acronimosUnidadGestion) {
-    log.debug(
-        "findAllTodosRestringidos(List<QueryCriteria> query, Pageable paging,  List<String> acronimosUnidadGestion) - start");
+    log.debug("findAllTodosRestringidos(String query, Pageable paging,  List<String> acronimosUnidadGestion) - start");
 
-    Specification<Convocatoria> spec = getFiltroAplicado(query);
+    Specification<Convocatoria> specs = ConvocatoriaSpecifications.acronimosIn(acronimosUnidadGestion)
+        .and(SgiRSQLJPASupport.toSpecification(query, ConvocatoriaPredicateResolver.getInstance()));
 
-    Specification<Convocatoria> specAcronimos = ConvocatoriaSpecifications.acronimosIn(acronimosUnidadGestion);
-    if (spec != null) {
-      spec = spec.and(specAcronimos);
+    Page<Convocatoria> returnValue = repository.findAll(specs, paging);
+
+    log.debug("findAllTodosRestringidos(String query, Pageable paging,  List<String> acronimosUnidadGestion) - end");
+    return returnValue;
+  }
+
+  /**
+   * Hace las comprobaciones para determinar si el usuario tiene la autorización
+   * indicada tanto de manera independiente como dentro de la unidad organizativa
+   * indicada.
+   *
+   * @param authority Permiso a comprobar.
+   * @param unidad    unidad organizativa
+   * @return true tiene autorización / false no tiene autorización
+   */
+  protected Boolean checkAuthority(String authority, String unidad) {
+    log.debug("checkAuthority(String authority, String unidad) - start");
+
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    SgiMethodSecurityExpressionRoot sgiMethodSecurityExpressionRoot = new SgiMethodSecurityExpressionRoot(
+        authentication);
+
+    Boolean returnValue = Boolean.FALSE;
+
+    if (StringUtils.isBlank(unidad)) {
+      returnValue = sgiMethodSecurityExpressionRoot.hasAuthority(authority);
     } else {
-      spec = Specification.where(specAcronimos);
+      returnValue = (sgiMethodSecurityExpressionRoot.hasAuthority(authority)
+          || sgiMethodSecurityExpressionRoot.hasAuthority(authority + "_" + unidad));
     }
 
-    Page<Convocatoria> returnValue = repository.findAll(spec, paging);
-
-    log.debug(
-        "findAllTodosRestringidos(List<QueryCriteria> query, Pageable paging,  List<String> acronimosUnidadGestion) - end");
+    log.debug("checkAuthority(String authority, String unidad) - end");
     return returnValue;
   }
 
@@ -298,15 +550,49 @@ public class ConvocatoriaServiceImpl implements ConvocatoriaService {
     log.debug("validarDatosConvocatoria(Convocatoria datosConvocatoria, Convocatoria datosOriginales) - start");
 
     // Campos obligatorios en estado Registrada
-    if (datosConvocatoria.getEstadoActual().equals(TipoEstadoConvocatoriaEnum.REGISTRADA)) {
+    if (datosConvocatoria.getEstado() == Convocatoria.Estado.REGISTRADA) {
       validarRequeridosConvocatoriaRegistrada(datosConvocatoria);
+    } else {
+      validarRequeridosConvocatoriaBorrador(datosConvocatoria);
     }
+
+    // comprobar si es modificable
+    if (datosOriginales != null) {
+      Assert.isTrue(this.modificable(datosOriginales.getId(), datosOriginales.getUnidadGestionRef()),
+          "No se puede modificar Convocatoria. No tiene los permisos necesarios o está registrada y cuenta con solicitudes o proyectos asociados");
+    }
+
+    Boolean tieneVinculaciones = null;
 
     // ModeloUnidadGestion
     if (datosConvocatoria.getUnidadGestionRef() != null && !CollectionUtils.isEmpty(acronimosUnidadGestion)) {
 
       Assert.isTrue(acronimosUnidadGestion.contains(datosConvocatoria.getUnidadGestionRef()),
           "El usuario no tiene permisos para crear una convocatoria asociada a la unidad de gestión recibida.");
+    }
+
+    // Permitir actualizar UnidadGestionRef
+    if (datosOriginales != null
+        && !datosConvocatoria.getUnidadGestionRef().equals(datosOriginales.getUnidadGestionRef())) {
+      tieneVinculaciones = this.tieneVinculaciones(datosConvocatoria.getId());
+
+      Assert.isTrue(!tieneVinculaciones,
+          "No se puede modificar la unidad de gestión al existir registros dependientes en las pantallas Enlaces, Plazos y fases, Hitos o Documentos");
+    }
+
+    // Permitir actualizar ModeloEjecucion
+    if (datosOriginales != null && ((datosOriginales.getModeloEjecucion() == null
+        && datosOriginales.getModeloEjecucion() != null)
+        || (datosOriginales.getModeloEjecucion() != null && datosOriginales.getModeloEjecucion() == null)
+        || (datosOriginales.getModeloEjecucion() != null && datosConvocatoria.getModeloEjecucion() != null
+            && !datosConvocatoria.getModeloEjecucion().getId().equals(datosOriginales.getModeloEjecucion().getId())))) {
+
+      if (tieneVinculaciones == null) {
+        tieneVinculaciones = this.tieneVinculaciones(datosConvocatoria.getId());
+      }
+
+      Assert.isTrue(!tieneVinculaciones,
+          "No se puede modificar el modelo de ejecución al existir registros dependientes en las pantallas Enlaces, Plazos y fases, Hitos o Documentos");
     }
 
     // ModeloEjecucion
@@ -454,7 +740,8 @@ public class ConvocatoriaServiceImpl implements ConvocatoriaService {
   }
 
   /**
-   * Valida los campos requieridos para una convocatoria en estado 'Registrada'
+   * Valida los campos generales requeridos para una convocatoria en estado
+   * 'Registrada'
    * 
    * @param datosConvocatoria
    */
@@ -478,101 +765,58 @@ public class ConvocatoriaServiceImpl implements ConvocatoriaService {
     // TipoAmbitoGeografico
     Assert.notNull(datosConvocatoria.getAmbitoGeografico(), "AmbitoGeografico no puede ser null en la Convocatoria");
 
+    // ConfiguracionSolicitud
+    validarRequeridosConfiguracionSolicitudConvocatoriaRegistrada(datosConvocatoria);
+
     log.debug("validarRequeridosConvocatoriaRegistrada(Convocatoria datosConvocatoria) - end");
   }
 
   /**
-   * Devuelve la Specification para el filtro avanzado de convocatoria.
+   * Valida los campos generales requeridos para una convocatoria en estado
+   * 'Borrador'
    * 
-   * @param query opciones de búsqueda.
+   * @param datosConvocatoria
    */
-  private Specification<Convocatoria> getFiltroAplicado(List<QueryCriteria> query) {
-    log.debug("getFiltroAplicado(List<QueryCriteria> query) - start");
-    Specification<Convocatoria> spec = null;
+  private void validarRequeridosConvocatoriaBorrador(Convocatoria datosConvocatoria) {
+    log.debug("validarRequeridosConvocatoriaBorrador(Convocatoria datosConvocatoria) - start");
 
-    List<QueryCriteria> queryEntity = CollectionUtils.isEmpty(query) ? query
-        : query.stream()
-            .filter(criteria -> !criteria.getKey().equals("areaTematica.id")
-                && !criteria.getKey().equals("convocatoriaEntidadConvocante.entidadRef")
-                && !criteria.getKey().equals("convocatoriaEntidadFinanciadora.entidadRef")
-                && !criteria.getKey().equals("fuenteFinanciacion.id"))
-            .collect(Collectors.toList());
+    // ModeloUnidadGestion
+    Assert.notNull(datosConvocatoria.getUnidadGestionRef(), "UnidadGestionRef no puede ser null en la Convocatoria");
+    // Codigo
+    Assert.notNull(datosConvocatoria.getCodigo(), "Codigo no puede ser null en la Convocatoria");
+    // Anio
+    Assert.notNull(datosConvocatoria.getAnio(), "Año no puede ser null en la Convocatoria");
+    // Titulo
+    Assert.notNull(datosConvocatoria.getTitulo(), "Titulo no puede ser null en la Convocatoria");
 
-    if (!CollectionUtils.isEmpty(queryEntity)) {
-      Specification<Convocatoria> specByQuery = new QuerySpecification<Convocatoria>(queryEntity);
-      spec = Specification.where(specByQuery);
-    }
-
-    // Área temática
-    List<QueryCriteria> idAreaTematica = CollectionUtils.isEmpty(query) ? query
-        : query.stream().filter(criteria -> criteria.getKey().equals("areaTematica.id")).collect(Collectors.toList());
-    if (!CollectionUtils.isEmpty(idAreaTematica)) {
-      Specification<Convocatoria> specByAreaTematicaId = ConvocatoriaSpecifications
-          .byAreaTematicaId(Long.valueOf(idAreaTematica.get(0).getValue()));
-
-      if (spec != null) {
-
-        spec = spec.and(specByAreaTematicaId);
-      } else {
-        spec = Specification.where(specByAreaTematicaId);
-      }
-
-    }
-
-    // Entidad convocante
-    List<QueryCriteria> entidadConvocanteRef = CollectionUtils.isEmpty(query) ? query
-        : query.stream().filter(criteria -> criteria.getKey().equals("convocatoriaEntidadConvocante.entidadRef"))
-            .collect(Collectors.toList());
-    if (!CollectionUtils.isEmpty(entidadConvocanteRef)) {
-      Specification<Convocatoria> specByEntidadConvocanteRef = ConvocatoriaSpecifications
-          .byEntidadConvocanteRef(entidadConvocanteRef.get(0).getValue());
-
-      if (spec != null) {
-
-        spec = spec.and(specByEntidadConvocanteRef);
-      } else {
-        spec = Specification.where(specByEntidadConvocanteRef);
-      }
-
-    }
-
-    // Entidad financiadora
-    List<QueryCriteria> entidadFinanciadoraRef = CollectionUtils.isEmpty(query) ? query
-        : query.stream().filter(criteria -> criteria.getKey().equals("convocatoriaEntidadFinanciadora.entidadRef"))
-            .collect(Collectors.toList());
-    if (!CollectionUtils.isEmpty(entidadFinanciadoraRef)) {
-      Specification<Convocatoria> specByEntidadFinanciadoraRef = ConvocatoriaSpecifications
-          .byEntidadFinancieraRef(entidadFinanciadoraRef.get(0).getValue());
-
-      if (spec != null) {
-
-        spec = spec.and(specByEntidadFinanciadoraRef);
-      } else {
-        spec = Specification.where(specByEntidadFinanciadoraRef);
-      }
-
-    }
-
-    // Fuente financiación
-    List<QueryCriteria> fuenteFinanciacionId = CollectionUtils.isEmpty(query) ? query
-        : query.stream().filter(criteria -> criteria.getKey().equals("fuenteFinanciacion.id"))
-            .collect(Collectors.toList());
-    if (!CollectionUtils.isEmpty(fuenteFinanciacionId)) {
-      Specification<Convocatoria> specByFuenteFinanciacionRef = ConvocatoriaSpecifications
-          .byFuenteFinanciacionId(Long.valueOf(fuenteFinanciacionId.get(0).getValue()));
-
-      if (spec != null) {
-
-        spec = spec.and(specByFuenteFinanciacionRef);
-      } else {
-        spec = Specification.where(specByFuenteFinanciacionRef);
-      }
-
-    }
-    log.debug("getFiltroAplicado(List<QueryCriteria> query) - start");
-
-    return spec;
-
+    log.debug("validarRequeridosConvocatoriaBorrador(Convocatoria datosConvocatoria) - end");
   }
 
+  /**
+   * Valida los campos requeridos de la configuración solicitud para una
+   * convocatoria en estado 'Registrada'
+   * 
+   * @param datosConvocatoria
+   */
+  private void validarRequeridosConfiguracionSolicitudConvocatoriaRegistrada(Convocatoria datosConvocatoria) {
+    log.debug("validarRequeridosConfiguracionSolicitudConvocatoriaRegistrada(Convocatoria datosConvocatoria) - start");
+
+    ConfiguracionSolicitud datosConfiguracionSolicitud = configuracionSolicitudRepository
+        .findByConvocatoriaId(datosConvocatoria.getId())
+        .orElseThrow(() -> new ConfiguracionSolicitudNotFoundException(datosConvocatoria.getId()));
+
+    // Tramitacion SGI
+    Assert.notNull(datosConfiguracionSolicitud.getTramitacionSGI(),
+        "Habilitar presentacion SGI no puede ser null para crear ConfiguracionSolicitud cuando la convocatoria está registrada");
+    // Convocatoria Fase
+    Assert.isTrue(
+        !(datosConfiguracionSolicitud.getFasePresentacionSolicitudes() == null
+            && datosConfiguracionSolicitud.getTramitacionSGI() == Boolean.TRUE),
+        "Plazo presentación solicitudes no puede ser null cuando se establece presentacion SGI");
+    // Tipo Formulario Solicitud
+    Assert.notNull(datosConfiguracionSolicitud.getFormularioSolicitud(),
+        "Tipo formulario no puede ser null para crear ConfiguracionSolicitud cuando la convocatoria está registrada");
+
+    log.debug("validarRequeridosConfiguracionSolicitudConvocatoriaRegistrada(Convocatoria datosConvocatoria) - end");
+  }
 }
