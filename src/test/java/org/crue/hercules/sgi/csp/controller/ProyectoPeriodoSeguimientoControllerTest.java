@@ -1,6 +1,6 @@
 package org.crue.hercules.sgi.csp.controller;
 
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,7 +8,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 
 import org.assertj.core.api.Assertions;
 import org.crue.hercules.sgi.csp.exceptions.ProyectoPeriodoSeguimientoNotFoundException;
-import org.crue.hercules.sgi.csp.model.Proyecto;
 import org.crue.hercules.sgi.csp.model.ProyectoPeriodoSeguimiento;
 import org.crue.hercules.sgi.csp.model.ProyectoPeriodoSeguimientoDocumento;
 import org.crue.hercules.sgi.csp.model.TipoDocumento;
@@ -79,10 +78,10 @@ public class ProyectoPeriodoSeguimientoControllerTest extends BaseControllerTest
         // then: new ProyectoPeriodoSeguimiento is created
         .andExpect(MockMvcResultMatchers.status().isCreated())
         .andExpect(MockMvcResultMatchers.jsonPath("id").isNotEmpty())
-        .andExpect(
-            MockMvcResultMatchers.jsonPath("proyecto.id").value(proyectoPeriodoSeguimiento.getProyecto().getId()))
-        .andExpect(MockMvcResultMatchers.jsonPath("fechaInicio").value("2020-10-19")).andExpect(MockMvcResultMatchers
-            .jsonPath("observaciones").value("obs-" + String.format("%03d", proyectoPeriodoSeguimiento.getId())));
+        .andExpect(MockMvcResultMatchers.jsonPath("proyectoId").value(proyectoPeriodoSeguimiento.getProyectoId()))
+        .andExpect(MockMvcResultMatchers.jsonPath("fechaInicio").value("2020-10-19T00:00:00Z"))
+        .andExpect(MockMvcResultMatchers.jsonPath("observaciones")
+            .value("obs-" + String.format("%03d", proyectoPeriodoSeguimiento.getId())));
   }
 
   @Test
@@ -124,10 +123,11 @@ public class ProyectoPeriodoSeguimientoControllerTest extends BaseControllerTest
         // then: ProyectoPeriodoSeguimiento is updated
         .andExpect(MockMvcResultMatchers.status().isOk())
         .andExpect(MockMvcResultMatchers.jsonPath("id").value(proyectoPeriodoSeguimientoExistente.getId()))
-        .andExpect(MockMvcResultMatchers.jsonPath("proyecto.id")
-            .value(proyectoPeriodoSeguimientoExistente.getProyecto().getId()))
-        .andExpect(MockMvcResultMatchers.jsonPath("fechaInicio").value("2020-10-19")).andExpect(MockMvcResultMatchers
-            .jsonPath("observaciones").value("obs-" + String.format("%03d", proyectoPeriodoSeguimiento.getId())));
+        .andExpect(
+            MockMvcResultMatchers.jsonPath("proyectoId").value(proyectoPeriodoSeguimientoExistente.getProyectoId()))
+        .andExpect(MockMvcResultMatchers.jsonPath("fechaInicio").value("2020-10-19T00:00:00Z"))
+        .andExpect(MockMvcResultMatchers.jsonPath("observaciones")
+            .value("obs-" + String.format("%03d", proyectoPeriodoSeguimiento.getId())));
   }
 
   @Test
@@ -237,8 +237,8 @@ public class ProyectoPeriodoSeguimientoControllerTest extends BaseControllerTest
         .andExpect(MockMvcResultMatchers.status().isOk())
         // and the requested ProyectoPeriodoSeguimiento is resturned as JSON object
         .andExpect(MockMvcResultMatchers.jsonPath("id").value(id))
-        .andExpect(MockMvcResultMatchers.jsonPath("proyecto.id").value(1L))
-        .andExpect(MockMvcResultMatchers.jsonPath("fechaInicio").value("2020-10-19"))
+        .andExpect(MockMvcResultMatchers.jsonPath("proyectoId").value(1L))
+        .andExpect(MockMvcResultMatchers.jsonPath("fechaInicio").value("2020-10-19T00:00:00Z"))
         .andExpect(MockMvcResultMatchers.jsonPath("observaciones").value("obs-001"));
 
   }
@@ -409,15 +409,12 @@ public class ProyectoPeriodoSeguimientoControllerTest extends BaseControllerTest
    * @return el objeto ProyectoPeriodoSeguimiento
    */
   private ProyectoPeriodoSeguimiento generarMockProyectoPeriodoSeguimiento(Long id) {
-    Proyecto proyecto = new Proyecto();
-    proyecto.setId(id == null ? 1 : id);
-
     ProyectoPeriodoSeguimiento proyectoPeriodoSeguimiento = new ProyectoPeriodoSeguimiento();
     proyectoPeriodoSeguimiento.setId(id);
-    proyectoPeriodoSeguimiento.setProyecto(proyecto);
+    proyectoPeriodoSeguimiento.setProyectoId(id == null ? 1 : id);
     proyectoPeriodoSeguimiento.setNumPeriodo(1);
-    proyectoPeriodoSeguimiento.setFechaInicio(LocalDate.of(2020, 10, 19));
-    proyectoPeriodoSeguimiento.setFechaFin(LocalDate.of(2020, 12, 19));
+    proyectoPeriodoSeguimiento.setFechaInicio(Instant.parse("2020-10-19T00:00:00Z"));
+    proyectoPeriodoSeguimiento.setFechaFin(Instant.parse("2020-12-19T23:59:59Z"));
     proyectoPeriodoSeguimiento.setObservaciones("obs-" + String.format("%03d", (id != null ? id : 1)));
 
     return proyectoPeriodoSeguimiento;
@@ -433,8 +430,7 @@ public class ProyectoPeriodoSeguimientoControllerTest extends BaseControllerTest
 
     ProyectoPeriodoSeguimientoDocumento proyectoPeriodoSeguimientoDocumento = new ProyectoPeriodoSeguimientoDocumento();
     proyectoPeriodoSeguimientoDocumento.setId(id);
-    proyectoPeriodoSeguimientoDocumento
-        .setProyectoPeriodoSeguimiento(generarMockProyectoPeriodoSeguimiento(id == null ? 1 : id));
+    proyectoPeriodoSeguimientoDocumento.setProyectoPeriodoSeguimientoId(id == null ? 1 : id);
     proyectoPeriodoSeguimientoDocumento.setNombre("Nombre-" + String.format("%03d", (id != null ? id : 1)));
     proyectoPeriodoSeguimientoDocumento.setDocumentoRef("Doc-" + String.format("%03d", (id != null ? id : 1)));
     proyectoPeriodoSeguimientoDocumento.setComentario("comentario-" + String.format("%03d", (id != null ? id : 1)));

@@ -1,6 +1,6 @@
 package org.crue.hercules.sgi.csp.service.impl;
 
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -70,7 +70,7 @@ public class ProyectoPeriodoSeguimientoServiceImpl implements ProyectoPeriodoSeg
 
     // Se recalcula el número de período en función de la ordenación de la fecha de
     // inicio
-    this.recalcularNumPeriodos(returnValue.getProyecto().getId());
+    this.recalcularNumPeriodos(returnValue.getProyectoId());
 
     log.debug("create(ProyectoPeriodoSeguimiento ProyectoPeriodoSeguimiento) - end");
     return returnValue;
@@ -109,7 +109,7 @@ public class ProyectoPeriodoSeguimientoServiceImpl implements ProyectoPeriodoSeg
 
       // Se recalcula el número de período en función de la ordenación de la fecha de
       // inicio
-      this.recalcularNumPeriodos(returnValue.getProyecto().getId());
+      this.recalcularNumPeriodos(returnValue.getProyectoId());
 
       log.debug("update(ProyectoPeriodoSeguimiento proyectoPeriodoSeguimientoActualizar) - end");
       return returnValue;
@@ -159,7 +159,7 @@ public class ProyectoPeriodoSeguimientoServiceImpl implements ProyectoPeriodoSeg
 
     ProyectoPeriodoSeguimiento proyectoPeriodoSeguimiento = this.findById(id);
     repository.deleteById(id);
-    this.recalcularNumPeriodos(proyectoPeriodoSeguimiento.getProyecto().getId());
+    this.recalcularNumPeriodos(proyectoPeriodoSeguimiento.getProyectoId());
     log.debug("delete(Long id) - end");
 
   }
@@ -228,11 +228,6 @@ public class ProyectoPeriodoSeguimientoServiceImpl implements ProyectoPeriodoSeg
 
     this.validarRequeridosProyectoPeriodoSeguimiento(datosProyectoPeriodoSeguimiento, datosOriginales);
 
-    // Se comprueba la existencia del proyecto
-    datosProyectoPeriodoSeguimiento
-        .setProyecto(proyectoRepository.findById(datosProyectoPeriodoSeguimiento.getProyecto().getId())
-            .orElseThrow(() -> new ProyectoNotFoundException(datosProyectoPeriodoSeguimiento.getProyecto().getId())));
-
     if (datosProyectoPeriodoSeguimiento.getFechaInicio() != null
         && datosProyectoPeriodoSeguimiento.getFechaFin() != null) {
 
@@ -240,18 +235,17 @@ public class ProyectoPeriodoSeguimientoServiceImpl implements ProyectoPeriodoSeg
           datosProyectoPeriodoSeguimiento.getFechaFin().isAfter(datosProyectoPeriodoSeguimiento.getFechaInicio()),
           "La fecha de fin debe ser posterior a la fecha de inicio");
 
+      Proyecto proyecto = proyectoRepository.findById(datosProyectoPeriodoSeguimiento.getProyectoId())
+          .orElseThrow(() -> new ProyectoNotFoundException(datosProyectoPeriodoSeguimiento.getProyectoId()));
+
       Assert.isTrue(
-          datosProyectoPeriodoSeguimiento.getProyecto().getFechaInicio()
-              .isBefore(datosProyectoPeriodoSeguimiento.getFechaInicio())
-              || datosProyectoPeriodoSeguimiento.getProyecto().getFechaInicio()
-                  .isEqual(datosProyectoPeriodoSeguimiento.getFechaInicio()),
+          proyecto.getFechaInicio().isBefore(datosProyectoPeriodoSeguimiento.getFechaInicio())
+              || proyecto.getFechaInicio().equals(datosProyectoPeriodoSeguimiento.getFechaInicio()),
           "La fecha de inicio del proyecto debe ser anterior o igual a la fecha de inicio del periodo de seguimiento");
 
       Assert.isTrue(
-          datosProyectoPeriodoSeguimiento.getProyecto().getFechaFin()
-              .isAfter(datosProyectoPeriodoSeguimiento.getFechaFin())
-              || datosProyectoPeriodoSeguimiento.getProyecto().getFechaFin()
-                  .isEqual(datosProyectoPeriodoSeguimiento.getFechaFin()),
+          proyecto.getFechaFin().isAfter(datosProyectoPeriodoSeguimiento.getFechaFin())
+              || proyecto.getFechaFin().equals(datosProyectoPeriodoSeguimiento.getFechaFin()),
           "La fecha de fin del proyecto debe ser posterior o igual a la fecha de fin del periodo de seguimiento");
     }
 
@@ -266,7 +260,7 @@ public class ProyectoPeriodoSeguimientoServiceImpl implements ProyectoPeriodoSeg
 
     // Solapamiento de fechas
     Assert.isTrue(
-        validarSolapamientoFechas(datosProyectoPeriodoSeguimiento.getProyecto().getId(),
+        validarSolapamientoFechas(datosProyectoPeriodoSeguimiento.getProyectoId(),
             datosProyectoPeriodoSeguimiento.getFechaInicio(), datosProyectoPeriodoSeguimiento.getFechaFin(),
             Arrays.asList(datosProyectoPeriodoSeguimiento.getId())),
         "Ya existe un periodo de fechas en vigencia que se solapa con el indicado");
@@ -285,10 +279,10 @@ public class ProyectoPeriodoSeguimientoServiceImpl implements ProyectoPeriodoSeg
    * @param excluidos   identificadores a excluir de la busqueda
    * @return true validación correcta/ false validacion incorrecta
    */
-  private boolean validarSolapamientoFechas(Long proyectoId, LocalDate fechaInicio, LocalDate fechaFin,
+  private boolean validarSolapamientoFechas(Long proyectoId, Instant fechaInicio, Instant fechaFin,
       List<Long> excluidos) {
     log.debug(
-        "validarSolapamientoFechas(Long proyectoId, LocalDate fechaInicio, LocalDate fechaFin, List<Long> excluidos - start");
+        "validarSolapamientoFechas(Long proyectoId, Instant fechaInicio, Instant fechaFin, List<Long> excluidos - start");
 
     Specification<ProyectoPeriodoSeguimiento> specByProyecto = ProyectoPeriodoSeguimientoSpecifications
         .byProyecto(proyectoId);
@@ -320,7 +314,7 @@ public class ProyectoPeriodoSeguimientoServiceImpl implements ProyectoPeriodoSeg
               || (fechaFin == null || item.getFechaFin() == null)) {
             returnValue = Boolean.FALSE;
           } else {
-            returnValue = !((item.getFechaInicio().isEqual(fechaInicio) && item.getFechaFin().isEqual(fechaFin))
+            returnValue = !((item.getFechaInicio().equals(fechaInicio) && item.getFechaFin().equals(fechaFin))
                 || (item.getFechaInicio().isBefore(fechaFin) && item.getFechaFin().isAfter(fechaInicio)));
           }
         }
@@ -341,11 +335,8 @@ public class ProyectoPeriodoSeguimientoServiceImpl implements ProyectoPeriodoSeg
     log.debug(
         "validarRequeridosProyectoPeriodoSeguimiento(ProyectoPeriodoSeguimiento datosProyectoPeriodoSeguimiento, ProyectoPeriodoSeguimiento datosOriginales) - start");
 
-    Assert.isTrue(
-        datosProyectoPeriodoSeguimiento.getProyecto() != null
-            && datosProyectoPeriodoSeguimiento.getProyecto().getId() != null,
-        "Id Proyecto no puede ser null para " + ((datosOriginales == null) ? "crear" : "actualizar")
-            + " ProyectoPeriodoSeguimiento");
+    Assert.isTrue(datosProyectoPeriodoSeguimiento.getProyectoId() != null, "Id Proyecto no puede ser null para "
+        + ((datosOriginales == null) ? "crear" : "actualizar") + " ProyectoPeriodoSeguimiento");
 
     Assert.notNull(datosProyectoPeriodoSeguimiento.getFechaInicio(), "FechaInicio no puede ser null para "
         + ((datosOriginales == null) ? "crear" : "actualizar") + " ProyectoPeriodoSeguimiento");
@@ -353,8 +344,11 @@ public class ProyectoPeriodoSeguimientoServiceImpl implements ProyectoPeriodoSeg
     Assert.notNull(datosProyectoPeriodoSeguimiento.getFechaFin(), "FechaFin no puede ser null para "
         + ((datosOriginales == null) ? "crear" : "actualizar") + " ProyectoPeriodoSeguimiento");
 
-    if (datosProyectoPeriodoSeguimiento.getProyecto().getEstado() != null
-        && datosProyectoPeriodoSeguimiento.getProyecto().getEstado().getEstado() == EstadoProyecto.Estado.ABIERTO) {
+    // Se comprueba la existencia del proyecto
+    Proyecto proyecto = proyectoRepository.findById(datosProyectoPeriodoSeguimiento.getProyectoId())
+        .orElseThrow(() -> new ProyectoNotFoundException(datosProyectoPeriodoSeguimiento.getProyectoId()));
+
+    if (proyecto.getEstado() != null && proyecto.getEstado().getEstado() == EstadoProyecto.Estado.ABIERTO) {
       Assert.notNull(datosProyectoPeriodoSeguimiento.getFechaInicioPresentacion(),
           "FechaInicioPresentacion no puede ser null para " + ((datosOriginales == null) ? "crear" : "actualizar")
               + " ProyectoPeriodoSeguimiento");

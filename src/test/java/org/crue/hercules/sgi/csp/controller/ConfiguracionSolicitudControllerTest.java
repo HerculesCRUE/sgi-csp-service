@@ -2,7 +2,7 @@ package org.crue.hercules.sgi.csp.controller;
 
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,7 +13,6 @@ import org.crue.hercules.sgi.csp.enums.FormularioSolicitud;
 import org.crue.hercules.sgi.csp.exceptions.ConfiguracionSolicitudNotFoundException;
 import org.crue.hercules.sgi.csp.exceptions.ConvocatoriaNotFoundException;
 import org.crue.hercules.sgi.csp.model.ConfiguracionSolicitud;
-import org.crue.hercules.sgi.csp.model.Convocatoria;
 import org.crue.hercules.sgi.csp.model.ConvocatoriaFase;
 import org.crue.hercules.sgi.csp.model.DocumentoRequeridoSolicitud;
 import org.crue.hercules.sgi.csp.model.ModeloEjecucion;
@@ -88,8 +87,8 @@ public class ConfiguracionSolicitudControllerTest extends BaseControllerTest {
         // then: new ConfiguracionSolicitud is created
         .andExpect(MockMvcResultMatchers.status().isCreated())
         .andExpect(MockMvcResultMatchers.jsonPath("id").isNotEmpty())
-        .andExpect(MockMvcResultMatchers.jsonPath("convocatoria.id")
-            .value(newConfiguracionSolicitud.getConvocatoria().getId()))
+        .andExpect(
+            MockMvcResultMatchers.jsonPath("convocatoriaId").value(newConfiguracionSolicitud.getConvocatoriaId()))
         .andExpect(
             MockMvcResultMatchers.jsonPath("tramitacionSGI").value(newConfiguracionSolicitud.getTramitacionSGI()))
         .andExpect(MockMvcResultMatchers.jsonPath("fasePresentacionSolicitudes.id")
@@ -143,8 +142,8 @@ public class ConfiguracionSolicitudControllerTest extends BaseControllerTest {
         // then: ConfiguracionSolicitud is updated
         .andExpect(MockMvcResultMatchers.status().isOk())
         .andExpect(MockMvcResultMatchers.jsonPath("id").value(configuracionSolicitudExistente.getId()))
-        .andExpect(MockMvcResultMatchers.jsonPath("convocatoria.id")
-            .value(configuracionSolicitudExistente.getConvocatoria().getId()))
+        .andExpect(
+            MockMvcResultMatchers.jsonPath("convocatoriaId").value(configuracionSolicitudExistente.getConvocatoriaId()))
         .andExpect(MockMvcResultMatchers.jsonPath("tramitacionSGI").value(configuracionSolicitud.getTramitacionSGI()))
         .andExpect(MockMvcResultMatchers.jsonPath("fasePresentacionSolicitudes.id")
             .value(configuracionSolicitud.getFasePresentacionSolicitudes().getId()))
@@ -192,7 +191,7 @@ public class ConfiguracionSolicitudControllerTest extends BaseControllerTest {
         .andExpect(MockMvcResultMatchers.status().isOk())
         // and the requested ConfiguracionSolicitud is resturned as JSON object
         .andExpect(MockMvcResultMatchers.jsonPath("id").value(2L))
-        .andExpect(MockMvcResultMatchers.jsonPath("convocatoria.id").value(1L));
+        .andExpect(MockMvcResultMatchers.jsonPath("convocatoriaId").value(1L));
   }
 
   @Test
@@ -321,6 +320,19 @@ public class ConfiguracionSolicitudControllerTest extends BaseControllerTest {
         .andExpect(MockMvcResultMatchers.status().isNoContent());
   }
 
+  private ModeloEjecucion generarMockModeloEjecucion(Long modeloEjecucionId) {
+    // @formatter:off
+    ModeloEjecucion modeloEjecucion = ModeloEjecucion.builder()
+        .id(modeloEjecucionId)
+        .nombre("nombreModeloEjecucion-1")
+        .descripcion("descripcionModeloEjecucion-1")
+        .activo(Boolean.TRUE)
+        .build();
+    // @formatter:on
+
+    return modeloEjecucion;
+  }
+
   /**
    * Genera un objeto ConfiguracionSolicitud
    * 
@@ -332,44 +344,31 @@ public class ConfiguracionSolicitudControllerTest extends BaseControllerTest {
   private ConfiguracionSolicitud generarMockConfiguracionSolicitud(Long configuracionSolicitudId, Long convocatoriaId,
       Long convocatoriaFaseId) {
 
-    ModeloEjecucion modeloEjecucion = ModeloEjecucion.builder()//
-        .id(1L)//
-        .nombre("nombreModeloEjecucion-1")//
-        .descripcion("descripcionModeloEjecucion-1")//
-        .activo(Boolean.TRUE)//
+    // @formatter:off
+    TipoFase tipoFase = TipoFase.builder()
+        .id(convocatoriaFaseId)
+        .nombre("nombre-1")
+        .activo(Boolean.TRUE)
         .build();
 
-    Convocatoria convocatoria = Convocatoria.builder()//
-        .id(convocatoriaId)//
-        .modeloEjecucion(modeloEjecucion)//
-        .estado(Convocatoria.Estado.BORRADOR)//
-
-        .activo(Boolean.TRUE)//
+    ConvocatoriaFase convocatoriaFase = ConvocatoriaFase.builder()
+        .id(convocatoriaFaseId)
+        .convocatoriaId(convocatoriaId)
+        .tipoFase(tipoFase)
+        .fechaInicio(Instant.parse("2020-10-01T00:00:00Z"))
+        .fechaFin(Instant.parse("2020-10-15T00:00:00Z"))
+        .observaciones("observaciones")
         .build();
 
-    TipoFase tipoFase = TipoFase.builder()//
-        .id(convocatoriaFaseId)//
-        .nombre("nombre-1")//
-        .activo(Boolean.TRUE)//
+    ConfiguracionSolicitud configuracionSolicitud = ConfiguracionSolicitud.builder()
+        .id(configuracionSolicitudId)
+        .convocatoriaId(convocatoriaId)
+        .tramitacionSGI(Boolean.TRUE)
+        .fasePresentacionSolicitudes(convocatoriaFase)
+        .importeMaximoSolicitud(BigDecimal.valueOf(12345))
+        .formularioSolicitud(FormularioSolicitud.ESTANDAR)
         .build();
-
-    ConvocatoriaFase convocatoriaFase = ConvocatoriaFase.builder()//
-        .id(convocatoriaFaseId)//
-        .convocatoria(convocatoria)//
-        .tipoFase(tipoFase)//
-        .fechaInicio(LocalDateTime.of(2020, 10, 1, 17, 18, 19))//
-        .fechaFin(LocalDateTime.of(2020, 10, 15, 17, 18, 19))//
-        .observaciones("observaciones")//
-        .build();
-
-    ConfiguracionSolicitud configuracionSolicitud = ConfiguracionSolicitud.builder()//
-        .id(configuracionSolicitudId)//
-        .convocatoria(convocatoria)//
-        .tramitacionSGI(Boolean.TRUE)//
-        .fasePresentacionSolicitudes(convocatoriaFase)//
-        .importeMaximoSolicitud(BigDecimal.valueOf(12345))//
-        .formularioSolicitud(FormularioSolicitud.ESTANDAR)//
-        .build();
+    // @formatter:on
 
     return configuracionSolicitud;
   }
@@ -381,37 +380,36 @@ public class ConfiguracionSolicitudControllerTest extends BaseControllerTest {
    * @return
    */
   private DocumentoRequeridoSolicitud generarDocumentoRequeridoSolicitud(Long documentoRequeridoSolicitudId) {
-
-    ConfiguracionSolicitud configuracionSolicitud = generarMockConfiguracionSolicitud(1L, 1L, 1L);
-
-    TipoFase tipoFase = TipoFase.builder()//
-        .id(1L)//
-        .nombre("nombre-1")//
-        .activo(Boolean.TRUE)//
+    // @formatter:off
+    TipoFase tipoFase = TipoFase.builder()
+        .id(1L)
+        .nombre("nombre-1")
+        .activo(Boolean.TRUE)
         .build();
 
-    ModeloTipoFase.builder()//
-        .id(1L)//
-        .modeloEjecucion(configuracionSolicitud.getConvocatoria().getModeloEjecucion())//
-        .tipoFase(tipoFase)//
-        .solicitud(Boolean.TRUE)//
-        .convocatoria(Boolean.TRUE)//
-        .proyecto(Boolean.TRUE)//
-        .activo(Boolean.TRUE)//
+    ModeloTipoFase.builder()
+        .id(1L)
+        .modeloEjecucion(generarMockModeloEjecucion(1L))
+        .tipoFase(tipoFase)
+        .solicitud(Boolean.TRUE)
+        .convocatoria(Boolean.TRUE)
+        .proyecto(Boolean.TRUE)
+        .activo(Boolean.TRUE)
         .build();
 
-    TipoDocumento tipoDocumento = TipoDocumento.builder()//
-        .id(1L)//
-        .nombre("nombre-1")//
-        .activo(Boolean.TRUE)//
+    TipoDocumento tipoDocumento = TipoDocumento.builder()
+        .id(1L)
+        .nombre("nombre-1")
+        .activo(Boolean.TRUE)
         .build();
 
-    return DocumentoRequeridoSolicitud.builder()//
-        .id(documentoRequeridoSolicitudId)//
-        .configuracionSolicitud(configuracionSolicitud)//
-        .tipoDocumento(tipoDocumento)//
-        .observaciones("observaciones-" + documentoRequeridoSolicitudId)//
+    return DocumentoRequeridoSolicitud.builder()
+        .id(documentoRequeridoSolicitudId)
+        .configuracionSolicitudId(1L)
+        .tipoDocumento(tipoDocumento)
+        .observaciones("observaciones-" + documentoRequeridoSolicitudId)
         .build();
+    // @formatter:on
 
   }
 }

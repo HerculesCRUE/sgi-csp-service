@@ -1,25 +1,20 @@
 package org.crue.hercules.sgi.csp.service;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.time.Period;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import org.assertj.core.api.Assertions;
-import org.crue.hercules.sgi.csp.enums.ClasificacionCVN;
 import org.crue.hercules.sgi.csp.exceptions.ProyectoNotFoundException;
-import org.crue.hercules.sgi.csp.model.AreaTematica;
-import org.crue.hercules.sgi.csp.model.Convocatoria;
-import org.crue.hercules.sgi.csp.model.ConvocatoriaAreaTematica;
 import org.crue.hercules.sgi.csp.model.EstadoProyecto;
 import org.crue.hercules.sgi.csp.model.ModeloEjecucion;
-import org.crue.hercules.sgi.csp.model.ModeloTipoFinalidad;
 import org.crue.hercules.sgi.csp.model.ModeloUnidad;
 import org.crue.hercules.sgi.csp.model.Proyecto;
 import org.crue.hercules.sgi.csp.model.TipoAmbitoGeografico;
 import org.crue.hercules.sgi.csp.model.TipoFinalidad;
-import org.crue.hercules.sgi.csp.model.TipoRegimenConcurrencia;
 import org.crue.hercules.sgi.csp.repository.ConvocatoriaAreaTematicaRepository;
 import org.crue.hercules.sgi.csp.repository.ConvocatoriaConceptoGastoRepository;
 import org.crue.hercules.sgi.csp.repository.ConvocatoriaEntidadConvocanteRepository;
@@ -32,12 +27,12 @@ import org.crue.hercules.sgi.csp.repository.ModeloUnidadRepository;
 import org.crue.hercules.sgi.csp.repository.ProgramaRepository;
 import org.crue.hercules.sgi.csp.repository.ProyectoRepository;
 import org.crue.hercules.sgi.csp.repository.SolicitudModalidadRepository;
-import org.crue.hercules.sgi.csp.repository.SolicitudProyectoDatosRepository;
 import org.crue.hercules.sgi.csp.repository.SolicitudProyectoEntidadFinanciadoraAjenaRepository;
 import org.crue.hercules.sgi.csp.repository.SolicitudProyectoEquipoRepository;
-import org.crue.hercules.sgi.csp.repository.SolicitudProyectoEquipoSocioRepository;
-import org.crue.hercules.sgi.csp.repository.SolicitudProyectoPeriodoJustificacionRepository;
-import org.crue.hercules.sgi.csp.repository.SolicitudProyectoPeriodoPagoRepository;
+import org.crue.hercules.sgi.csp.repository.SolicitudProyectoRepository;
+import org.crue.hercules.sgi.csp.repository.SolicitudProyectoSocioEquipoRepository;
+import org.crue.hercules.sgi.csp.repository.SolicitudProyectoSocioPeriodoJustificacionRepository;
+import org.crue.hercules.sgi.csp.repository.SolicitudProyectoSocioPeriodoPagoRepository;
 import org.crue.hercules.sgi.csp.repository.SolicitudProyectoSocioRepository;
 import org.crue.hercules.sgi.csp.repository.SolicitudRepository;
 import org.crue.hercules.sgi.csp.service.impl.ProyectoServiceImpl;
@@ -91,7 +86,7 @@ public class ProyectoServiceTest extends BaseServiceTest {
   @Mock
   private SolicitudRepository solicitudRepository;
   @Mock
-  private SolicitudProyectoDatosRepository solicitudProyectoDatosRepository;
+  private SolicitudProyectoRepository solicitudProyectoRepository;
   @Mock
   private SolicitudModalidadRepository solicitudModalidadRepository;
   @Mock
@@ -103,15 +98,15 @@ public class ProyectoServiceTest extends BaseServiceTest {
   @Mock
   private ProyectoSocioService proyectoSocioService;
   @Mock
-  private SolicitudProyectoEquipoSocioRepository solicitudEquipoSocioRepository;
+  private SolicitudProyectoSocioEquipoRepository solicitudEquipoSocioRepository;
   @Mock
   private ProyectoSocioEquipoService proyectoEquipoSocioService;
   @Mock
-  private SolicitudProyectoPeriodoPagoRepository solicitudPeriodoPagoRepository;
+  private SolicitudProyectoSocioPeriodoPagoRepository solicitudPeriodoPagoRepository;
   @Mock
   private ProyectoSocioPeriodoPagoService proyectoSocioPeriodoPagoService;
   @Mock
-  private SolicitudProyectoPeriodoJustificacionRepository solicitudPeriodoJustificacionRepository;
+  private SolicitudProyectoSocioPeriodoJustificacionRepository solicitudPeriodoJustificacionRepository;
   @Mock
   private ProyectoSocioPeriodoJustificacionService proyectoSocioPeriodoJustificacionService;
   @Mock
@@ -130,11 +125,11 @@ public class ProyectoServiceTest extends BaseServiceTest {
         convocatoriaEntidadConvocanteRepository, proyectoEntidadConvocanteService, convocatoriaEntidadGestoraRepository,
         proyectoEntidadGestoraService, convocatoriaAreaTematicaRepository, contextoProyectoService,
         convocatoriaPeriodoSeguimientoCientificoRepository, proyectoPeriodoSeguimientoService, solicitudRepository,
-        solicitudProyectoDatosRepository, solicitudModalidadRepository, solicitudEquipoRepository,
-        proyectoEquipoService, solicitudSocioRepository, proyectoSocioService, solicitudEquipoSocioRepository,
-        proyectoEquipoSocioService, solicitudPeriodoPagoRepository, proyectoSocioPeriodoPagoService,
-        solicitudPeriodoJustificacionRepository, proyectoSocioPeriodoJustificacionService,
-        convocatoriaConceptoGastoRepository, solicitudProyectoEntidadFinanciadoraAjenaRepository, programaRepository);
+        solicitudProyectoRepository, solicitudModalidadRepository, solicitudEquipoRepository, proyectoEquipoService,
+        solicitudSocioRepository, proyectoSocioService, solicitudEquipoSocioRepository, proyectoEquipoSocioService,
+        solicitudPeriodoPagoRepository, proyectoSocioPeriodoPagoService, solicitudPeriodoJustificacionRepository,
+        proyectoSocioPeriodoJustificacionService, convocatoriaConceptoGastoRepository,
+        solicitudProyectoEntidadFinanciadoraAjenaRepository, programaRepository);
   }
 
   @Test
@@ -186,7 +181,7 @@ public class ProyectoServiceTest extends BaseServiceTest {
   public void createWithConvocatoria_ReturnsProyecto() {
     // given: Un nuevo Proyecto
     Proyecto proyecto = generarMockProyecto(null);
-    proyecto.setConvocatoria(Convocatoria.builder().id(1L).build());
+    proyecto.setConvocatoriaId(1L);
 
     BDDMockito.given(repository.save(ArgumentMatchers.<Proyecto>any())).will((InvocationOnMock invocation) -> {
       Proyecto proyectoCreado = invocation.getArgument(0);
@@ -198,9 +193,6 @@ public class ProyectoServiceTest extends BaseServiceTest {
     });
 
     BDDMockito.given(convocatoriaRepository.existsById(ArgumentMatchers.anyLong())).willReturn(Boolean.TRUE);
-
-    BDDMockito.given(convocatoriaRepository.findById(ArgumentMatchers.anyLong()))
-        .willReturn(Optional.of(generarMockConvocatoria(1L, 1L, 1L, 1L, 1L, 1L, Boolean.TRUE)));
 
     BDDMockito.given(estadoProyectoRepository.save(ArgumentMatchers.<EstadoProyecto>any()))
         .will((InvocationOnMock invocation) -> {
@@ -236,7 +228,7 @@ public class ProyectoServiceTest extends BaseServiceTest {
   public void createWithConvocatoriaAndConvocatoriaAreaTematica_ReturnsProyecto() {
     // given: Un nuevo Proyecto
     Proyecto proyecto = generarMockProyecto(null);
-    proyecto.setConvocatoria(Convocatoria.builder().id(1L).build());
+    proyecto.setConvocatoriaId(1L);
 
     BDDMockito.given(repository.save(ArgumentMatchers.<Proyecto>any())).will((InvocationOnMock invocation) -> {
       Proyecto proyectoCreado = invocation.getArgument(0);
@@ -248,15 +240,6 @@ public class ProyectoServiceTest extends BaseServiceTest {
     });
 
     BDDMockito.given(convocatoriaRepository.existsById(ArgumentMatchers.anyLong())).willReturn(Boolean.TRUE);
-
-    BDDMockito.given(convocatoriaRepository.findById(ArgumentMatchers.anyLong()))
-        .willReturn(Optional.of(generarMockConvocatoria(1L, 1L, 1L, 1L, 1L, 1L, Boolean.TRUE)));
-
-    ConvocatoriaAreaTematica convocatoriaAreaTematica = generarMockConvocatoriaAreaTematica(
-        generarMockConvocatoria(1L, 1L, 1L, 1L, 1L, 1L, Boolean.TRUE));
-
-    BDDMockito.given(convocatoriaAreaTematicaRepository.findByConvocatoriaId(ArgumentMatchers.anyLong()))
-        .willReturn(Optional.of(convocatoriaAreaTematica));
 
     BDDMockito.given(estadoProyectoRepository.save(ArgumentMatchers.<EstadoProyecto>any()))
         .will((InvocationOnMock invocation) -> {
@@ -292,14 +275,14 @@ public class ProyectoServiceTest extends BaseServiceTest {
   public void create_WithConvocatoriaNotExists_ThrowsIllegalArgumentException() {
     // given: Un nuevo Proyecto
     Proyecto proyecto = generarMockProyecto(null);
-    proyecto.setConvocatoria(Convocatoria.builder().id(1L).build());
+    proyecto.setConvocatoriaId(1L);
 
     BDDMockito.given(convocatoriaRepository.existsById(ArgumentMatchers.anyLong())).willReturn(Boolean.FALSE);
 
     // when: Creamos el Proyecto
     // then: Lanza una excepcion
     Assertions.assertThatThrownBy(() -> service.create(proyecto)).isInstanceOf(IllegalArgumentException.class)
-        .hasMessage("La convocatoria con id '" + proyecto.getConvocatoria().getId() + "' no existe");
+        .hasMessage("La convocatoria con id '" + proyecto.getConvocatoriaId() + "' no existe");
   }
 
   @Test
@@ -325,20 +308,6 @@ public class ProyectoServiceTest extends BaseServiceTest {
     // then: Lanza una excepcion
     Assertions.assertThatThrownBy(() -> service.create(proyecto)).isInstanceOf(IllegalArgumentException.class)
         .hasMessage("La Unidad de Gestión no es gestionable por el usuario");
-  }
-
-  @Test
-  @WithMockUser(authorities = { "CSP-PRO-C_OPE" })
-  public void create_WithConvocatoriaAndConvocatoriaExterna_ThrowsIllegalArgumentException() {
-    // given: Un nuevo Proyecto
-    Proyecto proyecto = generarMockProyecto(null);
-    proyecto.setConvocatoria(Convocatoria.builder().id(1L).build());
-    proyecto.setConvocatoriaExterna("conv-001");
-
-    // when: Creamos el Proyecto
-    // then: Lanza una excepcion
-    Assertions.assertThatThrownBy(() -> service.create(proyecto)).isInstanceOf(IllegalArgumentException.class)
-        .hasMessage("La convocatoria no puede ser externa ya que el proyecto tiene una convocatoria asignada");
   }
 
   @Test
@@ -418,7 +387,6 @@ public class ProyectoServiceTest extends BaseServiceTest {
     BDDMockito.given(modeloUnidadRepository.findByModeloEjecucionIdAndUnidadGestionRef(ArgumentMatchers.anyLong(),
         ArgumentMatchers.anyString())).willReturn(Optional.of(modeloUnidad));
     BDDMockito.given(repository.findById(ArgumentMatchers.<Long>any())).willReturn(Optional.of(proyecto));
-
     BDDMockito.given(repository.save(ArgumentMatchers.<Proyecto>any()))
         .will((InvocationOnMock invocation) -> invocation.getArgument(0));
 
@@ -440,10 +408,11 @@ public class ProyectoServiceTest extends BaseServiceTest {
   @WithMockUser(authorities = { "CSP-PRO-C_OPE" })
   public void updateWithConvocatoria_ReturnsProyecto() {
     // given: Un nuevo Proyecto con las observaciones actualizadas
+    Long convocatoriaId = 1L;
     Proyecto proyecto = generarMockProyecto(1L);
-    proyecto.setConvocatoria(generarMockConvocatoria(1L, 1L, 1L, 1L, 1L, 1L, Boolean.TRUE));
+    proyecto.setConvocatoriaId(convocatoriaId);
     Proyecto proyectoObservacionesActualizadas = generarMockProyecto(1L);
-    proyectoObservacionesActualizadas.setConvocatoria(generarMockConvocatoria(1L, 1L, 1L, 1L, 1L, 1L, Boolean.TRUE));
+    proyectoObservacionesActualizadas.setConvocatoriaId(convocatoriaId);
     proyectoObservacionesActualizadas.setObservaciones("observaciones actualizadas");
 
     ModeloUnidad modeloUnidad = new ModeloUnidad();
@@ -455,12 +424,7 @@ public class ProyectoServiceTest extends BaseServiceTest {
     BDDMockito.given(modeloUnidadRepository.findByModeloEjecucionIdAndUnidadGestionRef(ArgumentMatchers.anyLong(),
         ArgumentMatchers.anyString())).willReturn(Optional.of(modeloUnidad));
     BDDMockito.given(repository.findById(ArgumentMatchers.<Long>any())).willReturn(Optional.of(proyecto));
-
     BDDMockito.given(convocatoriaRepository.existsById(ArgumentMatchers.anyLong())).willReturn(Boolean.TRUE);
-
-    BDDMockito.given(convocatoriaRepository.findById(ArgumentMatchers.anyLong()))
-        .willReturn(Optional.of(generarMockConvocatoria(1L, 1L, 1L, 1L, 1L, 1L, Boolean.TRUE)));
-
     BDDMockito.given(repository.save(ArgumentMatchers.<Proyecto>any()))
         .will((InvocationOnMock invocation) -> invocation.getArgument(0));
 
@@ -501,14 +465,14 @@ public class ProyectoServiceTest extends BaseServiceTest {
   public void update_WithConvocatoriaNotExists_ThrowsIllegalArgumentException() {
     // given: Actualizar proyecto
     Proyecto proyecto = generarMockProyecto(1L);
-    proyecto.setConvocatoria(Convocatoria.builder().id(1L).build());
+    proyecto.setConvocatoriaId(1L);
 
     BDDMockito.given(convocatoriaRepository.existsById(ArgumentMatchers.anyLong())).willReturn(Boolean.FALSE);
 
     // when: Actualizamos el Proyecto
     // then: Lanza una excepcion
     Assertions.assertThatThrownBy(() -> service.update(proyecto)).isInstanceOf(IllegalArgumentException.class)
-        .hasMessage("La convocatoria con id '" + proyecto.getConvocatoria().getId() + "' no existe");
+        .hasMessage("La convocatoria con id '" + proyecto.getConvocatoriaId() + "' no existe");
   }
 
   @Test
@@ -525,20 +489,6 @@ public class ProyectoServiceTest extends BaseServiceTest {
     // then: Lanza una excepcion
     Assertions.assertThatThrownBy(() -> service.update(proyecto)).isInstanceOf(IllegalArgumentException.class)
         .hasMessage("El proyecto no pertenece a una Unidad de Gestión gestionable por el usuario");
-  }
-
-  @Test
-  @WithMockUser(authorities = { "CSP-PRO-C_OPE" })
-  public void update_WithConvocatoriaAndConvocatoriaExterna_ThrowsIllegalArgumentException() {
-    // given: Actualizar Proyecto
-    Proyecto proyecto = generarMockProyecto(1L);
-    proyecto.setConvocatoria(Convocatoria.builder().id(1L).build());
-    proyecto.setConvocatoriaExterna("conv-001");
-
-    // when: Actualizamos el Proyecto
-    // then: Lanza una excepcion
-    Assertions.assertThatThrownBy(() -> service.update(proyecto)).isInstanceOf(IllegalArgumentException.class)
-        .hasMessage("La convocatoria no puede ser externa ya que el proyecto tiene una convocatoria asignada");
   }
 
   @Test
@@ -562,9 +512,9 @@ public class ProyectoServiceTest extends BaseServiceTest {
   public void update_WithDistinctConvocatoria_ThrowsIllegalArgumentException() {
     // given: Actualizar Proyecto
     Proyecto proyecto = generarMockProyecto(1L);
-    proyecto.setConvocatoria(generarMockConvocatoria(1L, 1L, 1L, 1L, 1L, 1L, Boolean.TRUE));
+    proyecto.setConvocatoriaId(1L);
     Proyecto proyectoConvocatoriaUpdate = generarMockProyecto(1L);
-    proyecto.setConvocatoria(generarMockConvocatoria(2L, 2L, 2L, 2L, 2L, 2L, Boolean.TRUE));
+    proyecto.setConvocatoriaId(2L);
 
     ModeloUnidad modeloUnidad = new ModeloUnidad();
     modeloUnidad.setId(1L);
@@ -891,8 +841,8 @@ public class ProyectoServiceTest extends BaseServiceTest {
     proyecto.setCodigoExterno("cod-externo-" + (id != null ? String.format("%03d", id) : "001"));
     proyecto.setObservaciones("observaciones-" + String.format("%03d", id));
     proyecto.setUnidadGestionRef("OPE");
-    proyecto.setFechaInicio(LocalDate.now());
-    proyecto.setFechaFin(LocalDate.now().plusMonths(1));
+    proyecto.setFechaInicio(Instant.now());
+    proyecto.setFechaFin(Instant.from(Instant.now().atZone(ZoneOffset.UTC).plus(Period.ofMonths(1))));
     proyecto.setModeloEjecucion(modeloEjecucion);
     proyecto.setFinalidad(tipoFinalidad);
     proyecto.setAmbitoGeografico(tipoAmbitoGeografico);
@@ -920,103 +870,9 @@ public class ProyectoServiceTest extends BaseServiceTest {
     estadoProyecto.setId(id);
     estadoProyecto.setComentario("Estado-" + id);
     estadoProyecto.setEstado(EstadoProyecto.Estado.BORRADOR);
-    estadoProyecto.setFechaEstado(LocalDateTime.now());
-    estadoProyecto.setIdProyecto(1L);
+    estadoProyecto.setFechaEstado(Instant.now());
+    estadoProyecto.setProyectoId(1L);
 
     return estadoProyecto;
   }
-
-  /**
-   * Función que genera Convocatoria
-   * 
-   * @param convocatoriaId
-   * @param unidadGestionId
-   * @param modeloEjecucionId
-   * @param modeloTipoFinalidadId
-   * @param tipoRegimenConcurrenciaId
-   * @param tipoAmbitoGeogragicoId
-   * @param activo
-   * @return la convocatoria
-   */
-  private Convocatoria generarMockConvocatoria(Long convocatoriaId, Long unidadGestionId, Long modeloEjecucionId,
-      Long modeloTipoFinalidadId, Long tipoRegimenConcurrenciaId, Long tipoAmbitoGeogragicoId, Boolean activo) {
-
-    ModeloEjecucion modeloEjecucion = (modeloEjecucionId == null) ? null
-        : ModeloEjecucion.builder()//
-            .id(modeloEjecucionId)//
-            .nombre("nombreModeloEjecucion-" + String.format("%03d", modeloEjecucionId))//
-            .activo(Boolean.TRUE)//
-            .build();
-
-    TipoFinalidad tipoFinalidad = (modeloTipoFinalidadId == null) ? null
-        : TipoFinalidad.builder()//
-            .id(modeloTipoFinalidadId)//
-            .nombre("nombreTipoFinalidad-" + String.format("%03d", modeloTipoFinalidadId))//
-            .activo(Boolean.TRUE)//
-            .build();
-
-    ModeloTipoFinalidad modeloTipoFinalidad = (modeloTipoFinalidadId == null) ? null
-        : ModeloTipoFinalidad.builder()//
-            .id(modeloTipoFinalidadId)//
-            .modeloEjecucion(modeloEjecucion)//
-            .tipoFinalidad(tipoFinalidad)//
-            .activo(Boolean.TRUE)//
-            .build();
-
-    TipoRegimenConcurrencia tipoRegimenConcurrencia = (tipoRegimenConcurrenciaId == null) ? null
-        : TipoRegimenConcurrencia.builder()//
-            .id(tipoRegimenConcurrenciaId)//
-            .nombre("nombreTipoRegimenConcurrencia-" + String.format("%03d", tipoRegimenConcurrenciaId))//
-            .activo(Boolean.TRUE)//
-            .build();
-
-    TipoAmbitoGeografico tipoAmbitoGeografico = (tipoAmbitoGeogragicoId == null) ? null
-        : TipoAmbitoGeografico.builder()//
-            .id(tipoAmbitoGeogragicoId)//
-            .nombre("nombreTipoAmbitoGeografico-" + String.format("%03d", tipoAmbitoGeogragicoId))//
-            .activo(Boolean.TRUE)//
-            .build();
-
-    Convocatoria convocatoria = Convocatoria.builder()//
-        .id(convocatoriaId)//
-        .unidadGestionRef((unidadGestionId == null) ? null : "unidad-" + String.format("%03d", unidadGestionId))//
-        .modeloEjecucion(modeloEjecucion)//
-        .codigo("codigo-" + String.format("%03d", convocatoriaId))//
-        .anio(2020)//
-        .titulo("titulo-" + String.format("%03d", convocatoriaId))//
-        .objeto("objeto-" + String.format("%03d", convocatoriaId))//
-        .observaciones("observaciones-" + String.format("%03d", convocatoriaId))//
-        .finalidad((modeloTipoFinalidad == null) ? null : modeloTipoFinalidad.getTipoFinalidad())//
-        .regimenConcurrencia(tipoRegimenConcurrencia)//
-        .destinatarios(Convocatoria.Destinatarios.INDIVIDUAL)//
-        .colaborativos(Boolean.TRUE)//
-        .estado(Convocatoria.Estado.REGISTRADA)//
-        .duracion(12)//
-        .ambitoGeografico(tipoAmbitoGeografico)//
-        .clasificacionCVN(ClasificacionCVN.AYUDAS)//
-        .activo(activo)//
-        .build();
-
-    return convocatoria;
-  }
-
-  /**
-   * Función que devuelve un objeto ConvocatoriaAreaTematica
-   * 
-   * @param convocatoria la Convocatoria
-   * @return el objeto ConvocatoriaAreaTematica
-   */
-  private ConvocatoriaAreaTematica generarMockConvocatoriaAreaTematica(Convocatoria convocatoria) {
-    AreaTematica areaTematica = new AreaTematica();
-    areaTematica.setId(1L);
-    areaTematica.setNombre("AreaTematica");
-    areaTematica.setDescripcion("descripcion");
-    areaTematica.setActivo(true);
-    ConvocatoriaAreaTematica convocatoriaAreaTematica = new ConvocatoriaAreaTematica();
-    convocatoriaAreaTematica.setConvocatoria(convocatoria);
-    convocatoriaAreaTematica.setAreaTematica(areaTematica);
-
-    return convocatoriaAreaTematica;
-  }
-
 }

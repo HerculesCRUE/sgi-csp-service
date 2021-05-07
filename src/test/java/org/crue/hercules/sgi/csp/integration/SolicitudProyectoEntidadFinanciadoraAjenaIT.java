@@ -4,8 +4,6 @@ import java.util.Collections;
 
 import org.assertj.core.api.Assertions;
 import org.crue.hercules.sgi.csp.model.FuenteFinanciacion;
-import org.crue.hercules.sgi.csp.model.Solicitud;
-import org.crue.hercules.sgi.csp.model.SolicitudProyectoDatos;
 import org.crue.hercules.sgi.csp.model.SolicitudProyectoEntidadFinanciadoraAjena;
 import org.crue.hercules.sgi.csp.model.TipoFinanciacion;
 import org.junit.jupiter.api.Test;
@@ -57,8 +55,8 @@ public class SolicitudProyectoEntidadFinanciadoraAjenaIT extends BaseIT {
     Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
     SolicitudProyectoEntidadFinanciadoraAjena responseData = response.getBody();
     Assertions.assertThat(responseData.getId()).as("getId()").isNotNull();
-    Assertions.assertThat(responseData.getSolicitudProyectoDatos().getId()).as("getSolicitudProyectoDatos().getId()")
-        .isEqualTo(newSolicitudProyectoEntidadFinanciadoraAjena.getSolicitudProyectoDatos().getId());
+    Assertions.assertThat(responseData.getSolicitudProyectoId()).as("getSolicitudProyectoId()")
+        .isEqualTo(newSolicitudProyectoEntidadFinanciadoraAjena.getSolicitudProyectoId());
     Assertions.assertThat(responseData.getEntidadRef()).as("getEntidadRef()")
         .isEqualTo(newSolicitudProyectoEntidadFinanciadoraAjena.getEntidadRef());
     Assertions.assertThat(responseData.getFuenteFinanciacion().getId()).as("getFuenteFinanciacion().getId()")
@@ -86,9 +84,8 @@ public class SolicitudProyectoEntidadFinanciadoraAjenaIT extends BaseIT {
 
     SolicitudProyectoEntidadFinanciadoraAjena solicitudProyectoEntidadFinanciadoraAjenaActualizado = response.getBody();
     Assertions.assertThat(solicitudProyectoEntidadFinanciadoraAjenaActualizado.getId()).as("getId()").isNotNull();
-    Assertions.assertThat(solicitudProyectoEntidadFinanciadoraAjenaActualizado.getSolicitudProyectoDatos().getId())
-        .as("getSolicitudProyectoDatos().getId()")
-        .isEqualTo(solicitudProyectoEntidadFinanciadoraAjena.getSolicitudProyectoDatos().getId());
+    Assertions.assertThat(solicitudProyectoEntidadFinanciadoraAjenaActualizado.getSolicitudProyectoId())
+        .as("getSolicitudProyectoId()").isEqualTo(solicitudProyectoEntidadFinanciadoraAjena.getSolicitudProyectoId());
     Assertions.assertThat(solicitudProyectoEntidadFinanciadoraAjenaActualizado.getEntidadRef()).as("getEntidadRef()")
         .isEqualTo(solicitudProyectoEntidadFinanciadoraAjena.getEntidadRef());
     Assertions.assertThat(solicitudProyectoEntidadFinanciadoraAjenaActualizado.getFuenteFinanciacion().getId())
@@ -134,8 +131,8 @@ public class SolicitudProyectoEntidadFinanciadoraAjenaIT extends BaseIT {
     SolicitudProyectoEntidadFinanciadoraAjena solicitudProyectoEntidadFinanciadoraAjena = response.getBody();
     Assertions.assertThat(solicitudProyectoEntidadFinanciadoraAjena.getId()).as("getId()")
         .isEqualTo(idSolicitudProyectoEntidadFinanciadoraAjena);
-    Assertions.assertThat(solicitudProyectoEntidadFinanciadoraAjena.getSolicitudProyectoDatos().getId())
-        .as("getSolicitudProyectoDatos().getId()").isEqualTo(1L);
+    Assertions.assertThat(solicitudProyectoEntidadFinanciadoraAjena.getSolicitudProyectoId())
+        .as("getSolicitudProyectoId()").isEqualTo(1L);
     Assertions.assertThat(solicitudProyectoEntidadFinanciadoraAjena.getEntidadRef()).as("getEntidadRef()")
         .isEqualTo("entidad-001");
     Assertions.assertThat(solicitudProyectoEntidadFinanciadoraAjena.getFuenteFinanciacion().getId())
@@ -154,30 +151,27 @@ public class SolicitudProyectoEntidadFinanciadoraAjenaIT extends BaseIT {
    */
   private SolicitudProyectoEntidadFinanciadoraAjena generarMockSolicitudProyectoEntidadFinanciadoraAjena(Long id) {
 
-    SolicitudProyectoDatos solicitudProyectoDatos = SolicitudProyectoDatos.builder()//
-        .id(id == null ? 1 : id)//
-        .solicitud(Solicitud.builder().id(id == null ? 1 : id).build())//
+    // @formatter:off
+    FuenteFinanciacion fuenteFinanciacion = FuenteFinanciacion.builder()
+        .id(id == null ? 1 : id)
+        .activo(true)
         .build();
 
-    FuenteFinanciacion fuenteFinanciacion = FuenteFinanciacion.builder()//
-        .id(id == null ? 1 : id)//
-        .activo(true)//
-        .build();
-
-    TipoFinanciacion tipoFinanciacion = TipoFinanciacion.builder()//
-        .id(id == null ? 1 : id)//
-        .activo(true)//
+    TipoFinanciacion tipoFinanciacion = TipoFinanciacion.builder()
+        .id(id == null ? 1 : id)
+        .activo(true)
         .build();
 
     SolicitudProyectoEntidadFinanciadoraAjena solicitudProyectoEntidadFinanciadoraAjena = SolicitudProyectoEntidadFinanciadoraAjena
-        .builder()//
-        .id(id)//
-        .solicitudProyectoDatos(solicitudProyectoDatos)//
-        .entidadRef("entidad-" + (id == null ? 0 : String.format("%03d", id)))//
-        .fuenteFinanciacion(fuenteFinanciacion)//
-        .tipoFinanciacion(tipoFinanciacion)//
-        .porcentajeFinanciacion(50)//
+        .builder()
+        .id(id)
+        .solicitudProyectoId(id == null ? 1 : id)
+        .entidadRef("entidad-" + (id == null ? 0 : String.format("%03d", id)))
+        .fuenteFinanciacion(fuenteFinanciacion)
+        .tipoFinanciacion(tipoFinanciacion)
+        .porcentajeFinanciacion(50)
         .build();
+    // @formatter:on
 
     return solicitudProyectoEntidadFinanciadoraAjena;
   }

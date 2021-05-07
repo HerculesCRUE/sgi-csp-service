@@ -1,6 +1,6 @@
 package org.crue.hercules.sgi.csp.model;
 
-import java.time.LocalDate;
+import java.time.Instant;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -16,11 +16,14 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "proyecto_equipo")
@@ -43,11 +46,10 @@ public class ProyectoEquipo extends BaseEntity {
   @SequenceGenerator(name = "proyecto_equipo_seq", sequenceName = "proyecto_equipo_seq", allocationSize = 1)
   private Long id;
 
-  /** Rol socio. */
-  @ManyToOne
-  @JoinColumn(name = "proyecto_id", nullable = false, foreignKey = @ForeignKey(name = "FK_PROYECTO_EQUIPO_PROYECTO"))
+  /** Proyecto Id */
+  @Column(name = "proyecto_id", nullable = false)
   @NotNull
-  private Proyecto proyecto;
+  private Long proyectoId;
 
   /** Persona ref. */
   @Column(name = "persona_ref", length = 50, nullable = false)
@@ -63,15 +65,21 @@ public class ProyectoEquipo extends BaseEntity {
 
   /** Fecha Inicio. */
   @Column(name = "fecha_inicio", nullable = true)
-  private LocalDate fechaInicio;
+  private Instant fechaInicio;
 
   /** Fecha Fin. */
   @Column(name = "fecha_fin", nullable = true)
-  private LocalDate fechaFin;
+  private Instant fechaFin;
 
   /** Horas dedicación. */
   @Column(name = "horas_dedicacion", nullable = true)
   @Min(0)
   private Double horasDedicacion;
 
+  // Relation mappings for JPA metamodel generation only
+  @ManyToOne
+  @JoinColumn(name = "proyecto_id", insertable = false, updatable = false, foreignKey = @ForeignKey(name = "FK_PROYECTOEQUIPO_PROYECTO"))
+  @Getter(AccessLevel.NONE)
+  @Setter(AccessLevel.NONE)
+  private final Proyecto proyecto = null;
 }

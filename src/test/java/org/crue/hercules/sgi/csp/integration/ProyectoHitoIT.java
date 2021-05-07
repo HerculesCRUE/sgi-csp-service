@@ -1,6 +1,6 @@
 package org.crue.hercules.sgi.csp.integration;
 
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.Collections;
 
 import org.assertj.core.api.Assertions;
@@ -41,7 +41,7 @@ public class ProyectoHitoIT extends BaseIT {
   @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:scripts/tipo_hito.sql",
       "classpath:scripts/modelo_ejecucion.sql", "classpath:scripts/modelo_unidad.sql",
       "classpath:scripts/tipo_finalidad.sql", "classpath:scripts/tipo_ambito_geografico.sql",
-      "classpath:scripts/estado_proyecto.sql", "classpath:scripts/proyecto.sql",
+      "classpath:scripts/proyecto.sql", "classpath:scripts/estado_proyecto.sql",
       "classpath:scripts/modelo_tipo_hito.sql" })
   @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:cleanup.sql")
   @Test
@@ -58,8 +58,8 @@ public class ProyectoHitoIT extends BaseIT {
     Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
     ProyectoHito responseData = response.getBody();
     Assertions.assertThat(responseData.getId()).as("getId()").isNotNull();
-    Assertions.assertThat(responseData.getProyecto().getId()).as("getProyecto().getId()")
-        .isEqualTo(newProyectoHito.getProyecto().getId());
+    Assertions.assertThat(responseData.getProyectoId()).as("getProyectoId()")
+        .isEqualTo(newProyectoHito.getProyectoId());
     Assertions.assertThat(responseData.getTipoHito().getId()).as("getTipoHito().getId()")
         .isEqualTo(newProyectoHito.getTipoHito().getId());
 
@@ -68,7 +68,7 @@ public class ProyectoHitoIT extends BaseIT {
   @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:scripts/tipo_hito.sql",
       "classpath:scripts/modelo_ejecucion.sql", "classpath:scripts/modelo_unidad.sql",
       "classpath:scripts/tipo_finalidad.sql", "classpath:scripts/tipo_ambito_geografico.sql",
-      "classpath:scripts/estado_proyecto.sql", "classpath:scripts/proyecto.sql",
+      "classpath:scripts/proyecto.sql", "classpath:scripts/estado_proyecto.sql",
       "classpath:scripts/modelo_tipo_hito.sql", "classpath:scripts/proyecto_hito.sql" })
   @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:cleanup.sql")
   @Test
@@ -85,8 +85,8 @@ public class ProyectoHitoIT extends BaseIT {
     ProyectoHito proyectoHitoActualizado = response.getBody();
     Assertions.assertThat(proyectoHitoActualizado.getId()).as("getId()").isNotNull();
 
-    Assertions.assertThat(proyectoHitoActualizado.getProyecto().getId()).as("getProyecto()")
-        .isEqualTo(proyectoHito.getProyecto().getId());
+    Assertions.assertThat(proyectoHitoActualizado.getProyectoId()).as("getProyectoId()")
+        .isEqualTo(proyectoHito.getProyectoId());
     Assertions.assertThat(proyectoHitoActualizado.getFecha()).as("getFecha()").isEqualTo(proyectoHito.getFecha());
     Assertions.assertThat(proyectoHitoActualizado.getTipoHito().getId()).as("getTipoHito().getId()")
         .isEqualTo(proyectoHito.getTipoHito().getId());
@@ -98,7 +98,7 @@ public class ProyectoHitoIT extends BaseIT {
   @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:scripts/tipo_hito.sql",
       "classpath:scripts/modelo_ejecucion.sql", "classpath:scripts/modelo_unidad.sql",
       "classpath:scripts/tipo_finalidad.sql", "classpath:scripts/tipo_ambito_geografico.sql",
-      "classpath:scripts/estado_proyecto.sql", "classpath:scripts/proyecto.sql",
+      "classpath:scripts/proyecto.sql", "classpath:scripts/estado_proyecto.sql",
       "classpath:scripts/modelo_tipo_hito.sql", "classpath:scripts/proyecto_hito.sql" })
   @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:cleanup.sql")
   @Test
@@ -114,7 +114,7 @@ public class ProyectoHitoIT extends BaseIT {
   @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:scripts/tipo_hito.sql",
       "classpath:scripts/modelo_ejecucion.sql", "classpath:scripts/modelo_unidad.sql",
       "classpath:scripts/tipo_finalidad.sql", "classpath:scripts/tipo_ambito_geografico.sql",
-      "classpath:scripts/estado_proyecto.sql", "classpath:scripts/proyecto.sql",
+      "classpath:scripts/proyecto.sql", "classpath:scripts/estado_proyecto.sql",
       "classpath:scripts/modelo_tipo_hito.sql", "classpath:scripts/proyecto_hito.sql" })
   @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:cleanup.sql")
   @Test
@@ -143,7 +143,7 @@ public class ProyectoHitoIT extends BaseIT {
   @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:scripts/tipo_hito.sql",
       "classpath:scripts/modelo_ejecucion.sql", "classpath:scripts/modelo_unidad.sql",
       "classpath:scripts/tipo_finalidad.sql", "classpath:scripts/tipo_ambito_geografico.sql",
-      "classpath:scripts/estado_proyecto.sql", "classpath:scripts/proyecto.sql",
+      "classpath:scripts/proyecto.sql", "classpath:scripts/estado_proyecto.sql",
       "classpath:scripts/modelo_tipo_hito.sql", "classpath:scripts/proyecto_hito.sql" })
   @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:cleanup.sql")
   @Test
@@ -158,10 +158,10 @@ public class ProyectoHitoIT extends BaseIT {
     ProyectoHito proyectoHito = response.getBody();
     Assertions.assertThat(proyectoHito.getId()).as("getId()").isNotNull();
     Assertions.assertThat(proyectoHito.getTipoHito().getId()).as("getTipoHito().getId()").isEqualTo(1L);
-    Assertions.assertThat(proyectoHito.getProyecto().getId()).as("getProyecto().getId()").isEqualTo(1L);
+    Assertions.assertThat(proyectoHito.getProyectoId()).as("getProyectoId()").isEqualTo(1L);
     Assertions.assertThat(proyectoHito.getComentario()).as("comentario")
         .isEqualTo("comentario-proyecto-hito-" + String.format("%03d", idProyectoHito));
-    Assertions.assertThat(proyectoHito.getFecha()).as("getFecha()").isEqualTo("2020-10-01");
+    Assertions.assertThat(proyectoHito.getFecha()).as("getFecha()").isEqualTo("2020-10-01T00:00:00Z");
 
   }
 
@@ -175,13 +175,15 @@ public class ProyectoHitoIT extends BaseIT {
    */
   private ProyectoHito generarMockProyectoHito(Long id, Long tipoHitoId, Long proyectoId) {
 
-    return ProyectoHito.builder()//
-        .id(id)//
-        .tipoHito(TipoHito.builder().id(tipoHitoId).build())//
-        .proyecto(Proyecto.builder().id(proyectoId).build())//
-        .fecha(LocalDate.of(2020, 10, 01))//
-        .comentario("comentario-proyecto-hito-" + (id == null ? "" : String.format("%03d", id)))//
-        .generaAviso(Boolean.TRUE)//
+    // @formatter:off
+    return ProyectoHito.builder()
+        .id(id)
+        .tipoHito(TipoHito.builder().id(tipoHitoId).build())
+        .proyectoId(proyectoId)
+        .fecha(Instant.parse("2020-10-01T00:00:00Z"))
+        .comentario("comentario-proyecto-hito-" + (id == null ? "" : String.format("%03d", id)))
+        .generaAviso(Boolean.TRUE)
         .build();
+    // @formatter:on
   }
 }

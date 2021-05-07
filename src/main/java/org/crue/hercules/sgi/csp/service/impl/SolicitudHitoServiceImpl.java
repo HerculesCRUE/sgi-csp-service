@@ -1,6 +1,6 @@
 package org.crue.hercules.sgi.csp.service.impl;
 
-import java.time.LocalDate;
+import java.time.Instant;
 
 import org.crue.hercules.sgi.csp.exceptions.SolicitudHitoNotFoundException;
 import org.crue.hercules.sgi.csp.exceptions.SolicitudNotFoundException;
@@ -59,22 +59,21 @@ public class SolicitudHitoServiceImpl implements SolicitudHitoService {
     log.debug("create(SolicitudHito solicitudHito) - start");
 
     Assert.isNull(solicitudHito.getId(), "Id tiene que ser null para crear la SolicitudHito");
-    Assert.notNull(solicitudHito.getSolicitud(), "La solicitud no puede ser null para crear la SolicitudHito");
+    Assert.notNull(solicitudHito.getSolicitudId(), "La solicitud no puede ser null para crear la SolicitudHito");
     Assert.notNull(solicitudHito.getFecha(), "La fecha no puede ser null para crear la SolicitudHito");
     Assert.notNull(solicitudHito.getTipoHito(), "El tipo hito no puede ser null para crear la SolicitudHito");
     Assert.notNull(solicitudHito.getGeneraAviso(), "Generar aviso no puede ser null para crear la SolicitudHito");
 
-    if (solicitudHito.getFecha().isBefore(LocalDate.now())) {
+    if (solicitudHito.getFecha().isBefore(Instant.now())) {
       solicitudHito.setGeneraAviso(false);
     }
 
-    Assert.isTrue(
-        !repository.findBySolicitudIdAndFechaAndTipoHitoId(solicitudHito.getSolicitud().getId(),
-            solicitudHito.getFecha(), solicitudHito.getTipoHito().getId()).isPresent(),
+    Assert.isTrue(!repository.findBySolicitudIdAndFechaAndTipoHitoId(solicitudHito.getSolicitudId(),
+        solicitudHito.getFecha(), solicitudHito.getTipoHito().getId()).isPresent(),
         "Ya existe un Hito con el mismo tipo en esa fecha");
 
-    solicitudHito.setSolicitud(solicitudRepository.findById(solicitudHito.getSolicitud().getId())
-        .orElseThrow(() -> new SolicitudNotFoundException(solicitudHito.getSolicitud().getId())));
+    solicitudRepository.findById(solicitudHito.getSolicitudId())
+        .orElseThrow(() -> new SolicitudNotFoundException(solicitudHito.getSolicitudId()));
 
     solicitudHito.setTipoHito(tipoHitoRepository.findById(solicitudHito.getTipoHito().getId())
         .orElseThrow(() -> new TipoHitoNotFoundException(solicitudHito.getTipoHito().getId())));
@@ -100,31 +99,30 @@ public class SolicitudHitoServiceImpl implements SolicitudHitoService {
     log.debug("update(SolicitudHito solicitudHito) - start");
 
     Assert.notNull(solicitudHito.getId(), "Id no puede ser null para actualizar SolicitudHito");
-    Assert.notNull(solicitudHito.getSolicitud(), "La solicitud no puede ser null para actualizar la SolicitudHito");
+    Assert.notNull(solicitudHito.getSolicitudId(), "La solicitud no puede ser null para actualizar la SolicitudHito");
     Assert.notNull(solicitudHito.getFecha(), "Nombre documento no puede ser null para actualizar la SolicitudHito");
     Assert.notNull(solicitudHito.getTipoHito(),
         "La referencia del documento no puede ser null para actualizar la SolicitudHito");
     Assert.notNull(solicitudHito.getGeneraAviso(), "Generar aviso no puede ser null para crear la SolicitudHito");
 
-    if (solicitudHito.getFecha().isBefore(LocalDate.now())) {
+    if (solicitudHito.getFecha().isBefore(Instant.now())) {
       solicitudHito.setGeneraAviso(false);
     }
 
-    repository.findBySolicitudIdAndFechaAndTipoHitoId(solicitudHito.getSolicitud().getId(), solicitudHito.getFecha(),
+    repository.findBySolicitudIdAndFechaAndTipoHitoId(solicitudHito.getSolicitudId(), solicitudHito.getFecha(),
         solicitudHito.getTipoHito().getId()).ifPresent((solicitudHitoExistente) -> {
           Assert.isTrue(solicitudHito.getId() == solicitudHitoExistente.getId(),
               "Ya existe un Hito con el mismo tipo en esa fecha");
         });
 
-    solicitudHito.setSolicitud(solicitudRepository.findById(solicitudHito.getSolicitud().getId())
-        .orElseThrow(() -> new SolicitudNotFoundException(solicitudHito.getSolicitud().getId())));
+    solicitudRepository.findById(solicitudHito.getSolicitudId())
+        .orElseThrow(() -> new SolicitudNotFoundException(solicitudHito.getSolicitudId()));
 
     solicitudHito.setTipoHito(tipoHitoRepository.findById(solicitudHito.getTipoHito().getId())
         .orElseThrow(() -> new TipoHitoNotFoundException(solicitudHito.getTipoHito().getId())));
 
     // comprobar si la solicitud es modificable
-    Assert.isTrue(solicitudService.modificable(solicitudHito.getSolicitud().getId()),
-        "No se puede modificar SolicitudHito");
+    Assert.isTrue(solicitudService.modificable(solicitudHito.getSolicitudId()), "No se puede modificar SolicitudHito");
 
     return repository.findById(solicitudHito.getId()).map((solicitudHitoExistente) -> {
 

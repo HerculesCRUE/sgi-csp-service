@@ -1,5 +1,6 @@
 package org.crue.hercules.sgi.csp.repository;
 
+import java.time.Instant;
 import java.util.List;
 
 import org.assertj.core.api.Assertions;
@@ -36,14 +37,14 @@ public class ConvocatoriaConceptoGastoCodigoEcRepositoryTest {
     generarConvocatoriaConceptoGastoCodigoEc("-002", true);
 
     // when: find by ConvocatoriaConceptoGasto and permitido
-    List<ConvocatoriaConceptoGastoCodigoEc> dataFound = repository.findAllByConvocatoriaConceptoGastoId(
-        convocatoriaConceptoGastoCodigoEc1.getConvocatoriaConceptoGasto().getId());
+    List<ConvocatoriaConceptoGastoCodigoEc> dataFound = repository
+        .findAllByConvocatoriaConceptoGastoId(convocatoriaConceptoGastoCodigoEc1.getConvocatoriaConceptoGastoId());
 
     // then: ConvocatoriaConceptoGasto is found
     Assertions.assertThat(dataFound.get(0)).isNotNull();
     Assertions.assertThat(dataFound.get(0).getId()).isEqualTo(convocatoriaConceptoGastoCodigoEc1.getId());
-    Assertions.assertThat(dataFound.get(0).getConvocatoriaConceptoGasto().getId())
-        .isEqualTo(convocatoriaConceptoGastoCodigoEc1.getConvocatoriaConceptoGasto().getId());
+    Assertions.assertThat(dataFound.get(0).getConvocatoriaConceptoGastoId())
+        .isEqualTo(convocatoriaConceptoGastoCodigoEc1.getConvocatoriaConceptoGastoId());
   }
 
   @Test
@@ -69,72 +70,77 @@ public class ConvocatoriaConceptoGastoCodigoEcRepositoryTest {
    */
   private ConvocatoriaConceptoGastoCodigoEc generarConvocatoriaConceptoGastoCodigoEc(String suffix, Boolean permitido) {
 
-    ModeloEjecucion modeloEjecucion = ModeloEjecucion.builder()//
-        .nombre("nombreModeloEjecucion" + suffix)//
-        .activo(Boolean.TRUE)//
+    // @formatter:off
+    ModeloEjecucion modeloEjecucion = ModeloEjecucion.builder()
+        .nombre("nombreModeloEjecucion" + suffix)
+        .activo(Boolean.TRUE)
         .build();
     entityManager.persistAndFlush(modeloEjecucion);
 
-    TipoFinalidad tipoFinalidad = TipoFinalidad.builder()//
-        .nombre("nombreTipoFinalidad" + suffix)//
-        .activo(Boolean.TRUE)//
+    TipoFinalidad tipoFinalidad = TipoFinalidad.builder()
+        .nombre("nombreTipoFinalidad" + suffix)
+        .activo(Boolean.TRUE)
         .build();
     entityManager.persistAndFlush(tipoFinalidad);
 
-    ModeloTipoFinalidad modeloTipoFinalidad = ModeloTipoFinalidad.builder()//
-        .modeloEjecucion(modeloEjecucion)//
-        .tipoFinalidad(tipoFinalidad)//
-        .activo(Boolean.TRUE)//
+    ModeloTipoFinalidad modeloTipoFinalidad = ModeloTipoFinalidad.builder()
+        .modeloEjecucion(modeloEjecucion)
+        .tipoFinalidad(tipoFinalidad)
+        .activo(Boolean.TRUE)
         .build();
     entityManager.persistAndFlush(modeloTipoFinalidad);
 
-    TipoRegimenConcurrencia tipoRegimenConcurrencia = TipoRegimenConcurrencia.builder()//
-        .nombre("nombreTipoRegimenConcurrencia" + suffix)//
-        .activo(Boolean.TRUE)//
+    TipoRegimenConcurrencia tipoRegimenConcurrencia = TipoRegimenConcurrencia.builder()
+        .nombre("nombreTipoRegimenConcurrencia" + suffix)
+        .activo(Boolean.TRUE)
         .build();
     entityManager.persistAndFlush(tipoRegimenConcurrencia);
 
-    TipoAmbitoGeografico tipoAmbitoGeografico = TipoAmbitoGeografico.builder()//
-        .nombre("nombreTipoAmbitoGeografico" + suffix)//
-        .activo(Boolean.TRUE)//
+    TipoAmbitoGeografico tipoAmbitoGeografico = TipoAmbitoGeografico.builder()
+        .nombre("nombreTipoAmbitoGeografico" + suffix)
+        .activo(Boolean.TRUE)
         .build();
     entityManager.persistAndFlush(tipoAmbitoGeografico);
 
-    Convocatoria convocatoria = Convocatoria.builder()//
-        .unidadGestionRef("unidad" + suffix)//
-        .modeloEjecucion(modeloEjecucion)//
-        .codigo("codigo" + suffix)//
-        .anio(2020)//
-        .titulo("titulo" + suffix)//
-        .objeto("objeto" + suffix)//
-        .observaciones("observaciones" + suffix)//
-        .finalidad(modeloTipoFinalidad.getTipoFinalidad())//
-        .regimenConcurrencia(tipoRegimenConcurrencia)//
-        .destinatarios(Convocatoria.Destinatarios.INDIVIDUAL)//
-        .colaborativos(Boolean.TRUE)//
-        .estado(Convocatoria.Estado.REGISTRADA)//
-        .duracion(12)//
-        .ambitoGeografico(tipoAmbitoGeografico)//
-        .clasificacionCVN(ClasificacionCVN.AYUDAS)//
-        .activo(Boolean.TRUE)//
+    Convocatoria convocatoria = Convocatoria.builder()
+        .unidadGestionRef("unidad" + suffix)
+        .modeloEjecucion(modeloEjecucion)
+        .codigo("codigo" + suffix)
+        .fechaPublicacion(Instant.parse("2021-08-01T00:00:00Z"))
+        .fechaProvisional(Instant.parse("2021-08-01T00:00:00Z"))
+        .fechaConcesion(Instant.parse("2021-08-01T00:00:00Z"))
+        .titulo("titulo" + suffix)
+        .objeto("objeto" + suffix)
+        .observaciones("observaciones" + suffix)
+        .finalidad(modeloTipoFinalidad.getTipoFinalidad())
+        .regimenConcurrencia(tipoRegimenConcurrencia)
+        .colaborativos(Boolean.TRUE)
+        .estado(Convocatoria.Estado.REGISTRADA)
+        .duracion(12)
+        .ambitoGeografico(tipoAmbitoGeografico)
+        .clasificacionCVN(ClasificacionCVN.AYUDAS)
+        .activo(Boolean.TRUE)
         .build();
     entityManager.persistAndFlush(convocatoria);
 
-    ConceptoGasto conceptoGasto = ConceptoGasto.builder()//
-        .nombre("nombreConceptoGasto" + suffix)//
-        .activo(Boolean.TRUE)//
+    ConceptoGasto conceptoGasto = ConceptoGasto.builder()
+        .nombre("nombreConceptoGasto" + suffix)
+        .activo(Boolean.TRUE)
         .build();
     entityManager.persistAndFlush(conceptoGasto);
 
-    ConvocatoriaConceptoGasto convocatoriaConceptoGasto = ConvocatoriaConceptoGasto.builder()//
-        .convocatoria(convocatoria)//
-        .conceptoGasto(conceptoGasto)//
-        .observaciones("obs-1")//
+    ConvocatoriaConceptoGasto convocatoriaConceptoGasto = ConvocatoriaConceptoGasto.builder()
+        .convocatoriaId(convocatoria.getId())
+        .conceptoGasto(conceptoGasto)
+        .observaciones("obs-1")
         .permitido(permitido).build();
     entityManager.persistAndFlush(convocatoriaConceptoGasto);
 
     ConvocatoriaConceptoGastoCodigoEc convocatoriaConceptoGastoCodigoEc = ConvocatoriaConceptoGastoCodigoEc.builder()
-        .convocatoriaConceptoGasto(convocatoriaConceptoGasto).codigoEconomicoRef("cod-" + suffix).build();
+        .convocatoriaConceptoGastoId(convocatoriaConceptoGasto.getId())
+        .codigoEconomicoRef("cod-" + suffix)
+        .build();
+    // @formatter:on
     return entityManager.persistAndFlush(convocatoriaConceptoGastoCodigoEc);
   }
 }

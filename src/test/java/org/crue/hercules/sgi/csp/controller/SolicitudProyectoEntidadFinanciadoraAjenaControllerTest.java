@@ -2,8 +2,7 @@ package org.crue.hercules.sgi.csp.controller;
 
 import org.crue.hercules.sgi.csp.exceptions.SolicitudProyectoEntidadFinanciadoraAjenaNotFoundException;
 import org.crue.hercules.sgi.csp.model.FuenteFinanciacion;
-import org.crue.hercules.sgi.csp.model.Solicitud;
-import org.crue.hercules.sgi.csp.model.SolicitudProyectoDatos;
+import org.crue.hercules.sgi.csp.model.SolicitudProyecto;
 import org.crue.hercules.sgi.csp.model.SolicitudProyectoEntidadFinanciadoraAjena;
 import org.crue.hercules.sgi.csp.model.TipoFinanciacion;
 import org.crue.hercules.sgi.csp.service.ProgramaService;
@@ -62,8 +61,8 @@ public class SolicitudProyectoEntidadFinanciadoraAjenaControllerTest extends Bas
         // then: new SolicitudProyectoEntidadFinanciadoraAjena is created
         .andExpect(MockMvcResultMatchers.status().isCreated())
         .andExpect(MockMvcResultMatchers.jsonPath("id").isNotEmpty())
-        .andExpect(MockMvcResultMatchers.jsonPath("solicitudProyectoDatos.id")
-            .value(solicitudProyectoEntidadFinanciadoraAjena.getSolicitudProyectoDatos().getId()))
+        .andExpect(MockMvcResultMatchers.jsonPath("solicitudProyectoId")
+            .value(solicitudProyectoEntidadFinanciadoraAjena.getSolicitudProyectoId()))
         .andExpect(MockMvcResultMatchers.jsonPath("entidadRef")
             .value(solicitudProyectoEntidadFinanciadoraAjena.getEntidadRef()))
         .andExpect(MockMvcResultMatchers.jsonPath("fuenteFinanciacion.id")
@@ -121,8 +120,8 @@ public class SolicitudProyectoEntidadFinanciadoraAjenaControllerTest extends Bas
         .andExpect(MockMvcResultMatchers.status().isOk())
         .andExpect(
             MockMvcResultMatchers.jsonPath("id").value(solicitudProyectoEntidadFinanciadoraAjenaExistente.getId()))
-        .andExpect(MockMvcResultMatchers.jsonPath("solicitudProyectoDatos.id")
-            .value(solicitudProyectoEntidadFinanciadoraAjenaExistente.getSolicitudProyectoDatos().getId()))
+        .andExpect(MockMvcResultMatchers.jsonPath("solicitudProyectoId")
+            .value(solicitudProyectoEntidadFinanciadoraAjenaExistente.getSolicitudProyectoId()))
         .andExpect(MockMvcResultMatchers.jsonPath("entidadRef")
             .value(solicitudProyectoEntidadFinanciadoraAjenaExistente.getEntidadRef()))
         .andExpect(MockMvcResultMatchers.jsonPath("fuenteFinanciacion.id")
@@ -210,7 +209,7 @@ public class SolicitudProyectoEntidadFinanciadoraAjenaControllerTest extends Bas
         // and the requested SolicitudProyectoEntidadFinanciadoraAjena is resturned as
         // JSON object
         .andExpect(MockMvcResultMatchers.jsonPath("id").value(1L))
-        .andExpect(MockMvcResultMatchers.jsonPath("solicitudProyectoDatos.id").value(1L))
+        .andExpect(MockMvcResultMatchers.jsonPath("solicitudProyectoId").value(1L))
         .andExpect(MockMvcResultMatchers.jsonPath("entidadRef").value("entidad-001"))
         .andExpect(MockMvcResultMatchers.jsonPath("fuenteFinanciacion.id").value(1L))
         .andExpect(MockMvcResultMatchers.jsonPath("tipoFinanciacion.id").value(1L))
@@ -241,30 +240,31 @@ public class SolicitudProyectoEntidadFinanciadoraAjenaControllerTest extends Bas
    * @return el objeto SolicitudProyectoEntidadFinanciadoraAjena
    */
   private SolicitudProyectoEntidadFinanciadoraAjena generarMockSolicitudProyectoEntidadFinanciadoraAjena(Long id) {
-    SolicitudProyectoDatos solicitudProyectoDatos = SolicitudProyectoDatos.builder()//
-        .id(id == null ? 1 : id)//
-        .solicitud(Solicitud.builder().id(id == null ? 1 : id).build())//
+    // @formatter:off
+    SolicitudProyecto solicitudProyecto = SolicitudProyecto.builder()
+        .id(id == null ? 1 : id)
         .build();
 
-    FuenteFinanciacion fuenteFinanciacion = FuenteFinanciacion.builder()//
-        .id(id == null ? 1 : id)//
-        .activo(true)//
+    FuenteFinanciacion fuenteFinanciacion = FuenteFinanciacion.builder()
+        .id(id == null ? 1 : id)
+        .activo(true)
         .build();
 
-    TipoFinanciacion tipoFinanciacion = TipoFinanciacion.builder()//
-        .id(id == null ? 1 : id)//
-        .activo(true)//
+    TipoFinanciacion tipoFinanciacion = TipoFinanciacion.builder()
+        .id(id == null ? 1 : id)
+        .activo(true)
         .build();
 
     SolicitudProyectoEntidadFinanciadoraAjena solicitudProyectoEntidadFinanciadoraAjena = SolicitudProyectoEntidadFinanciadoraAjena
-        .builder()//
-        .id(id)//
-        .solicitudProyectoDatos(solicitudProyectoDatos)//
-        .entidadRef("entidad-" + (id == null ? 0 : String.format("%03d", id)))//
-        .fuenteFinanciacion(fuenteFinanciacion)//
-        .tipoFinanciacion(tipoFinanciacion)//
-        .porcentajeFinanciacion(50)//
+        .builder()
+        .id(id)
+        .solicitudProyectoId(solicitudProyecto.getId())
+        .entidadRef("entidad-" + (id == null ? 0 : String.format("%03d", id)))
+        .fuenteFinanciacion(fuenteFinanciacion)
+        .tipoFinanciacion(tipoFinanciacion)
+        .porcentajeFinanciacion(50)
         .build();
+    // @formatter:on
 
     return solicitudProyectoEntidadFinanciadoraAjena;
   }

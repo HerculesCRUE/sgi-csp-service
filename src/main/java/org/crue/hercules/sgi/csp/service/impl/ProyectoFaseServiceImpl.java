@@ -1,6 +1,6 @@
 package org.crue.hercules.sgi.csp.service.impl;
 
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.Optional;
 
 import org.crue.hercules.sgi.csp.exceptions.ProyectoFaseNotFoundException;
@@ -180,10 +180,10 @@ public class ProyectoFaseServiceImpl implements ProyectoFaseService {
     // caso se indicaría el mismo valor tanto en fecha de inicio como en fecha de
     // fin.
     if (datosProyectoFase.getFechaInicio() == null) {
-      datosProyectoFase.setFechaInicio(datosProyectoFase.getFechaFin().toLocalDate().atStartOfDay());
+      datosProyectoFase.setFechaInicio(datosProyectoFase.getFechaFin());
     }
     if (datosProyectoFase.getFechaFin() == null) {
-      datosProyectoFase.setFechaFin(datosProyectoFase.getFechaInicio().toLocalDate().atTime(23, 59, 59));
+      datosProyectoFase.setFechaFin(datosProyectoFase.getFechaInicio());
     }
 
     Assert.isTrue(datosProyectoFase.getFechaFin().compareTo(datosProyectoFase.getFechaInicio()) >= 0,
@@ -191,12 +191,12 @@ public class ProyectoFaseServiceImpl implements ProyectoFaseService {
 
     // Si el rango de fechas es pasado, el campo "generar aviso" tomará el valor
     // false, y no será editable.
-    if (datosProyectoFase.getFechaFin().toLocalDate().isBefore(LocalDate.now())) {
+    if (datosProyectoFase.getFechaFin().isBefore(Instant.now())) {
       datosProyectoFase.setGeneraAviso(false);
     }
 
     // Se comprueba la existencia del proyecto
-    Long proyectoId = datosProyectoFase.getProyecto().getId();
+    Long proyectoId = datosProyectoFase.getProyectoId();
     if (!proyectoRepository.existsById(proyectoId)) {
       throw new ProyectoNotFoundException(proyectoId);
     }
@@ -239,7 +239,7 @@ public class ProyectoFaseServiceImpl implements ProyectoFaseService {
   private void validarRequeridosProyectoFase(ProyectoFase datosProyectoFase) {
     log.debug("validarRequeridosProyectoFase(ProyectoFase datosProyectoFase) - start");
 
-    Assert.isTrue(datosProyectoFase.getProyecto() != null && datosProyectoFase.getProyecto().getId() != null,
+    Assert.isTrue(datosProyectoFase.getProyectoId() != null,
         "Id Proyecto no puede ser null para realizar la acción sobre ProyectoFase");
 
     Assert.isTrue(datosProyectoFase.getTipoFase() != null && datosProyectoFase.getTipoFase().getId() != null,
@@ -266,8 +266,7 @@ public class ProyectoFaseServiceImpl implements ProyectoFaseService {
     log.debug("existsProyectoFaseConFechasSolapadas(ProyectoFase proyectoFase) - start");
     Specification<ProyectoFase> specByRangoFechaSolapados = ProyectoFaseSpecifications
         .byRangoFechaSolapados(proyectoFase.getFechaInicio(), proyectoFase.getFechaFin());
-    Specification<ProyectoFase> specByProyecto = ProyectoFaseSpecifications
-        .byProyectoId(proyectoFase.getProyecto().getId());
+    Specification<ProyectoFase> specByProyecto = ProyectoFaseSpecifications.byProyectoId(proyectoFase.getProyectoId());
     Specification<ProyectoFase> specByTipoFase = ProyectoFaseSpecifications
         .byTipoFaseId(proyectoFase.getTipoFase().getId());
     Specification<ProyectoFase> specByIdNotEqual = ProyectoFaseSpecifications.byIdNotEqual(proyectoFase.getId());

@@ -1,6 +1,6 @@
 package org.crue.hercules.sgi.csp.model;
 
-import java.time.LocalDate;
+import java.time.Instant;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -15,11 +15,14 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "solicitud_hito")
@@ -42,22 +45,21 @@ public class SolicitudHito extends BaseEntity {
   @SequenceGenerator(name = "solicitud_hito_seq", sequenceName = "solicitud_hito_seq", allocationSize = 1)
   private Long id;
 
-  /** Solicitud */
-  @ManyToOne
-  @JoinColumn(name = "solicitud_id", nullable = false, foreignKey = @ForeignKey(name = "FK_SOLICITUD_HITO_SOLICITUD"))
+  /** Solicitud Id */
+  @Column(name = "solicitud_id", nullable = false)
   @NotNull
-  private Solicitud solicitud;
+  private Long solicitudId;
 
   /** Tipo hito */
   @ManyToOne
-  @JoinColumn(name = "tipo_hito_id", nullable = false, foreignKey = @ForeignKey(name = "FK_SOLICITUD_HITO_TIPO_HITO"))
+  @JoinColumn(name = "tipo_hito_id", nullable = false, foreignKey = @ForeignKey(name = "FK_SOLICITUDHITO_TIPOHITO"))
   @NotNull
   private TipoHito tipoHito;
 
   /** Fecha */
   @Column(name = "fecha", nullable = false)
   @NotNull
-  private LocalDate fecha;
+  private Instant fecha;
 
   /** Comentario */
   @Column(name = "comentario", length = 2000, nullable = true)
@@ -69,4 +71,10 @@ public class SolicitudHito extends BaseEntity {
   @NotNull
   private Boolean generaAviso;
 
+  // Relation mappings for JPA metamodel generation only
+  @ManyToOne
+  @JoinColumn(name = "solicitud_id", insertable = false, updatable = false, foreignKey = @ForeignKey(name = "FK_SOLICITUDHITO_SOLICITUD"))
+  @Getter(AccessLevel.NONE)
+  @Setter(AccessLevel.NONE)
+  private final Solicitud solicitud = null;
 }

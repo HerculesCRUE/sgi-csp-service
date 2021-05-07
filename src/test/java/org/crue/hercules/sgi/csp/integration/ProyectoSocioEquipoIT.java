@@ -1,19 +1,14 @@
 package org.crue.hercules.sgi.csp.integration;
 
-import java.math.BigDecimal;
 import java.net.URI;
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import org.assertj.core.api.Assertions;
-import org.crue.hercules.sgi.csp.model.EstadoProyecto;
-import org.crue.hercules.sgi.csp.model.Proyecto;
-import org.crue.hercules.sgi.csp.model.ProyectoSocio;
 import org.crue.hercules.sgi.csp.model.ProyectoSocioEquipo;
 import org.crue.hercules.sgi.csp.model.RolProyecto;
-import org.crue.hercules.sgi.csp.model.RolSocio;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.ParameterizedTypeReference;
@@ -61,8 +56,8 @@ public class ProyectoSocioEquipoIT extends BaseIT {
 
   @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:scripts/modelo_ejecucion.sql",
       "classpath:scripts/modelo_unidad.sql", "classpath:scripts/tipo_finalidad.sql",
-      "classpath:scripts/tipo_ambito_geografico.sql", "classpath:scripts/estado_proyecto.sql",
-      "classpath:scripts/proyecto.sql", "classpath:scripts/rol_socio.sql", "classpath:scripts/rol_proyecto.sql",
+      "classpath:scripts/tipo_ambito_geografico.sql", "classpath:scripts/proyecto.sql",
+      "classpath:scripts/estado_proyecto.sql", "classpath:scripts/rol_socio.sql", "classpath:scripts/rol_proyecto.sql",
       "classpath:scripts/proyecto_socio.sql", "classpath:scripts/proyecto_socio_equipo.sql" })
   @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:cleanup.sql")
   @Test
@@ -72,7 +67,7 @@ public class ProyectoSocioEquipoIT extends BaseIT {
     // otro nuevo y sin los otros 3 periodos existentes
     Long proyectoSocioId = 1L;
     ProyectoSocioEquipo updatedProyectoSocioEquipo = generarMockProyectoSocioEquipo(3L);
-    updatedProyectoSocioEquipo.getProyectoSocio().setId(1L);
+    updatedProyectoSocioEquipo.setProyectoSocioId(1L);
 
     List<ProyectoSocioEquipo> proyectoSocioEquipos = Arrays.asList(updatedProyectoSocioEquipo);
 
@@ -90,7 +85,7 @@ public class ProyectoSocioEquipoIT extends BaseIT {
     List<ProyectoSocioEquipo> responseData = response.getBody();
     Assertions.assertThat(responseData.get(0).getId()).as("get(0).getId()")
         .isEqualTo(updatedProyectoSocioEquipo.getId());
-    Assertions.assertThat(responseData.get(0).getProyectoSocio().getId()).as("get(0).getProyectoSocio().getId()")
+    Assertions.assertThat(responseData.get(0).getProyectoSocioId()).as("get(0).getProyectoSocioId()")
         .isEqualTo(proyectoSocioId);
     Assertions.assertThat(responseData.get(0).getFechaInicio()).as("get(0).getFechaInicio()")
         .isEqualTo(updatedProyectoSocioEquipo.getFechaInicio());
@@ -124,8 +119,8 @@ public class ProyectoSocioEquipoIT extends BaseIT {
 
   @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:scripts/modelo_ejecucion.sql",
       "classpath:scripts/modelo_unidad.sql", "classpath:scripts/tipo_finalidad.sql",
-      "classpath:scripts/tipo_ambito_geografico.sql", "classpath:scripts/estado_proyecto.sql",
-      "classpath:scripts/proyecto.sql", "classpath:scripts/rol_socio.sql", "classpath:scripts/rol_proyecto.sql",
+      "classpath:scripts/tipo_ambito_geografico.sql", "classpath:scripts/proyecto.sql",
+      "classpath:scripts/estado_proyecto.sql", "classpath:scripts/rol_socio.sql", "classpath:scripts/rol_proyecto.sql",
       "classpath:scripts/proyecto_socio.sql", "classpath:scripts/proyecto_socio_equipo.sql" })
   @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:cleanup.sql")
   @Test
@@ -139,11 +134,11 @@ public class ProyectoSocioEquipoIT extends BaseIT {
 
     ProyectoSocioEquipo proyectoSocioEquipo = response.getBody();
     Assertions.assertThat(proyectoSocioEquipo.getId()).as("getId()").isEqualTo(idProyectoSocioEquipo);
-    Assertions.assertThat(proyectoSocioEquipo.getProyectoSocio().getId()).as("getProyectoSocio().getId()")
-        .isEqualTo(1L);
+    Assertions.assertThat(proyectoSocioEquipo.getProyectoSocioId()).as("getProyectoSocioId()").isEqualTo(1L);
     Assertions.assertThat(proyectoSocioEquipo.getFechaInicio()).as("getFechaInicio()")
-        .isEqualTo(LocalDate.of(2021, 1, 11));
-    Assertions.assertThat(proyectoSocioEquipo.getFechaFin()).as("getFechaFin()").isEqualTo(LocalDate.of(2022, 1, 11));
+        .isEqualTo(Instant.parse("2021-01-11T00:00:00Z"));
+    Assertions.assertThat(proyectoSocioEquipo.getFechaFin()).as("getFechaFin()")
+        .isEqualTo(Instant.parse("2022-01-11T23:59:59Z"));
     Assertions.assertThat(proyectoSocioEquipo.getPersonaRef()).as("getPersonaRef()").isEqualTo("personaRef-001");
     Assertions.assertThat(proyectoSocioEquipo.getRolProyecto().getId()).as("getRolProyecto()").isEqualTo(1);
 
@@ -157,26 +152,23 @@ public class ProyectoSocioEquipoIT extends BaseIT {
    */
   private ProyectoSocioEquipo generarMockProyectoSocioEquipo(Long id) {
 
-    ProyectoSocioEquipo proyectoSocioEquipo = new ProyectoSocioEquipo(id, ProyectoSocio.builder()//
-        .id(id)//
-        .proyecto(Proyecto.builder()//
-            .id(1L)//
-            .estado(//
-                EstadoProyecto.builder()//
-                    .id(1L)//
-                    .estado(EstadoProyecto.Estado.BORRADOR)//
-                    .build())
-            .build())//
-        .empresaRef("empresa-001")//
-        .rolSocio(RolSocio.builder().id(1L).coordinador(true).build())//
-        .fechaInicio(LocalDate.of(2021, 1, 11))//
-        .fechaFin(LocalDate.of(2022, 1, 11))//
-        .numInvestigadores(5)//
-        .importeConcedido(BigDecimal.valueOf(1000))//
-        .build(),
-        RolProyecto.builder().id(1L).abreviatura("001").nombre("rolProyecto1").equipo(RolProyecto.Equipo.INVESTIGACION)
-            .activo(Boolean.TRUE).build(),
-        "001", LocalDate.of(2021, 4, 10), null);
+    // @formatter:off
+    ProyectoSocioEquipo proyectoSocioEquipo = ProyectoSocioEquipo.builder()
+      .id(id)
+      .proyectoSocioId(1L)
+      .rolProyecto(
+        RolProyecto.builder()
+          .id(1L)
+          .abreviatura("001")
+          .nombre("rolProyecto1")
+          .equipo(RolProyecto.Equipo.INVESTIGACION)
+          .activo(Boolean.TRUE)
+          .build()
+      )
+      .personaRef("001")
+      .fechaInicio(Instant.parse("2021-04-10T00:00:00Z"))
+    .build();
+    // @formatter:on
 
     return proyectoSocioEquipo;
   }

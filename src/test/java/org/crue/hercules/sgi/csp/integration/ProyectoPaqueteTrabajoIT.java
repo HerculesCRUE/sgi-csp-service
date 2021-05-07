@@ -1,6 +1,6 @@
 package org.crue.hercules.sgi.csp.integration;
 
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.Collections;
 
 import org.assertj.core.api.Assertions;
@@ -40,8 +40,8 @@ public class ProyectoPaqueteTrabajoIT extends BaseIT {
 
   @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:scripts/modelo_ejecucion.sql",
       "classpath:scripts/modelo_unidad.sql", "classpath:scripts/tipo_finalidad.sql",
-      "classpath:scripts/tipo_ambito_geografico.sql", "classpath:scripts/estado_proyecto.sql",
-      "classpath:scripts/proyecto.sql", "classpath:scripts/proyecto_paquete_trabajo.sql" })
+      "classpath:scripts/tipo_ambito_geografico.sql", "classpath:scripts/proyecto.sql",
+      "classpath:scripts/estado_proyecto.sql", "classpath:scripts/proyecto_paquete_trabajo.sql" })
   @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:cleanup.sql")
   @Test
   public void existsById_Returns200() throws Exception {
@@ -68,8 +68,8 @@ public class ProyectoPaqueteTrabajoIT extends BaseIT {
 
   @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:scripts/modelo_ejecucion.sql",
       "classpath:scripts/modelo_unidad.sql", "classpath:scripts/tipo_finalidad.sql",
-      "classpath:scripts/tipo_ambito_geografico.sql", "classpath:scripts/estado_proyecto.sql",
-      "classpath:scripts/proyecto.sql", "classpath:scripts/proyecto_paquete_trabajo.sql" })
+      "classpath:scripts/tipo_ambito_geografico.sql", "classpath:scripts/proyecto.sql",
+      "classpath:scripts/estado_proyecto.sql", "classpath:scripts/proyecto_paquete_trabajo.sql" })
   @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:cleanup.sql")
   @Test
   public void findById_ReturnsProyectoPaqueteTrabajo() throws Exception {
@@ -84,13 +84,13 @@ public class ProyectoPaqueteTrabajoIT extends BaseIT {
     ProyectoPaqueteTrabajo proyectoPaqueteTrabajo = response.getBody();
     Assertions.assertThat(proyectoPaqueteTrabajo.getId()).as("getId()").isNotNull();
     Assertions.assertThat(proyectoPaqueteTrabajo.getId()).as("getId()").isEqualTo(idProyectoPaqueteTrabajo);
-    Assertions.assertThat(proyectoPaqueteTrabajo.getProyecto().getId()).as("getProyecto().getId()").isEqualTo(1L);
+    Assertions.assertThat(proyectoPaqueteTrabajo.getProyectoId()).as("getProyectoId()").isEqualTo(1L);
     Assertions.assertThat(proyectoPaqueteTrabajo.getNombre()).as("getNombre()")
         .isEqualTo("proyecto-paquete-trabajo-001");
     Assertions.assertThat(proyectoPaqueteTrabajo.getFechaInicio()).as("getFechaInicio()")
-        .isEqualTo(LocalDate.of(2020, 01, 01));
+        .isEqualTo(Instant.parse("2020-01-01T00:00:00Z"));
     Assertions.assertThat(proyectoPaqueteTrabajo.getFechaFin()).as("getFechaFin()")
-        .isEqualTo(LocalDate.of(2020, 01, 15));
+        .isEqualTo(Instant.parse("2020-01-15T23:59:59Z"));
     Assertions.assertThat(proyectoPaqueteTrabajo.getPersonaMes()).as("getPersonaMes()").isEqualTo(1D);
     Assertions.assertThat(proyectoPaqueteTrabajo.getDescripcion()).as("getDescripcion()")
         .isEqualTo("descripcion-proyecto-equipo-trabajo-001");

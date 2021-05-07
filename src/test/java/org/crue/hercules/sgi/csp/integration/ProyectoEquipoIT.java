@@ -1,13 +1,12 @@
 package org.crue.hercules.sgi.csp.integration;
 
 import java.net.URI;
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import org.assertj.core.api.Assertions;
-import org.crue.hercules.sgi.csp.model.Proyecto;
 import org.crue.hercules.sgi.csp.model.ProyectoEquipo;
 import org.crue.hercules.sgi.csp.model.RolProyecto;
 import org.junit.jupiter.api.Test;
@@ -57,8 +56,9 @@ public class ProyectoEquipoIT extends BaseIT {
 
   @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:scripts/modelo_ejecucion.sql",
       "classpath:scripts/modelo_unidad.sql", "classpath:scripts/tipo_finalidad.sql",
-      "classpath:scripts/tipo_ambito_geografico.sql", "classpath:scripts/estado_proyecto.sql",
-      "classpath:scripts/proyecto.sql", "classpath:scripts/rol_proyecto.sql", "classpath:scripts/proyecto_equipo.sql" })
+      "classpath:scripts/tipo_ambito_geografico.sql", "classpath:scripts/proyecto.sql",
+      "classpath:scripts/estado_proyecto.sql", "classpath:scripts/rol_proyecto.sql",
+      "classpath:scripts/proyecto_equipo.sql" })
   @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:cleanup.sql")
   @Test
   public void updateProyectoEquiposConvocatoria_ReturnsProyectoEquipoList() throws Exception {
@@ -67,10 +67,10 @@ public class ProyectoEquipoIT extends BaseIT {
     // actualizado,
     // otro nuevo y sin los otros 3 periodos existentes
     Long proyectoId = 1L;
-    ProyectoEquipo newProyectoEquipo = generarMockProyectoEquipo(null, LocalDate.of(2020, 12, 16),
-        LocalDate.of(2020, 12, 18), 1L);
-    ProyectoEquipo updatedProyectoEquipo = generarMockProyectoEquipo(103L, LocalDate.of(2020, 4, 2),
-        LocalDate.of(2020, 4, 15), 1L);
+    ProyectoEquipo newProyectoEquipo = generarMockProyectoEquipo(null, Instant.parse("2020-12-16T00:00:00Z"),
+        Instant.parse("2020-12-18T23:59:59Z"), 1L);
+    ProyectoEquipo updatedProyectoEquipo = generarMockProyectoEquipo(103L, Instant.parse("2020-04-02T00:00:00Z"),
+        Instant.parse("2020-04-15T23:59:59Z"), 1L);
 
     proyectoEquipos = Arrays.asList(newProyectoEquipo, updatedProyectoEquipo);
 
@@ -88,8 +88,7 @@ public class ProyectoEquipoIT extends BaseIT {
     Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
     List<ProyectoEquipo> responseData = response.getBody();
     Assertions.assertThat(responseData.get(0).getId()).as("get(0).getId()").isEqualTo(updatedProyectoEquipo.getId());
-    Assertions.assertThat(responseData.get(0).getProyecto().getId()).as("get(0).getProyecto().getId()")
-        .isEqualTo(proyectoId);
+    Assertions.assertThat(responseData.get(0).getProyectoId()).as("get(0).getProyectoId()").isEqualTo(proyectoId);
     Assertions.assertThat(responseData.get(0).getFechaInicio()).as("get(0).getFechaInicio()")
         .isEqualTo(updatedProyectoEquipo.getFechaInicio());
     Assertions.assertThat(responseData.get(0).getFechaFin()).as("get(0).getFechaFin()")
@@ -101,8 +100,7 @@ public class ProyectoEquipoIT extends BaseIT {
     Assertions.assertThat(responseData.get(0).getRolProyecto().getId()).as("get(0).getRolProyecto().getId()")
         .isEqualTo(updatedProyectoEquipo.getRolProyecto().getId());
 
-    Assertions.assertThat(responseData.get(1).getProyecto().getId()).as("get(1).getProyecto().getId()")
-        .isEqualTo(proyectoId);
+    Assertions.assertThat(responseData.get(1).getProyectoId()).as("get(1).getProyectoId()").isEqualTo(proyectoId);
     Assertions.assertThat(responseData.get(1).getFechaInicio()).as("get(1).getFechaInicio()")
         .isEqualTo(newProyectoEquipo.getFechaInicio());
     Assertions.assertThat(responseData.get(1).getFechaFin()).as("get(1).getFechaFin()")
@@ -140,8 +138,9 @@ public class ProyectoEquipoIT extends BaseIT {
 
   @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:scripts/modelo_ejecucion.sql",
       "classpath:scripts/modelo_unidad.sql", "classpath:scripts/tipo_finalidad.sql",
-      "classpath:scripts/tipo_ambito_geografico.sql", "classpath:scripts/estado_proyecto.sql",
-      "classpath:scripts/proyecto.sql", "classpath:scripts/rol_proyecto.sql", "classpath:scripts/proyecto_equipo.sql" })
+      "classpath:scripts/tipo_ambito_geografico.sql", "classpath:scripts/proyecto.sql",
+      "classpath:scripts/estado_proyecto.sql", "classpath:scripts/rol_proyecto.sql",
+      "classpath:scripts/proyecto_equipo.sql" })
   @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:cleanup.sql")
   @Test
   public void findById_ReturnsProyectoEquipo() throws Exception {
@@ -153,12 +152,12 @@ public class ProyectoEquipoIT extends BaseIT {
     Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     ProyectoEquipo responseData = response.getBody();
     Assertions.assertThat(responseData.getId()).as("getId()").isEqualTo(id);
-    Assertions.assertThat(responseData.getProyecto().getId()).as("getProyecto().getId()").isEqualTo(1);
+    Assertions.assertThat(responseData.getProyectoId()).as("getProyectoId()").isEqualTo(1);
     Assertions.assertThat(responseData.getPersonaRef()).as("getPersonaRef()").isEqualTo("ref-001");
     Assertions.assertThat(responseData.getHorasDedicacion()).as("getHorasDedicacion()").isEqualTo(1);
     Assertions.assertThat(responseData.getRolProyecto().getId()).as("getRolProyecto().getId()").isEqualTo(1);
-    Assertions.assertThat(responseData.getFechaInicio()).as("getFechaInicio()").isEqualTo("2020-01-01");
-    Assertions.assertThat(responseData.getFechaFin()).as("getFechaFin()").isEqualTo("2020-01-15");
+    Assertions.assertThat(responseData.getFechaInicio()).as("getFechaInicio()").isEqualTo("2020-01-01T00:00:00Z");
+    Assertions.assertThat(responseData.getFechaFin()).as("getFechaFin()").isEqualTo("2020-01-15T23:59:59Z");
   }
 
   /**
@@ -170,10 +169,9 @@ public class ProyectoEquipoIT extends BaseIT {
    * @param proyectoId Id Proyecto
    * @return el objeto ProyectoEquipo
    */
-  private ProyectoEquipo generarMockProyectoEquipo(Long id, LocalDate fechaInicio, LocalDate fechaFin,
-      Long proyectoId) {
+  private ProyectoEquipo generarMockProyectoEquipo(Long id, Instant fechaInicio, Instant fechaFin, Long proyectoId) {
 
-    ProyectoEquipo proyectoEquipo = ProyectoEquipo.builder().id(id).proyecto(Proyecto.builder().id(proyectoId).build())
+    ProyectoEquipo proyectoEquipo = ProyectoEquipo.builder().id(id).proyectoId(proyectoId)
         .rolProyecto(RolProyecto.builder().id(1L).build()).fechaInicio(fechaInicio).fechaFin(fechaFin).personaRef("001")
         .horasDedicacion(new Double(2)).build();
 

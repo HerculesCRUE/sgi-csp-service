@@ -1,5 +1,6 @@
 package org.crue.hercules.sgi.csp.repository;
 
+import java.time.Instant;
 import java.util.Optional;
 
 import org.assertj.core.api.Assertions;
@@ -31,7 +32,7 @@ public class ConvocatoriaEnlaceRepositoryTest extends BaseRepositoryTest {
     ConvocatoriaEnlace convocatoriaEnlace2 = generarConvocatoriaEnlace("-002");
     entityManager.persistAndFlush(convocatoriaEnlace2);
 
-    Long convocatoriaIdBuscado = convocatoriaEnlace1.getConvocatoria().getId();
+    Long convocatoriaIdBuscado = convocatoriaEnlace1.getConvocatoriaId();
     String urlBuscada = "www.url1.com";
 
     // when: find by by Convocatoria and url
@@ -40,7 +41,7 @@ public class ConvocatoriaEnlaceRepositoryTest extends BaseRepositoryTest {
     // then: ConvocatoriaEnlace is found
     Assertions.assertThat(dataFound).isNotNull();
     Assertions.assertThat(dataFound.getId()).isEqualTo(convocatoriaEnlace1.getId());
-    Assertions.assertThat(dataFound.getConvocatoria().getId()).isEqualTo(convocatoriaEnlace1.getConvocatoria().getId());
+    Assertions.assertThat(dataFound.getConvocatoriaId()).isEqualTo(convocatoriaEnlace1.getConvocatoriaId());
     Assertions.assertThat(dataFound.getUrl()).isEqualTo(convocatoriaEnlace1.getUrl());
   }
 
@@ -54,7 +55,7 @@ public class ConvocatoriaEnlaceRepositoryTest extends BaseRepositoryTest {
     ConvocatoriaEnlace convocatoriaEnlace2 = generarConvocatoriaEnlace("-002");
     entityManager.persistAndFlush(convocatoriaEnlace2);
 
-    Long convocatoriaIdBuscado = convocatoriaEnlace1.getConvocatoria().getId();
+    Long convocatoriaIdBuscado = convocatoriaEnlace1.getConvocatoriaId();
     String urlBuscada = "www.url3.com";
 
     // when: find by by Convocatoria and url
@@ -72,69 +73,72 @@ public class ConvocatoriaEnlaceRepositoryTest extends BaseRepositoryTest {
    */
   private ConvocatoriaEnlace generarConvocatoriaEnlace(String suffix) {
 
-    ModeloEjecucion modeloEjecucion = ModeloEjecucion.builder()//
-        .nombre("nombreModeloEjecucion" + suffix)//
-        .activo(Boolean.TRUE)//
+    // @formatter:off
+    ModeloEjecucion modeloEjecucion = ModeloEjecucion.builder()
+        .nombre("nombreModeloEjecucion" + suffix)
+        .activo(Boolean.TRUE)
         .build();
     entityManager.persistAndFlush(modeloEjecucion);
 
-    TipoFinalidad tipoFinalidad = TipoFinalidad.builder()//
-        .nombre("nombreTipoFinalidad" + suffix)//
-        .activo(Boolean.TRUE)//
+    TipoFinalidad tipoFinalidad = TipoFinalidad.builder()
+        .nombre("nombreTipoFinalidad" + suffix)
+        .activo(Boolean.TRUE)
         .build();
     entityManager.persistAndFlush(tipoFinalidad);
 
-    ModeloTipoFinalidad modeloTipoFinalidad = ModeloTipoFinalidad.builder()//
-        .modeloEjecucion(modeloEjecucion)//
-        .tipoFinalidad(tipoFinalidad)//
-        .activo(Boolean.TRUE)//
+    ModeloTipoFinalidad modeloTipoFinalidad = ModeloTipoFinalidad.builder()
+        .modeloEjecucion(modeloEjecucion)
+        .tipoFinalidad(tipoFinalidad)
+        .activo(Boolean.TRUE)
         .build();
     entityManager.persistAndFlush(modeloTipoFinalidad);
 
-    TipoRegimenConcurrencia tipoRegimenConcurrencia = TipoRegimenConcurrencia.builder()//
-        .nombre("nombreTipoRegimenConcurrencia" + suffix)//
-        .activo(Boolean.TRUE)//
+    TipoRegimenConcurrencia tipoRegimenConcurrencia = TipoRegimenConcurrencia.builder()
+        .nombre("nombreTipoRegimenConcurrencia" + suffix)
+        .activo(Boolean.TRUE)
         .build();
     entityManager.persistAndFlush(tipoRegimenConcurrencia);
 
-    TipoAmbitoGeografico tipoAmbitoGeografico = TipoAmbitoGeografico.builder()//
-        .nombre("nombreTipoAmbitoGeografico" + suffix)//
-        .activo(Boolean.TRUE)//
+    TipoAmbitoGeografico tipoAmbitoGeografico = TipoAmbitoGeografico.builder()
+        .nombre("nombreTipoAmbitoGeografico" + suffix)
+        .activo(Boolean.TRUE)
         .build();
     entityManager.persistAndFlush(tipoAmbitoGeografico);
 
-    Convocatoria convocatoria = Convocatoria.builder()//
-        .unidadGestionRef("unidad" + suffix)//
-        .modeloEjecucion(modeloEjecucion)//
-        .codigo("codigo" + suffix)//
-        .anio(2020)//
-        .titulo("titulo" + suffix)//
-        .objeto("objeto" + suffix)//
-        .observaciones("observaciones" + suffix)//
-        .finalidad(modeloTipoFinalidad.getTipoFinalidad())//
-        .regimenConcurrencia(tipoRegimenConcurrencia)//
-        .destinatarios(Convocatoria.Destinatarios.INDIVIDUAL)//
-        .colaborativos(Boolean.TRUE)//
-        .estado(Convocatoria.Estado.REGISTRADA)//
-        .duracion(12)//
-        .ambitoGeografico(tipoAmbitoGeografico)//
-        .clasificacionCVN(ClasificacionCVN.AYUDAS)//
-        .activo(Boolean.TRUE)//
+    Convocatoria convocatoria = Convocatoria.builder()
+        .unidadGestionRef("unidad" + suffix)
+        .modeloEjecucion(modeloEjecucion)
+        .codigo("codigo" + suffix)
+        .fechaPublicacion(Instant.parse("2021-08-01T00:00:00Z"))
+        .fechaProvisional(Instant.parse("2021-08-01T00:00:00Z"))
+        .fechaConcesion(Instant.parse("2021-08-01T00:00:00Z"))
+        .titulo("titulo" + suffix)
+        .objeto("objeto" + suffix)
+        .observaciones("observaciones" + suffix)
+        .finalidad(modeloTipoFinalidad.getTipoFinalidad())
+        .regimenConcurrencia(tipoRegimenConcurrencia)
+        .colaborativos(Boolean.TRUE)
+        .estado(Convocatoria.Estado.REGISTRADA)
+        .duracion(12)
+        .ambitoGeografico(tipoAmbitoGeografico)
+        .clasificacionCVN(ClasificacionCVN.AYUDAS)
+        .activo(Boolean.TRUE)
         .build();
     entityManager.persistAndFlush(convocatoria);
 
-    TipoEnlace tipoEnlace = TipoEnlace.builder()//
-        .nombre("nombreTipoEnlace" + suffix)//
-        .activo(Boolean.TRUE)//
+    TipoEnlace tipoEnlace = TipoEnlace.builder()
+        .nombre("nombreTipoEnlace" + suffix)
+        .activo(Boolean.TRUE)
         .build();
     entityManager.persistAndFlush(tipoEnlace);
 
-    ConvocatoriaEnlace convocatoriaEnlace = ConvocatoriaEnlace.builder()//
-        .convocatoria(convocatoria)//
-        .tipoEnlace(tipoEnlace)//
-        .descripcion("descripcion-1")//
-        .url("www.url1.com")//
+    ConvocatoriaEnlace convocatoriaEnlace = ConvocatoriaEnlace.builder()
+        .convocatoriaId(convocatoria.getId())
+        .tipoEnlace(tipoEnlace)
+        .descripcion("descripcion-1")
+        .url("www.url1.com")
         .build();
+    // @formatter:on
     return entityManager.persistAndFlush(convocatoriaEnlace);
   }
 }

@@ -1,12 +1,11 @@
 package org.crue.hercules.sgi.csp.controller;
 
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.crue.hercules.sgi.csp.exceptions.ConvocatoriaPeriodoSeguimientoCientificoNotFoundException;
-import org.crue.hercules.sgi.csp.model.Convocatoria;
 import org.crue.hercules.sgi.csp.model.ConvocatoriaPeriodoSeguimientoCientifico;
 import org.crue.hercules.sgi.csp.service.ConvocatoriaPeriodoSeguimientoCientificoService;
 import org.hamcrest.Matchers;
@@ -61,7 +60,7 @@ public class ConvocatoriaPeriodoSeguimientoCientificoControllerTest extends Base
             if (periodoSeguimientoCientifico.getId() == null) {
               periodoSeguimientoCientifico.setId(5L);
             }
-            periodoSeguimientoCientifico.getConvocatoria().setId(convocatoriaId);
+            periodoSeguimientoCientifico.setConvocatoriaId(convocatoriaId);
             return periodoSeguimientoCientifico;
           }).collect(Collectors.toList());
         });
@@ -80,28 +79,28 @@ public class ConvocatoriaPeriodoSeguimientoCientificoControllerTest extends Base
         .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(2)))
         .andExpect(
             MockMvcResultMatchers.jsonPath("$[0].id").value(convocatoriaPeriodoSeguimientoCientificos.get(0).getId()))
-        .andExpect(MockMvcResultMatchers.jsonPath("$[0].convocatoria.id").value(convocatoriaId))
+        .andExpect(MockMvcResultMatchers.jsonPath("$[0].convocatoriaId").value(convocatoriaId))
         .andExpect(MockMvcResultMatchers.jsonPath("$[0].numPeriodo")
             .value(convocatoriaPeriodoSeguimientoCientificos.get(0).getNumPeriodo()))
         .andExpect(MockMvcResultMatchers.jsonPath("$[0].mesInicial")
             .value(convocatoriaPeriodoSeguimientoCientificos.get(0).getMesInicial()))
         .andExpect(MockMvcResultMatchers.jsonPath("$[0].mesFinal")
             .value(convocatoriaPeriodoSeguimientoCientificos.get(0).getMesFinal()))
-        .andExpect(MockMvcResultMatchers.jsonPath("$[0].fechaInicioPresentacion").value("2020-10-10"))
-        .andExpect(MockMvcResultMatchers.jsonPath("$[0].fechaFinPresentacion").value("2020-11-20"))
+        .andExpect(MockMvcResultMatchers.jsonPath("$[0].fechaInicioPresentacion").value("2020-10-10T00:00:00Z"))
+        .andExpect(MockMvcResultMatchers.jsonPath("$[0].fechaFinPresentacion").value("2020-11-20T23:59:59Z"))
         .andExpect(MockMvcResultMatchers.jsonPath("$[0].observaciones")
             .value(convocatoriaPeriodoSeguimientoCientificos.get(0).getObservaciones()))
 
         .andExpect(MockMvcResultMatchers.jsonPath("$[1].id").value(5))
-        .andExpect(MockMvcResultMatchers.jsonPath("$[1].convocatoria.id").value(convocatoriaId))
+        .andExpect(MockMvcResultMatchers.jsonPath("$[1].convocatoriaId").value(convocatoriaId))
         .andExpect(MockMvcResultMatchers.jsonPath("$[1].numPeriodo")
             .value(convocatoriaPeriodoSeguimientoCientificos.get(1).getNumPeriodo()))
         .andExpect(MockMvcResultMatchers.jsonPath("$[1].mesInicial")
             .value(convocatoriaPeriodoSeguimientoCientificos.get(1).getMesInicial()))
         .andExpect(MockMvcResultMatchers.jsonPath("$[1].mesFinal")
             .value(convocatoriaPeriodoSeguimientoCientificos.get(1).getMesFinal()))
-        .andExpect(MockMvcResultMatchers.jsonPath("$[1].fechaInicioPresentacion").value("2020-10-10"))
-        .andExpect(MockMvcResultMatchers.jsonPath("$[1].fechaFinPresentacion").value("2020-11-20"))
+        .andExpect(MockMvcResultMatchers.jsonPath("$[1].fechaInicioPresentacion").value("2020-10-10T00:00:00Z"))
+        .andExpect(MockMvcResultMatchers.jsonPath("$[1].fechaFinPresentacion").value("2020-11-20T23:59:59Z"))
         .andExpect(MockMvcResultMatchers.jsonPath("$[1].observaciones")
             .value(convocatoriaPeriodoSeguimientoCientificos.get(1).getObservaciones()));
   }
@@ -200,17 +199,14 @@ public class ConvocatoriaPeriodoSeguimientoCientificoControllerTest extends Base
    */
   private ConvocatoriaPeriodoSeguimientoCientifico generarMockConvocatoriaPeriodoSeguimientoCientifico(Long id,
       Integer mesInicial, Integer mesFinal, Long convocatoriaId) {
-    Convocatoria convocatoria = new Convocatoria();
-    convocatoria.setId(convocatoriaId == null ? 1 : convocatoriaId);
-
     ConvocatoriaPeriodoSeguimientoCientifico convocatoriaPeriodoSeguimientoCientifico = new ConvocatoriaPeriodoSeguimientoCientifico();
     convocatoriaPeriodoSeguimientoCientifico.setId(id);
-    convocatoriaPeriodoSeguimientoCientifico.setConvocatoria(convocatoria);
+    convocatoriaPeriodoSeguimientoCientifico.setConvocatoriaId(convocatoriaId == null ? 1 : convocatoriaId);
     convocatoriaPeriodoSeguimientoCientifico.setNumPeriodo(1);
     convocatoriaPeriodoSeguimientoCientifico.setMesInicial(mesInicial);
     convocatoriaPeriodoSeguimientoCientifico.setMesFinal(mesFinal);
-    convocatoriaPeriodoSeguimientoCientifico.setFechaInicioPresentacion(LocalDate.of(2020, 10, 10));
-    convocatoriaPeriodoSeguimientoCientifico.setFechaFinPresentacion(LocalDate.of(2020, 11, 20));
+    convocatoriaPeriodoSeguimientoCientifico.setFechaInicioPresentacion(Instant.parse("2020-10-10T00:00:00Z"));
+    convocatoriaPeriodoSeguimientoCientifico.setFechaFinPresentacion(Instant.parse("2020-11-20T23:59:59Z"));
     convocatoriaPeriodoSeguimientoCientifico.setObservaciones("observaciones-" + id);
 
     return convocatoriaPeriodoSeguimientoCientifico;

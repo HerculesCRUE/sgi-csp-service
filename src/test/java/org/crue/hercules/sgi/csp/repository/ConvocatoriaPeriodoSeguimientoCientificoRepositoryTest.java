@@ -1,5 +1,6 @@
 package org.crue.hercules.sgi.csp.repository;
 
+import java.time.Instant;
 import java.util.List;
 
 import org.assertj.core.api.Assertions;
@@ -20,34 +21,36 @@ public class ConvocatoriaPeriodoSeguimientoCientificoRepositoryTest extends Base
       throws Exception {
 
     // given: 10 ConvocatoriaPeriodoSeguimientoCientifico with same ConvocatoriId
-    Convocatoria convocatoria1 = Convocatoria.builder()//
-        .estado(Convocatoria.Estado.BORRADOR)//
-        .codigo("codigo-1")//
-        .unidadGestionRef("OPE")//
-        .anio(2020)//
-        .titulo("titulo")//
-        .activo(Boolean.TRUE)//
+    // @formatter:off
+    Convocatoria convocatoria1 = Convocatoria.builder()
+        .estado(Convocatoria.Estado.BORRADOR)
+        .codigo("codigo-1")
+        .unidadGestionRef("OPE")
+        .fechaPublicacion(Instant.parse("2021-08-01T00:00:00Z"))
+        .titulo("titulo")
+        .activo(Boolean.TRUE)
         .build();
     entityManager.persistAndFlush(convocatoria1);
 
-    Convocatoria convocatoria2 = Convocatoria.builder()//
-        .estado(Convocatoria.Estado.BORRADOR)//
-        .codigo("codigo-2")//
-        .unidadGestionRef("OPE")//
-        .anio(2020)//
-        .titulo("titulo")//
-        .activo(Boolean.TRUE)//
+    Convocatoria convocatoria2 = Convocatoria.builder()
+        .estado(Convocatoria.Estado.BORRADOR)
+        .codigo("codigo-2")
+        .unidadGestionRef("OPE")
+        .fechaPublicacion(Instant.parse("2021-08-01T00:00:00Z"))
+        .titulo("titulo")
+        .activo(Boolean.TRUE)
         .build();
     entityManager.persistAndFlush(convocatoria2);
 
     for (int i = 11; i > 1; i--) {
-      ConvocatoriaPeriodoSeguimientoCientifico convocatoriaPeriodoSeguimientoCientifico = ConvocatoriaPeriodoSeguimientoCientifico//
-          .builder()//
-          .convocatoria((i % 2 == 0) ? convocatoria2 : convocatoria1)//
-          .numPeriodo(i / 2)//
-          .mesInicial(i - 1)//
-          .mesFinal(i)//
+      ConvocatoriaPeriodoSeguimientoCientifico convocatoriaPeriodoSeguimientoCientifico = ConvocatoriaPeriodoSeguimientoCientifico
+          .builder()
+          .convocatoriaId((i % 2 == 0) ? convocatoria2.getId() : convocatoria1.getId())
+          .numPeriodo(i / 2)
+          .mesInicial(i - 1)
+          .mesFinal(i)
           .build();
+      // @formatter:on
 
       entityManager.persistAndFlush(convocatoriaPeriodoSeguimientoCientifico);
     }
@@ -74,34 +77,38 @@ public class ConvocatoriaPeriodoSeguimientoCientificoRepositoryTest extends Base
   @Test
   public void findAllByConvocatoriaIdOrderByMesInicial_ReturnsNull() throws Exception {
     // given: 10 ConvocatoriaPeriodoSeguimientoCientifico
-    Convocatoria convocatoria1 = Convocatoria.builder()//
-        .estado(Convocatoria.Estado.BORRADOR)//
-        .codigo("codigo-1")//
-        .unidadGestionRef("OPE")//
-        .anio(2020)//
-        .titulo("titulo")//
-        .activo(Boolean.TRUE)//
+    // @formatter:off
+    Convocatoria convocatoria1 = Convocatoria.builder()
+        .estado(Convocatoria.Estado.BORRADOR)
+        .codigo("codigo-1")
+        .unidadGestionRef("OPE")
+        .fechaPublicacion(Instant.parse("2021-08-01T00:00:00Z"))
+        .titulo("titulo")
+        .activo(Boolean.TRUE)
         .build();
     entityManager.persistAndFlush(convocatoria1);
 
-    Convocatoria convocatoria2 = Convocatoria.builder()//
-        .estado(Convocatoria.Estado.BORRADOR)//
-        .codigo("codigo-2")//
-        .unidadGestionRef("OPE")//
-        .anio(2020)//
-        .titulo("titulo")//
-        .activo(Boolean.TRUE)//
+    Convocatoria convocatoria2 = Convocatoria.builder()
+        .estado(Convocatoria.Estado.BORRADOR)
+        .codigo("codigo-2")
+        .unidadGestionRef("OPE")
+        .fechaPublicacion(Instant.parse("2021-08-01T00:00:00Z"))
+        .titulo("titulo")
+        .activo(Boolean.TRUE)
         .build();
     entityManager.persistAndFlush(convocatoria2);
+    // @formatter:on
 
     for (int i = 11; i > 1; i--) {
-      ConvocatoriaPeriodoSeguimientoCientifico convocatoriaPeriodoSeguimientoCientifico = ConvocatoriaPeriodoSeguimientoCientifico//
-          .builder()//
-          .convocatoria((i % 2 == 0) ? convocatoria2 : convocatoria1)//
-          .numPeriodo(i / 2)//
-          .mesInicial(i - 1)//
-          .mesFinal(i)//
+      // @formatter:off
+      ConvocatoriaPeriodoSeguimientoCientifico convocatoriaPeriodoSeguimientoCientifico = ConvocatoriaPeriodoSeguimientoCientifico
+          .builder()
+          .convocatoriaId((i % 2 == 0) ? convocatoria2.getId() : convocatoria1.getId())
+          .numPeriodo(i / 2)
+          .mesInicial(i - 1)
+          .mesFinal(i)
           .build();
+      // @formatter:on
 
       if (i % 2 == 0) {
         entityManager.persistAndFlush(convocatoriaPeriodoSeguimientoCientifico);

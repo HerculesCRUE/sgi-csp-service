@@ -1,8 +1,9 @@
 package org.crue.hercules.sgi.csp.integration;
 
 import java.net.URI;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.time.Period;
+import java.time.ZoneOffset;
 import java.util.Collections;
 import java.util.List;
 
@@ -100,8 +101,8 @@ public class ProyectoIT {
 
   @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:scripts/modelo_ejecucion.sql",
       "classpath:scripts/modelo_unidad.sql", "classpath:scripts/tipo_finalidad.sql",
-      "classpath:scripts/tipo_ambito_geografico.sql", "classpath:scripts/estado_proyecto.sql",
-      "classpath:scripts/proyecto.sql" })
+      "classpath:scripts/tipo_ambito_geografico.sql", "classpath:scripts/proyecto.sql",
+      "classpath:scripts/estado_proyecto.sql" })
   @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:cleanup.sql")
   @Test
   public void update_ReturnsProyecto() throws Exception {
@@ -127,8 +128,8 @@ public class ProyectoIT {
 
   @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:scripts/modelo_ejecucion.sql",
       "classpath:scripts/modelo_unidad.sql", "classpath:scripts/tipo_finalidad.sql",
-      "classpath:scripts/tipo_ambito_geografico.sql", "classpath:scripts/estado_proyecto.sql",
-      "classpath:scripts/proyecto.sql" })
+      "classpath:scripts/tipo_ambito_geografico.sql", "classpath:scripts/proyecto.sql",
+      "classpath:scripts/estado_proyecto.sql" })
   @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:cleanup.sql")
   @Test
   public void desactivar_ReturnProyecto() throws Exception {
@@ -147,8 +148,8 @@ public class ProyectoIT {
 
   @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:scripts/modelo_ejecucion.sql",
       "classpath:scripts/modelo_unidad.sql", "classpath:scripts/tipo_finalidad.sql",
-      "classpath:scripts/tipo_ambito_geografico.sql", "classpath:scripts/estado_proyecto.sql",
-      "classpath:scripts/proyecto.sql" })
+      "classpath:scripts/tipo_ambito_geografico.sql", "classpath:scripts/proyecto.sql",
+      "classpath:scripts/estado_proyecto.sql" })
   @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:cleanup.sql")
   @Test
   public void reactivar_ReturnProyecto() throws Exception {
@@ -167,8 +168,8 @@ public class ProyectoIT {
 
   @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:scripts/modelo_ejecucion.sql",
       "classpath:scripts/modelo_unidad.sql", "classpath:scripts/tipo_finalidad.sql",
-      "classpath:scripts/tipo_ambito_geografico.sql", "classpath:scripts/estado_proyecto.sql",
-      "classpath:scripts/proyecto.sql" })
+      "classpath:scripts/tipo_ambito_geografico.sql", "classpath:scripts/proyecto.sql",
+      "classpath:scripts/estado_proyecto.sql" })
   @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:cleanup.sql")
   @Test
   public void getModeloEjecucion_ReturnsModeloEjecucion() throws Exception {
@@ -189,8 +190,8 @@ public class ProyectoIT {
 
   @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:scripts/modelo_ejecucion.sql",
       "classpath:scripts/modelo_unidad.sql", "classpath:scripts/tipo_finalidad.sql",
-      "classpath:scripts/tipo_ambito_geografico.sql", "classpath:scripts/estado_proyecto.sql",
-      "classpath:scripts/proyecto.sql" })
+      "classpath:scripts/tipo_ambito_geografico.sql", "classpath:scripts/proyecto.sql",
+      "classpath:scripts/estado_proyecto.sql" })
   @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:cleanup.sql")
   @Test
   public void existsById_Returns200() throws Exception {
@@ -217,8 +218,8 @@ public class ProyectoIT {
 
   @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:scripts/modelo_ejecucion.sql",
       "classpath:scripts/modelo_unidad.sql", "classpath:scripts/tipo_finalidad.sql",
-      "classpath:scripts/tipo_ambito_geografico.sql", "classpath:scripts/estado_proyecto.sql",
-      "classpath:scripts/proyecto.sql" })
+      "classpath:scripts/tipo_ambito_geografico.sql", "classpath:scripts/proyecto.sql",
+      "classpath:scripts/estado_proyecto.sql" })
   @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:cleanup.sql")
   @Test
   public void findById_ReturnsProyecto() throws Exception {
@@ -237,8 +238,8 @@ public class ProyectoIT {
 
   @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:scripts/modelo_ejecucion.sql",
       "classpath:scripts/modelo_unidad.sql", "classpath:scripts/tipo_finalidad.sql",
-      "classpath:scripts/tipo_ambito_geografico.sql", "classpath:scripts/estado_proyecto.sql",
-      "classpath:scripts/proyecto.sql" })
+      "classpath:scripts/tipo_ambito_geografico.sql", "classpath:scripts/proyecto.sql",
+      "classpath:scripts/estado_proyecto.sql" })
   @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:cleanup.sql")
   @Test
   public void findAll_WithPagingSortingAndFiltering_ReturnsProyectoSubList() throws Exception {
@@ -279,8 +280,8 @@ public class ProyectoIT {
 
   @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:scripts/modelo_ejecucion.sql",
       "classpath:scripts/modelo_unidad.sql", "classpath:scripts/tipo_finalidad.sql",
-      "classpath:scripts/tipo_ambito_geografico.sql", "classpath:scripts/estado_proyecto.sql",
-      "classpath:scripts/proyecto.sql" })
+      "classpath:scripts/tipo_ambito_geografico.sql", "classpath:scripts/proyecto.sql",
+      "classpath:scripts/estado_proyecto.sql" })
   @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:cleanup.sql")
   @Test
   public void findAllTodos_WithPagingSortingAndFiltering_ReturnsProyectoSubList() throws Exception {
@@ -326,7 +327,7 @@ public class ProyectoIT {
   @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:scripts/tipo_hito.sql",
       "classpath:scripts/modelo_ejecucion.sql", "classpath:scripts/modelo_unidad.sql",
       "classpath:scripts/tipo_finalidad.sql", "classpath:scripts/tipo_ambito_geografico.sql",
-      "classpath:scripts/estado_proyecto.sql", "classpath:scripts/proyecto.sql",
+      "classpath:scripts/proyecto.sql", "classpath:scripts/estado_proyecto.sql",
       "classpath:scripts/modelo_tipo_hito.sql", "classpath:scripts/proyecto_hito.sql" })
   @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:cleanup.sql")
   @Test
@@ -371,7 +372,7 @@ public class ProyectoIT {
   @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:scripts/tipo_fase.sql",
       "classpath:scripts/modelo_ejecucion.sql", "classpath:scripts/modelo_unidad.sql",
       "classpath:scripts/tipo_finalidad.sql", "classpath:scripts/tipo_ambito_geografico.sql",
-      "classpath:scripts/estado_proyecto.sql", "classpath:scripts/proyecto.sql",
+      "classpath:scripts/proyecto.sql", "classpath:scripts/estado_proyecto.sql",
       "classpath:scripts/modelo_tipo_fase.sql", "classpath:scripts/proyecto_fase.sql" })
   @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:cleanup.sql")
   @Test
@@ -415,8 +416,8 @@ public class ProyectoIT {
    */
   @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:scripts/modelo_ejecucion.sql",
       "classpath:scripts/modelo_unidad.sql", "classpath:scripts/tipo_finalidad.sql",
-      "classpath:scripts/tipo_ambito_geografico.sql", "classpath:scripts/estado_proyecto.sql",
-      "classpath:scripts/proyecto.sql", "classpath:scripts/proyecto_paquete_trabajo.sql" })
+      "classpath:scripts/tipo_ambito_geografico.sql", "classpath:scripts/proyecto.sql",
+      "classpath:scripts/estado_proyecto.sql", "classpath:scripts/proyecto_paquete_trabajo.sql" })
   @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:cleanup.sql")
   @Test
   public void findAllProyectoPaqueteTrabajo_WithPagingSortingAndFiltering_ReturnsProyectoPaqueteTrabajoSubList()
@@ -502,8 +503,8 @@ public class ProyectoIT {
    */
   @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:scripts/modelo_ejecucion.sql",
       "classpath:scripts/modelo_unidad.sql", "classpath:scripts/tipo_finalidad.sql",
-      "classpath:scripts/tipo_ambito_geografico.sql", "classpath:scripts/estado_proyecto.sql",
-      "classpath:scripts/proyecto.sql", "classpath:scripts/proyecto_entidad_gestora.sql" })
+      "classpath:scripts/tipo_ambito_geografico.sql", "classpath:scripts/proyecto.sql",
+      "classpath:scripts/estado_proyecto.sql", "classpath:scripts/proyecto_entidad_gestora.sql" })
   @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:cleanup.sql")
   @Test
   public void findAllProyectoEntidadGestora_WithPagingSortingAndFiltering_ReturnsProyectoEntidadGestoraSubList()
@@ -549,8 +550,9 @@ public class ProyectoIT {
 
   @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:scripts/modelo_ejecucion.sql",
       "classpath:scripts/modelo_unidad.sql", "classpath:scripts/tipo_finalidad.sql",
-      "classpath:scripts/tipo_ambito_geografico.sql", "classpath:scripts/estado_proyecto.sql",
-      "classpath:scripts/proyecto.sql", "classpath:scripts/rol_proyecto.sql", "classpath:scripts/proyecto_equipo.sql" })
+      "classpath:scripts/tipo_ambito_geografico.sql", "classpath:scripts/proyecto.sql",
+      "classpath:scripts/estado_proyecto.sql", "classpath:scripts/rol_proyecto.sql",
+      "classpath:scripts/proyecto_equipo.sql" })
   @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:cleanup.sql")
   @Test
   public void findAllProyectoEquipo_WithPagingSortingAndFiltering_ReturnsProyectoEquipoSubList() throws Exception {
@@ -592,8 +594,8 @@ public class ProyectoIT {
    */
   @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:scripts/modelo_ejecucion.sql",
       "classpath:scripts/modelo_unidad.sql", "classpath:scripts/tipo_finalidad.sql",
-      "classpath:scripts/tipo_ambito_geografico.sql", "classpath:scripts/estado_proyecto.sql",
-      "classpath:scripts/proyecto.sql", "classpath:scripts/proyecto_prorroga.sql" })
+      "classpath:scripts/tipo_ambito_geografico.sql", "classpath:scripts/proyecto.sql",
+      "classpath:scripts/estado_proyecto.sql", "classpath:scripts/proyecto_prorroga.sql" })
   @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:cleanup.sql")
   @Test
   public void findAllProyectoProrroga_WithPagingSortingAndFiltering_ReturnsProyectoProrrogaSubList() throws Exception {
@@ -654,8 +656,8 @@ public class ProyectoIT {
     proyecto.setCodigoExterno("cod-externo-" + (id != null ? String.format("%03d", id) : "001"));
     proyecto.setObservaciones("observaciones-" + String.format("%03d", id));
     proyecto.setUnidadGestionRef("OPE");
-    proyecto.setFechaInicio(LocalDate.now());
-    proyecto.setFechaFin(LocalDate.now().plusMonths(1));
+    proyecto.setFechaInicio(Instant.now());
+    proyecto.setFechaFin(Instant.from(Instant.now().atZone(ZoneOffset.UTC).plus(Period.ofMonths(3))));
     proyecto.setModeloEjecucion(modeloEjecucion);
     proyecto.setFinalidad(tipoFinalidad);
     proyecto.setAmbitoGeografico(tipoAmbitoGeografico);
@@ -680,8 +682,8 @@ public class ProyectoIT {
     estadoProyecto.setId(id);
     estadoProyecto.setComentario("Estado-" + id);
     estadoProyecto.setEstado(EstadoProyecto.Estado.BORRADOR);
-    estadoProyecto.setFechaEstado(LocalDateTime.now());
-    estadoProyecto.setIdProyecto(1L);
+    estadoProyecto.setFechaEstado(Instant.now());
+    estadoProyecto.setProyectoId(1L);
 
     return estadoProyecto;
   }

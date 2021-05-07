@@ -1,16 +1,8 @@
 package org.crue.hercules.sgi.csp.controller;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-
-import org.crue.hercules.sgi.csp.enums.FormularioSolicitud;
 import org.crue.hercules.sgi.csp.exceptions.DocumentoRequeridoSolicitudNotFoundException;
-import org.crue.hercules.sgi.csp.model.ConfiguracionSolicitud;
-import org.crue.hercules.sgi.csp.model.Convocatoria;
-import org.crue.hercules.sgi.csp.model.ConvocatoriaFase;
 import org.crue.hercules.sgi.csp.model.DocumentoRequeridoSolicitud;
 import org.crue.hercules.sgi.csp.model.TipoDocumento;
-import org.crue.hercules.sgi.csp.model.TipoFase;
 import org.crue.hercules.sgi.csp.service.DocumentoRequeridoSolicitudService;
 import org.crue.hercules.sgi.csp.service.ProgramaService;
 import org.junit.jupiter.api.Test;
@@ -67,8 +59,8 @@ public class DocumentoRequeridoSolicitudControllerTest extends BaseControllerTes
         // then: new DocumentoRequeridoSolicitud is created
         .andExpect(MockMvcResultMatchers.status().isCreated())
         .andExpect(MockMvcResultMatchers.jsonPath("id").isNotEmpty())
-        .andExpect(MockMvcResultMatchers.jsonPath("configuracionSolicitud.id")
-            .value(documentoRequeridoSolicitud.getConfiguracionSolicitud().getId()))
+        .andExpect(MockMvcResultMatchers.jsonPath("configuracionSolicitudId")
+            .value(documentoRequeridoSolicitud.getConfiguracionSolicitudId()))
         .andExpect(MockMvcResultMatchers.jsonPath("tipoDocumento.id")
             .value(documentoRequeridoSolicitud.getTipoDocumento().getId()))
         .andExpect(
@@ -116,8 +108,8 @@ public class DocumentoRequeridoSolicitudControllerTest extends BaseControllerTes
         // then: DocumentoRequeridoSolicitud is updated
         .andExpect(MockMvcResultMatchers.status().isOk())
         .andExpect(MockMvcResultMatchers.jsonPath("id").value(documentoRequeridoSolicitudExistente.getId()))
-        .andExpect(MockMvcResultMatchers.jsonPath("configuracionSolicitud.id")
-            .value(documentoRequeridoSolicitudExistente.getConfiguracionSolicitud().getId()))
+        .andExpect(MockMvcResultMatchers.jsonPath("configuracionSolicitudId")
+            .value(documentoRequeridoSolicitudExistente.getConfiguracionSolicitudId()))
         .andExpect(MockMvcResultMatchers.jsonPath("tipoDocumento.id")
             .value(documentoRequeridoSolicitudExistente.getTipoDocumento().getId()))
         .andExpect(
@@ -200,8 +192,8 @@ public class DocumentoRequeridoSolicitudControllerTest extends BaseControllerTes
         // and the requested DocumentoRequeridoSolicitud is resturned as JSON
         // object
         .andExpect(MockMvcResultMatchers.jsonPath("id").value(documentoRequeridoSolicitud.getId()))
-        .andExpect(MockMvcResultMatchers.jsonPath("configuracionSolicitud.id")
-            .value(documentoRequeridoSolicitud.getConfiguracionSolicitud().getId()))
+        .andExpect(MockMvcResultMatchers.jsonPath("configuracionSolicitudId")
+            .value(documentoRequeridoSolicitud.getConfiguracionSolicitudId()))
         .andExpect(MockMvcResultMatchers.jsonPath("tipoDocumento.id")
             .value(documentoRequeridoSolicitud.getTipoDocumento().getId()))
         .andExpect(
@@ -226,51 +218,6 @@ public class DocumentoRequeridoSolicitudControllerTest extends BaseControllerTes
   }
 
   /**
-   * Genera un objeto ConfiguracionSolicitud
-   * 
-   * @param configuracionSolicitudId
-   * @param convocatoriaId
-   * @param convocatoriaFaseId
-   * @return
-   */
-  private ConfiguracionSolicitud generarMockConfiguracionSolicitud(Long configuracionSolicitudId, Long convocatoriaId,
-      Long convocatoriaFaseId) {
-
-    Convocatoria convocatoria = Convocatoria.builder()//
-        .id(convocatoriaId)//
-        .estado(Convocatoria.Estado.BORRADOR)//
-        .activo(Boolean.TRUE)//
-        .build();
-
-    TipoFase tipoFase = TipoFase.builder()//
-        .id(convocatoriaFaseId)//
-        .nombre("nombre-1")//
-        .activo(Boolean.TRUE)//
-        .build();
-
-    ConvocatoriaFase convocatoriaFase = ConvocatoriaFase.builder()//
-        .id(convocatoriaFaseId)//
-        .convocatoria(convocatoria)//
-        .tipoFase(tipoFase)//
-        .fechaInicio(LocalDateTime.of(2020, 10, 1, 17, 18, 19))//
-        .fechaFin(LocalDateTime.of(2020, 10, 15, 17, 18, 19))//
-        .observaciones("observaciones")//
-        .build();
-
-    ConfiguracionSolicitud configuracionSolicitud = ConfiguracionSolicitud.builder()//
-        .id(configuracionSolicitudId)//
-        .convocatoria(convocatoria)//
-        .tramitacionSGI(Boolean.TRUE)//
-        .fasePresentacionSolicitudes(convocatoriaFase)//
-        .importeMaximoSolicitud(BigDecimal.valueOf(12345))//
-        .formularioSolicitud(FormularioSolicitud.ESTANDAR)//
-        .build();
-
-    return configuracionSolicitud;
-
-  }
-
-  /**
    * Función que devuelve un objeto TipoDocumento
    * 
    * @param id id del TipoDocumento
@@ -278,12 +225,14 @@ public class DocumentoRequeridoSolicitudControllerTest extends BaseControllerTes
    */
   private TipoDocumento generarMockTipoDocumento(Long id) {
 
-    return TipoDocumento.builder()//
-        .id(id)//
-        .nombre("nombreTipoDocumento-" + id)//
-        .descripcion("descripcionTipoDocumento-" + id)//
-        .activo(Boolean.TRUE)//
+    // @formatter:off
+    return TipoDocumento.builder()
+        .id(id)
+        .nombre("nombreTipoDocumento-" + id)
+        .descripcion("descripcionTipoDocumento-" + id)
+        .activo(Boolean.TRUE)
         .build();
+    // @formatter:on
   }
 
   /**
@@ -294,12 +243,14 @@ public class DocumentoRequeridoSolicitudControllerTest extends BaseControllerTes
    */
   private DocumentoRequeridoSolicitud generarMockDocumentoRequeridoSolicitud(Long id) {
 
-    return DocumentoRequeridoSolicitud.builder()//
-        .id(id)//
-        .configuracionSolicitud(generarMockConfiguracionSolicitud(id, id, id))//
-        .tipoDocumento(generarMockTipoDocumento(id))//
-        .observaciones("observacionesDocumentoRequeridoSolicitud-" + id)//
+    // @formatter:off
+    return DocumentoRequeridoSolicitud.builder()
+        .id(id)
+        .configuracionSolicitudId(id)
+        .tipoDocumento(generarMockTipoDocumento(id))
+        .observaciones("observacionesDocumentoRequeridoSolicitud-" + id)
         .build();
+    // @formatter:on
   }
 
 }

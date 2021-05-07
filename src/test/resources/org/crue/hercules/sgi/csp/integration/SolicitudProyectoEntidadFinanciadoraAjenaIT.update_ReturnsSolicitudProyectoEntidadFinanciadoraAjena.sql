@@ -19,14 +19,14 @@ INSERT INTO csp.tipo_ambito_geografico (id, nombre, activo) VALUES (1, 'nombre-0
 
 -- CONVOCATORIA
 INSERT INTO csp.convocatoria
-(id, unidad_gestion_ref, modelo_ejecucion_id, codigo, anio, titulo, objeto, observaciones, tipo_finalidad_id, tipo_regimen_concurrencia_id, destinatarios, colaborativos, estado, duracion, tipo_ambito_geografico_id, clasificacion_cvn, activo)
-VALUES(1, 'OPE', 1, 'codigo-001', 2020, 'titulo-001', 'objeto-001', 'observaciones-001', 1, 1, 'INDIVIDUAL', true, 'REGISTRADA', 12, 1, 'AYUDAS', true);
+(id, unidad_gestion_ref, modelo_ejecucion_id, codigo, fecha_publicacion, fecha_provisional, fecha_concesion, titulo, objeto, observaciones, tipo_finalidad_id, tipo_regimen_concurrencia_id, colaborativos, estado, duracion, tipo_ambito_geografico_id, clasificacion_cvn, activo)
+VALUES(1, 'OPE', 1, 'codigo-001', '2021-10-15T23:59:59Z', '2021-10-16T23:59:59Z', '2021-10-17T23:59:59Z', 'titulo-001', 'objeto-001', 'observaciones-001', 1, 1, true, 'REGISTRADA', 12, 1, 'AYUDAS', true);
 
 -- TIPO FASE
 INSERT INTO csp.tipo_fase (id, nombre, descripcion, activo) VALUES (1, 'nombre-001', 'descripcion-001', true);
 
 --CONVOCATORIA FASE
-INSERT INTO csp.convocatoria_fase(id, convocatoria_id, tipo_fase_id, fecha_inicio, fecha_fin, observaciones) VALUES (1, 1, 1, '2020-10-01', '2020-10-15', 'observaciones-1');
+INSERT INTO csp.convocatoria_fase(id, convocatoria_id, tipo_fase_id, fecha_inicio, fecha_fin, observaciones) VALUES (1, 1, 1, '2020-10-01T00:00:00Z', '2020-10-15T23:59:59Z', 'observaciones-1');
 
 -- CONFIGURACION SOLICITUD
 INSERT INTO csp.configuracion_solicitud 
@@ -40,21 +40,23 @@ INSERT INTO csp.programa (id, nombre, descripcion, programa_padre_id, activo) VA
 INSERT INTO csp.convocatoria_entidad_convocante (id,  convocatoria_id, entidad_ref, programa_id) VALUES (1, 1, 'entidad-001', 1);
 INSERT INTO csp.convocatoria_entidad_convocante (id,  convocatoria_id, entidad_ref, programa_id) VALUES (2, 1, 'entidad-002', 1);
 
-
--- ESTADO SOLICITUD
-INSERT INTO csp.estado_solicitud (id, id_solicitud, estado, fecha_estado, comentario) VALUES (1, 1, 'BORRADOR', '2020-11-17 15:00', 'comentario');
-
 -- SOLICITUD
 INSERT INTO csp.solicitud (id, codigo_externo, codigo_registro_interno, estado_solicitud_id, convocatoria_id, creador_ref, solicitante_ref, observaciones, convocatoria_externa, unidad_gestion_ref, formulario_solicitud, activo)
- VALUES (1, null, 'SGI_SLC1202011061027', 1, 1, 'usr-001', 'personaRef-001', 'observaciones 1', null, 'OPE', 'ESTANDAR', true);
+ VALUES (1, null, 'SGI_SLC1202011061027', null, 1, 'usr-001', 'personaRef-001', 'observaciones 1', null, 'OPE', 'ESTANDAR', true);
+
+-- ESTADO SOLICITUD
+INSERT INTO csp.estado_solicitud (id, solicitud_id, estado, fecha_estado, comentario) VALUES (1, 1, 'BORRADOR', '2020-11-17T00:00:00Z', 'comentario');
+
+-- UPDATE SOLICITUD
+UPDATE csp.solicitud SET estado_solicitud_id = 1 WHERE id = 1;
 
 -- SOLICITUD PROYECTO DATOS
-INSERT INTO csp.solicitud_proyecto_datos (id, solicitud_id, titulo, colaborativo, presupuesto_por_entidades ) 
-VALUES (1, 1, 'titulo-1', true, true);
+INSERT INTO csp.solicitud_proyecto (id, titulo, colaborativo, presupuesto_por_entidades ) 
+VALUES (1, 'titulo-1', true, true);
 
 -- ROL PROYECTO
-INSERT INTO csp.rol_proyecto (id, abreviatura, nombre, descripcion, rol_principal, responsable_economico, equipo, colectivo_ref, activo) 
-VALUES(1, '001', 'nombre-001', 'descripcion-001', false, false, 'INVESTIGACION', 'PDI', true);
+INSERT INTO csp.rol_proyecto (id, abreviatura, nombre, descripcion, rol_principal, responsable_economico, equipo, activo) 
+VALUES(1, '001', 'nombre-001', 'descripcion-001', false, false, 'INVESTIGACION', true);
 
 -- TIPO ORIGEN FUENTE FINANCIACION
 INSERT INTO csp.tipo_origen_fuente_financiacion (id, nombre, activo) VALUES (1, 'nombre-001', true);
@@ -67,7 +69,7 @@ INSERT INTO csp.fuente_financiacion (id, nombre, descripcion, fondo_estructural,
 INSERT INTO csp.tipo_financiacion (id, nombre, descripcion, activo) VALUES (1, 'nombre-001', 'descripcion-001', true);
 
 -- SOLICITUD PROYECTO ENTIDAD FINANCIADORA AJENA
-INSERT INTO csp.solicitud_proyecto_entidad_financiadora_ajena (id, solicitud_proyecto_datos_id, entidad_ref, fuente_financiacion_id, tipo_financiacion_id, porcentaje_financiacion) 
+INSERT INTO csp.solicitud_proyecto_entidad_financiadora_ajena (id, solicitud_proyecto_id, entidad_ref, fuente_financiacion_id, tipo_financiacion_id, porcentaje_financiacion) 
   VALUES (1, 1, 'entidad-001', 1, 1, 20);
-INSERT INTO csp.solicitud_proyecto_entidad_financiadora_ajena (id, solicitud_proyecto_datos_id, entidad_ref, fuente_financiacion_id, tipo_financiacion_id, porcentaje_financiacion) 
+INSERT INTO csp.solicitud_proyecto_entidad_financiadora_ajena (id, solicitud_proyecto_id, entidad_ref, fuente_financiacion_id, tipo_financiacion_id, porcentaje_financiacion) 
   VALUES (2, 1, 'entidad-002', null, null, 30);

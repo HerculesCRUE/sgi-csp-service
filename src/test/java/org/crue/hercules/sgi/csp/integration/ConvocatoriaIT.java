@@ -1,6 +1,7 @@
 package org.crue.hercules.sgi.csp.integration;
 
 import java.net.URI;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 
@@ -100,7 +101,12 @@ public class ConvocatoriaIT extends BaseIT {
     Assertions.assertThat(responseData.getModeloEjecucion().getId()).as("getModeloEjecucion().getId()")
         .isEqualTo(convocatoria.getModeloEjecucion().getId());
     Assertions.assertThat(responseData.getCodigo()).as("getCodigo()").isEqualTo(convocatoria.getCodigo());
-    Assertions.assertThat(responseData.getAnio()).as("getAnio()").isEqualTo(convocatoria.getAnio());
+    Assertions.assertThat(responseData.getFechaPublicacion()).as("getFechaPublicacion()")
+        .isEqualTo(convocatoria.getFechaPublicacion());
+    Assertions.assertThat(responseData.getFechaProvisional()).as("getFechaProvisional()")
+        .isEqualTo(convocatoria.getFechaProvisional());
+    Assertions.assertThat(responseData.getFechaConcesion()).as("getFechaConcesion()")
+        .isEqualTo(convocatoria.getFechaConcesion());
     Assertions.assertThat(responseData.getTitulo()).as("getTitulo()").isEqualTo(convocatoria.getTitulo());
     Assertions.assertThat(responseData.getObjeto()).as("getObjeto()").isEqualTo(convocatoria.getObjeto());
     Assertions.assertThat(responseData.getObservaciones()).as("getObservaciones()")
@@ -109,8 +115,6 @@ public class ConvocatoriaIT extends BaseIT {
         .isEqualTo(convocatoria.getFinalidad().getId());
     Assertions.assertThat(responseData.getRegimenConcurrencia().getId()).as("getRegimenConcurrencia().getId()")
         .isEqualTo(convocatoria.getRegimenConcurrencia().getId());
-    Assertions.assertThat(responseData.getDestinatarios()).as("getDestinatarios()")
-        .isEqualTo(convocatoria.getDestinatarios());
     Assertions.assertThat(responseData.getColaborativos()).as("getColaborativos()")
         .isEqualTo(convocatoria.getColaborativos());
     Assertions.assertThat(responseData.getEstado()).as("getEstado()").isEqualTo(Convocatoria.Estado.BORRADOR);
@@ -147,7 +151,12 @@ public class ConvocatoriaIT extends BaseIT {
     Assertions.assertThat(responseData.getModeloEjecucion().getId()).as("getModeloEjecucion().getId()")
         .isEqualTo(convocatoria.getModeloEjecucion().getId());
     Assertions.assertThat(responseData.getCodigo()).as("getCodigo()").isEqualTo(convocatoria.getCodigo());
-    Assertions.assertThat(responseData.getAnio()).as("getAnio()").isEqualTo(convocatoria.getAnio());
+    Assertions.assertThat(responseData.getFechaPublicacion()).as("getFechaPublicacion()")
+        .isEqualTo(convocatoria.getFechaPublicacion());
+    Assertions.assertThat(responseData.getFechaProvisional()).as("getFechaProvisional()")
+        .isEqualTo(convocatoria.getFechaProvisional());
+    Assertions.assertThat(responseData.getFechaConcesion()).as("getFechaConcesion()")
+        .isEqualTo(convocatoria.getFechaConcesion());
     Assertions.assertThat(responseData.getTitulo()).as("getTitulo()").isEqualTo(convocatoria.getTitulo());
     Assertions.assertThat(responseData.getObjeto()).as("getObjeto()").isEqualTo(convocatoria.getObjeto());
     Assertions.assertThat(responseData.getObservaciones()).as("getObservaciones()")
@@ -156,8 +165,6 @@ public class ConvocatoriaIT extends BaseIT {
         .isEqualTo(convocatoria.getFinalidad().getId());
     Assertions.assertThat(responseData.getRegimenConcurrencia().getId()).as("getRegimenConcurrencia().getId()")
         .isEqualTo(convocatoria.getRegimenConcurrencia().getId());
-    Assertions.assertThat(responseData.getDestinatarios()).as("getDestinatarios()")
-        .isEqualTo(convocatoria.getDestinatarios());
     Assertions.assertThat(responseData.getColaborativos()).as("getColaborativos()")
         .isEqualTo(convocatoria.getColaborativos());
     Assertions.assertThat(responseData.getEstado()).as("getEstado()").isEqualTo(convocatoria.getEstado());
@@ -418,15 +425,18 @@ public class ConvocatoriaIT extends BaseIT {
     Assertions.assertThat(responseData.getUnidadGestionRef()).as("getUnidadGestionRef()").isEqualTo("unidad-001");
     Assertions.assertThat(responseData.getModeloEjecucion().getId()).as("getModeloEjecucion().getId()").isEqualTo(1L);
     Assertions.assertThat(responseData.getCodigo()).as("getCodigo()").isEqualTo("codigo-001");
-    Assertions.assertThat(responseData.getAnio()).as("getAnio()").isEqualTo(2020);
+    Assertions.assertThat(responseData.getFechaPublicacion()).as("getFechaPublicacion()")
+        .isEqualTo(Instant.parse("2021-08-01T00:00:00Z"));
+    Assertions.assertThat(responseData.getFechaProvisional()).as("getFechaProvisional()")
+        .isEqualTo(Instant.parse("2021-09-01T00:00:00Z"));
+    Assertions.assertThat(responseData.getFechaConcesion()).as("getFechaConcesion()")
+        .isEqualTo(Instant.parse("2021-10-01T00:00:00Z"));
     Assertions.assertThat(responseData.getTitulo()).as("getTitulo()").isEqualTo("titulo-001");
     Assertions.assertThat(responseData.getObjeto()).as("getObjeto()").isEqualTo("objeto-001");
     Assertions.assertThat(responseData.getObservaciones()).as("getObservaciones()").isEqualTo("observaciones-001");
     Assertions.assertThat(responseData.getFinalidad().getId()).as("getFinalidad().getId()").isEqualTo(1L);
     Assertions.assertThat(responseData.getRegimenConcurrencia().getId()).as("getRegimenConcurrencia().getId()")
         .isEqualTo(1L);
-    Assertions.assertThat(responseData.getDestinatarios()).as("getDestinatarios()")
-        .isEqualTo(Convocatoria.Destinatarios.INDIVIDUAL);
     Assertions.assertThat(responseData.getColaborativos()).as("getColaborativos()").isEqualTo(Boolean.TRUE);
     Assertions.assertThat(responseData.getEstado()).as("getEstado()").isEqualTo(Convocatoria.Estado.REGISTRADA);
     Assertions.assertThat(responseData.getDuracion()).as("getDuracion()").isEqualTo(12);
@@ -1170,61 +1180,64 @@ public class ConvocatoriaIT extends BaseIT {
   private Convocatoria generarMockConvocatoria(Long convocatoriaId, Long unidadGestionId, Long modeloEjecucionId,
       Long modeloTipoFinalidadId, Long tipoRegimenConcurrenciaId, Long tipoAmbitoGeogragicoId, Boolean activo) {
 
+    // @formatter:off
     ModeloEjecucion modeloEjecucion = (modeloEjecucionId == null) ? null
-        : ModeloEjecucion.builder()//
-            .id(modeloEjecucionId)//
-            .nombre("nombreModeloEjecucion-" + String.format("%03d", modeloEjecucionId))//
-            .activo(Boolean.TRUE)//
+        : ModeloEjecucion.builder()
+            .id(modeloEjecucionId)
+            .nombre("nombreModeloEjecucion-" + String.format("%03d", modeloEjecucionId))
+            .activo(Boolean.TRUE)
             .build();
 
     TipoFinalidad tipoFinalidad = (modeloTipoFinalidadId == null) ? null
-        : TipoFinalidad.builder()//
-            .id(modeloTipoFinalidadId)//
-            .nombre("nombreTipoFinalidad-" + String.format("%03d", modeloTipoFinalidadId))//
-            .activo(Boolean.TRUE)//
+        : TipoFinalidad.builder()
+            .id(modeloTipoFinalidadId)
+            .nombre("nombreTipoFinalidad-" + String.format("%03d", modeloTipoFinalidadId))
+            .activo(Boolean.TRUE)
             .build();
 
     ModeloTipoFinalidad modeloTipoFinalidad = (modeloTipoFinalidadId == null) ? null
-        : ModeloTipoFinalidad.builder()//
-            .id(modeloTipoFinalidadId)//
-            .modeloEjecucion(modeloEjecucion)//
-            .tipoFinalidad(tipoFinalidad)//
-            .activo(Boolean.TRUE)//
+        : ModeloTipoFinalidad.builder()
+            .id(modeloTipoFinalidadId)
+            .modeloEjecucion(modeloEjecucion)
+            .tipoFinalidad(tipoFinalidad)
+            .activo(Boolean.TRUE)
             .build();
 
     TipoRegimenConcurrencia tipoRegimenConcurrencia = (tipoRegimenConcurrenciaId == null) ? null
-        : TipoRegimenConcurrencia.builder()//
-            .id(tipoRegimenConcurrenciaId)//
-            .nombre("nombreTipoRegimenConcurrencia-" + String.format("%03d", tipoRegimenConcurrenciaId))//
-            .activo(Boolean.TRUE)//
+        : TipoRegimenConcurrencia.builder()
+            .id(tipoRegimenConcurrenciaId)
+            .nombre("nombreTipoRegimenConcurrencia-" + String.format("%03d", tipoRegimenConcurrenciaId))
+            .activo(Boolean.TRUE)
             .build();
 
     TipoAmbitoGeografico tipoAmbitoGeografico = (tipoAmbitoGeogragicoId == null) ? null
-        : TipoAmbitoGeografico.builder()//
-            .id(tipoAmbitoGeogragicoId)//
-            .nombre("nombreTipoAmbitoGeografico-" + String.format("%03d", tipoAmbitoGeogragicoId))//
-            .activo(Boolean.TRUE)//
+        : TipoAmbitoGeografico.builder()
+            .id(tipoAmbitoGeogragicoId)
+            .nombre("nombreTipoAmbitoGeografico-" + String.format("%03d", tipoAmbitoGeogragicoId))
+            .activo(Boolean.TRUE)
             .build();
 
-    Convocatoria convocatoria = Convocatoria.builder()//
-        .id(convocatoriaId)//
-        .unidadGestionRef((unidadGestionId == null) ? null : "OPE")//
-        .modeloEjecucion(modeloEjecucion)//
-        .codigo("codigo-" + String.format("%03d", convocatoriaId))//
-        .anio(2020)//
-        .titulo("titulo-" + String.format("%03d", convocatoriaId))//
-        .objeto("objeto-" + String.format("%03d", convocatoriaId))//
-        .observaciones("observaciones-" + String.format("%03d", convocatoriaId))//
-        .finalidad((modeloTipoFinalidad == null) ? null : modeloTipoFinalidad.getTipoFinalidad())//
-        .regimenConcurrencia(tipoRegimenConcurrencia)//
-        .destinatarios(Convocatoria.Destinatarios.INDIVIDUAL)//
-        .colaborativos(Boolean.TRUE)//
-        .estado(Convocatoria.Estado.REGISTRADA)//
-        .duracion(12)//
-        .ambitoGeografico(tipoAmbitoGeografico)//
-        .clasificacionCVN(ClasificacionCVN.AYUDAS)//
-        .activo(activo)//
+    Convocatoria convocatoria = Convocatoria.builder()
+        .id(convocatoriaId)
+        .unidadGestionRef((unidadGestionId == null) ? null : "OPE")
+        .modeloEjecucion(modeloEjecucion)
+        .codigo("codigo-" + String.format("%03d", convocatoriaId))
+        .fechaPublicacion(Instant.parse("2021-08-01T00:00:00Z"))
+        .fechaProvisional(Instant.parse("2021-08-01T00:00:00Z"))
+        .fechaConcesion(Instant.parse("2021-08-01T00:00:00Z"))
+        .titulo("titulo-" + String.format("%03d", convocatoriaId))
+        .objeto("objeto-" + String.format("%03d", convocatoriaId))
+        .observaciones("observaciones-" + String.format("%03d", convocatoriaId))
+        .finalidad((modeloTipoFinalidad == null) ? null : modeloTipoFinalidad.getTipoFinalidad())
+        .regimenConcurrencia(tipoRegimenConcurrencia)
+        .colaborativos(Boolean.TRUE)
+        .estado(Convocatoria.Estado.REGISTRADA)
+        .duracion(12)
+        .ambitoGeografico(tipoAmbitoGeografico)
+        .clasificacionCVN(ClasificacionCVN.AYUDAS)
+        .activo(activo)
         .build();
+    // @formatter:on
 
     return convocatoria;
 

@@ -1838,13 +1838,14 @@ industries" />
       <column name="unidad_gestion_ref" value="UGI" />
       <column name="modelo_ejecucion_id" value="1" />
       <column name="codigo" value="CGF/UGI-01" />
-      <column name="anio" value="2021" />
+      <column name="fecha_publicacion" value="2021-02-14T23:00:00Z" />
+      <column name="fecha_provisional" value="2021-02-15T23:00:00Z" />
+      <column name="fecha_concesion" value="2021-02-16T23:00:00Z" />
       <column name="titulo" value="Título de la referencia CGF/UGI-01" />
       <column name="objeto" value="" />
       <column name="observaciones" value="" />
       <column name="tipo_finalidad_id" value="1" />
       <column name="tipo_regimen_concurrencia_id" value="2" />
-      <column name="destinatarios" value="EQUIPO_PROYECTO" />
       <column name="colaborativos" value="true" />
       <column name="estado" value="REGISTRADA" />
       <column name="duracion" value="24" />
@@ -1857,13 +1858,14 @@ industries" />
       <column name="unidad_gestion_ref" value="OPE" />
       <column name="modelo_ejecucion_id" value="7" />
       <column name="codigo" value="CGF/OPE-01" />
-      <column name="anio" value="2021" />
+      <column name="fecha_publicacion" value="2021-02-14T23:00:00Z" />
+      <column name="fecha_provisional" value="2021-02-15T23:00:00Z" />
+      <column name="fecha_concesion" value="2021-02-16T23:00:00Z" />
       <column name="titulo" value="Título de la referencia CG/OPE-01" />
       <column name="objeto" value="" />
       <column name="observaciones" value="" />
       <column name="tipo_finalidad_id" value="1" />
       <column name="tipo_regimen_concurrencia_id" value="2" />
-      <column name="destinatarios" value="EQUIPO_PROYECTO" />
       <column name="colaborativos" value="true" />
       <column name="estado" value="REGISTRADA" />
       <column name="duracion" value="36" />
@@ -1876,13 +1878,14 @@ industries" />
       <column name="unidad_gestion_ref" value="OPE" />
       <column name="modelo_ejecucion_id" value="7" />
       <column name="codigo" value="CGF/OPE-02" />
-      <column name="anio" value="2021" />
+      <column name="fecha_publicacion" value="2021-02-14T23:00:00Z" />
+      <column name="fecha_provisional" value="2021-02-15T23:00:00Z" />
+      <column name="fecha_concesion" value="2021-02-16T23:00:00Z" />
       <column name="titulo" value="Título de la referencia CGF/OPE-02" />
       <column name="objeto" value="" />
       <column name="observaciones" value="" />
       <column name="tipo_finalidad_id" value="1" />
       <column name="tipo_regimen_concurrencia_id" value="2" />
-      <column name="destinatarios" value="EQUIPO_PROYECTO" />
       <column name="colaborativos" value="true" />
       <column name="estado" value="REGISTRADA" />
       <column name="duracion" value="36" />
@@ -1895,13 +1898,14 @@ industries" />
       <column name="unidad_gestion_ref" value="OPE" />
       <column name="modelo_ejecucion_id" value="7" />
       <column name="codigo" value="CGF/OPE-03" />
-      <column name="anio" value="2021" />
+      <column name="fecha_publicacion" value="2021-02-14T23:00:00Z" />
+      <column name="fecha_provisional" value="2021-02-15T23:00:00Z" />
+      <column name="fecha_concesion" value="2021-02-16T23:00:00Z" />
       <column name="titulo" value="Título referencia CGF/OPE-3" />
       <column name="objeto" value="" />
       <column name="observaciones" value="" />
       <column name="tipo_finalidad_id" value="1" />
       <column name="tipo_regimen_concurrencia_id" value="2" />
-      <column name="destinatarios" value="EQUIPO_PROYECTO" />
       <column name="colaborativos" value="false" />
       <column name="estado" value="REGISTRADA" />
       <column name="duracion" value="48" />
@@ -1914,13 +1918,14 @@ industries" />
       <column name="unidad_gestion_ref" value="OPE" />
       <column name="modelo_ejecucion_id" value="7" />
       <column name="codigo" value="CGF/OPE-04" />
-      <column name="anio" value="2021" />
+      <column name="fecha_publicacion" value="2021-02-14T23:00:00Z" />
+      <column name="fecha_provisional" value="2021-02-15T23:00:00Z" />
+      <column name="fecha_concesion" value="2021-02-16T23:00:00Z" />
       <column name="titulo" value="Título CGF/OPE-04" />
       <column name="objeto" value="" />
       <column name="observaciones" value="" />
       <column name="tipo_finalidad_id" value="1" />
       <column name="tipo_regimen_concurrencia_id" value="null" />
-      <column name="destinatarios" value="null" />
       <column name="colaborativos" value="null" />
       <column name="estado" value="BORRADOR" />
       <column name="duracion" value="24" />
@@ -1933,13 +1938,14 @@ industries" />
       <column name="unidad_gestion_ref" value="OPE" />
       <column name="modelo_ejecucion_id" value="7" />
       <column name="codigo" value="H2020-MSCA-IF-2020" />
-      <column name="anio" value="2020" />
+      <column name="fecha_publicacion" value="2021-02-14T23:00:00Z" />
+      <column name="fecha_provisional" value="2021-02-15T23:00:00Z" />
+      <column name="fecha_concesion" value="2021-02-16T23:00:00Z" />
       <column name="titulo" value="Marie Sklodowska Curie Individual Fellowship" />
       <column name="objeto" value="" />
       <column name="observaciones" value="" />
       <column name="tipo_finalidad_id" value="1" />
       <column name="tipo_regimen_concurrencia_id" value="null" />
-      <column name="destinatarios" value="null" />
       <column name="colaborativos" value="false" />
       <column name="estado" value="BORRADOR" />
       <column name="duracion" value="null" />
@@ -1952,13 +1958,14 @@ industries" />
       <column name="unidad_gestion_ref" value="OPE" />
       <column name="modelo_ejecucion_id" value="7" />
       <column name="codigo" value="LIFE 2020- CLIMATE ACTION- CCA" />
-      <column name="anio" value="2020" />
+      <column name="fecha_publicacion" value="2021-02-14T23:00:00Z" />
+      <column name="fecha_provisional" value="2021-02-15T23:00:00Z" />
+      <column name="fecha_concesion" value="2021-02-16T23:00:00Z" />
       <column name="titulo" value="LIFE 2020- CLIMATE ACTION- CCA" />
       <column name="objeto" value="" />
       <column name="observaciones" value="" />
       <column name="tipo_finalidad_id" value="1" />
       <column name="tipo_regimen_concurrencia_id" value="null" />
-      <column name="destinatarios" value="null" />
       <column name="colaborativos" value="true" />
       <column name="estado" value="BORRADOR" />
       <column name="duracion" value="48" />
@@ -2001,25 +2008,25 @@ industries" />
     <insert tableName="convocatoria_entidad_convocante">
       <column name="id" valueSequenceNext="convocatoria_entidad_convocante_seq" />
       <column name="convocatoria_id" value="1" />
-      <column name="entidad_ref" value="ent-001" />
+      <column name="entidad_ref" value="1" />
       <column name="programa_id" value="16" />
     </insert>
     <insert tableName="convocatoria_entidad_convocante">
       <column name="id" valueSequenceNext="convocatoria_entidad_convocante_seq" />
       <column name="convocatoria_id" value="2" />
-      <column name="entidad_ref" value="ent-005" />
+      <column name="entidad_ref" value="5" />
       <column name="programa_id" value="34" />
     </insert>
     <insert tableName="convocatoria_entidad_convocante">
       <column name="id" valueSequenceNext="convocatoria_entidad_convocante_seq" />
       <column name="convocatoria_id" value="3" />
-      <column name="entidad_ref" value="ent-005" />
+      <column name="entidad_ref" value="5" />
       <column name="programa_id" value="27" />
     </insert>
     <insert tableName="convocatoria_entidad_convocante">
       <column name="id" valueSequenceNext="convocatoria_entidad_convocante_seq" />
       <column name="convocatoria_id" value="4" />
-      <column name="entidad_ref" value="ent-005" />
+      <column name="entidad_ref" value="5" />
       <column name="programa_id" value="51" />
     </insert>
   </changeSet>
@@ -2028,7 +2035,7 @@ industries" />
     <insert tableName="convocatoria_entidad_financiadora">
       <column name="id" valueSequenceNext="convocatoria_entidad_financiadora_seq" />
       <column name="convocatoria_id" value="1" />
-      <column name="entidad_ref" value="ent-001" />
+      <column name="entidad_ref" value="1" />
       <column name="fuente_financiacion_id" value="1" />
       <column name="tipo_financiacion_id" value="1" />
       <column name="porcentaje_financiacion" value="100" />
@@ -2036,7 +2043,7 @@ industries" />
     <insert tableName="convocatoria_entidad_financiadora">
       <column name="id" valueSequenceNext="convocatoria_entidad_financiadora_seq" />
       <column name="convocatoria_id" value="2" />
-      <column name="entidad_ref" value="ent-005" />
+      <column name="entidad_ref" value="5" />
       <column name="fuente_financiacion_id" value="4" />
       <column name="tipo_financiacion_id" value="1" />
       <column name="porcentaje_financiacion" value="80" />
@@ -2044,7 +2051,7 @@ industries" />
     <insert tableName="convocatoria_entidad_financiadora">
       <column name="id" valueSequenceNext="convocatoria_entidad_financiadora_seq" />
       <column name="convocatoria_id" value="3" />
-      <column name="entidad_ref" value="ent-005" />
+      <column name="entidad_ref" value="5" />
       <column name="fuente_financiacion_id" value="4" />
       <column name="tipo_financiacion_id" value="1" />
       <column name="porcentaje_financiacion" value="100" />
@@ -2055,27 +2062,27 @@ industries" />
     <insert tableName="convocatoria_entidad_gestora">
       <column name="id" valueSequenceNext="convocatoria_entidad_gestora_seq" />
       <column name="convocatoria_id" value="1" />
-      <column name="entidad_ref" value="ent-001" />
+      <column name="entidad_ref" value="1" />
     </insert>
     <insert tableName="convocatoria_entidad_gestora">
       <column name="id" valueSequenceNext="convocatoria_entidad_gestora_seq" />
       <column name="convocatoria_id" value="2" />
-      <column name="entidad_ref" value="ent-005" />
+      <column name="entidad_ref" value="5" />
     </insert>
     <insert tableName="convocatoria_entidad_gestora">
       <column name="id" valueSequenceNext="convocatoria_entidad_gestora_seq" />
       <column name="convocatoria_id" value="3" />
-      <column name="entidad_ref" value="ent-005" />
+      <column name="entidad_ref" value="5" />
     </insert>
     <insert tableName="convocatoria_entidad_gestora">
       <column name="id" valueSequenceNext="convocatoria_entidad_gestora_seq" />
       <column name="convocatoria_id" value="7" />
-      <column name="entidad_ref" value="ent-005" />
+      <column name="entidad_ref" value="5" />
     </insert>
     <insert tableName="convocatoria_entidad_gestora">
       <column name="id" valueSequenceNext="convocatoria_entidad_gestora_seq" />
       <column name="convocatoria_id" value="6" />
-      <column name="entidad_ref" value="ent-005" />
+      <column name="entidad_ref" value="5" />
     </insert>
   </changeSet>
 
@@ -2084,48 +2091,48 @@ industries" />
       <column name="id" valueSequenceNext="convocatoria_fase_seq" />
       <column name="convocatoria_id" value="1" />
       <column name="tipo_fase_id" value="2" />
-      <column name="fecha_inicio" value="2021-02-15" />
-      <column name="fecha_fin" value="2021-02-26" />
+      <column name="fecha_inicio" value="2021-02-14T23:00:00Z" />
+      <column name="fecha_fin" value="2021-02-26T22:59:59Z" />
       <column name="observaciones" value="null" />
     </insert>
     <insert tableName="convocatoria_fase">
       <column name="id" valueSequenceNext="convocatoria_fase_seq" />
       <column name="convocatoria_id" value="1" />
       <column name="tipo_fase_id" value="1" />
-      <column name="fecha_inicio" value="2021-02-01" />
-      <column name="fecha_fin" value="2021-02-20" />
+      <column name="fecha_inicio" value="2021-01-31T23:00:00Z" />
+      <column name="fecha_fin" value="2021-02-20T22:59:59Z" />
       <column name="observaciones" value="null" />
     </insert>
     <insert tableName="convocatoria_fase">
       <column name="id" valueSequenceNext="convocatoria_fase_seq" />
       <column name="convocatoria_id" value="2" />
       <column name="tipo_fase_id" value="1" />
-      <column name="fecha_inicio" value="2021-02-01" />
-      <column name="fecha_fin" value="2021-02-28" />
+      <column name="fecha_inicio" value="2021-01-31T23:00:00Z" />
+      <column name="fecha_fin" value="2021-02-28T22:59:59Z" />
       <column name="observaciones" value="null" />
     </insert>
     <insert tableName="convocatoria_fase">
       <column name="id" valueSequenceNext="convocatoria_fase_seq" />
       <column name="convocatoria_id" value="2" />
       <column name="tipo_fase_id" value="2" />
-      <column name="fecha_inicio" value="2021-03-01" />
-      <column name="fecha_fin" value="2021-03-13" />
+      <column name="fecha_inicio" value="2021-02-28T23:00:00Z" />
+      <column name="fecha_fin" value="2021-03-13T22:59:59Z" />
       <column name="observaciones" value="null" />
     </insert>
     <insert tableName="convocatoria_fase">
       <column name="id" valueSequenceNext="convocatoria_fase_seq" />
       <column name="convocatoria_id" value="4" />
       <column name="tipo_fase_id" value="1" />
-      <column name="fecha_inicio" value="2021-02-02" />
-      <column name="fecha_fin" value="2021-02-28" />
+      <column name="fecha_inicio" value="2021-02-01T23:00:00Z" />
+      <column name="fecha_fin" value="2021-02-28T22:59:59Z" />
       <column name="observaciones" value="null" />
     </insert>
     <insert tableName="convocatoria_fase">
       <column name="id" valueSequenceNext="convocatoria_fase_seq" />
       <column name="convocatoria_id" value="4" />
       <column name="tipo_fase_id" value="2" />
-      <column name="fecha_inicio" value="2021-03-01" />
-      <column name="fecha_fin" value="2021-03-14" />
+      <column name="fecha_inicio" value="2021-02-28T23:00:00Z" />
+      <column name="fecha_fin" value="2021-03-14T22:59:59Z" />
       <column name="observaciones" value="null" />
     </insert>
   </changeSet>
@@ -2137,8 +2144,8 @@ industries" />
       <column name="num_periodo" value="1" />
       <column name="mes_inicial" value="1" />
       <column name="mes_final" value="12" />
-      <column name="fecha_inicio_presentacion" value="2021-12-01" />
-      <column name="fecha_fin_presentacion" value="2021-12-31" />
+      <column name="fecha_inicio_presentacion" value="2021-11-30T23:00:00Z" />
+      <column name="fecha_fin_presentacion" value="2021-12-31T22:59:59Z" />
       <column name="observaciones" value="null" />
       <column name="tipo" value="PERIODICO" />
     </insert>
@@ -2148,8 +2155,8 @@ industries" />
       <column name="num_periodo" value="2" />
       <column name="mes_inicial" value="13" />
       <column name="mes_final" value="24" />
-      <column name="fecha_inicio_presentacion" value="2022-12-01" />
-      <column name="fecha_fin_presentacion" value="2022-12-31" />
+      <column name="fecha_inicio_presentacion" value="2022-11-30T23:00:00Z" />
+      <column name="fecha_fin_presentacion" value="2022-12-31T22:59:59Z" />
       <column name="observaciones" value="null" />
       <column name="tipo" value="PERIODICO" />
     </insert>
@@ -2159,8 +2166,8 @@ industries" />
       <column name="num_periodo" value="1" />
       <column name="mes_inicial" value="1" />
       <column name="mes_final" value="18" />
-      <column name="fecha_inicio_presentacion" value="2022-06-01" />
-      <column name="fecha_fin_presentacion" value="2022-06-30" />
+      <column name="fecha_inicio_presentacion" value="2022-05-31T22:00:00Z" />
+      <column name="fecha_fin_presentacion" value="2022-06-30T21:59:59Z" />
       <column name="observaciones" value="null" />
       <column name="tipo" value="PERIODICO" />
     </insert>
@@ -2170,8 +2177,8 @@ industries" />
       <column name="num_periodo" value="2" />
       <column name="mes_inicial" value="19" />
       <column name="mes_final" value="36" />
-      <column name="fecha_inicio_presentacion" value="2023-12-01" />
-      <column name="fecha_fin_presentacion" value="2023-12-31" />
+      <column name="fecha_inicio_presentacion" value="2023-11-30T23:00:00Z" />
+      <column name="fecha_fin_presentacion" value="2023-12-31T22:59:59Z" />
       <column name="observaciones" value="null" />
       <column name="tipo" value="FINAL" />
     </insert>
@@ -2263,40 +2270,40 @@ industries" />
       <column name="id" valueSequenceNext="convocatoria_concepto_gasto_codigo_ec_seq" />
       <column name="convocatoria_concepto_gasto_id" value="1" />
       <column name="codigo_economico_ref" value="cod-eco-011" />
-      <column name="fecha_inicio" value="2020-10-01" />
-      <column name="fecha_fin" value="2021-12-31" />
+      <column name="fecha_inicio" value="2020-09-30T22:00:00Z" />
+      <column name="fecha_fin" value="2021-12-31T22:59:59Z" />
       <column name="observaciones" value="null" />
     </insert>
     <insert tableName="convocatoria_concepto_gasto_codigo_ec">
       <column name="id" valueSequenceNext="convocatoria_concepto_gasto_codigo_ec_seq" />
       <column name="convocatoria_concepto_gasto_id" value="2" />
       <column name="codigo_economico_ref" value="cod-eco-013" />
-      <column name="fecha_inicio" value="2020-12-01" />
-      <column name="fecha_fin" value="2021-12-01" />
+      <column name="fecha_inicio" value="2020-11-30T23:00:00Z" />
+      <column name="fecha_fin" value="2021-12-01T22:59:59Z" />
       <column name="observaciones" value="null" />
     </insert>
     <insert tableName="convocatoria_concepto_gasto_codigo_ec">
       <column name="id" valueSequenceNext="convocatoria_concepto_gasto_codigo_ec_seq" />
       <column name="convocatoria_concepto_gasto_id" value="5" />
       <column name="codigo_economico_ref" value="cod-eco-011" />
-      <column name="fecha_inicio" value="2020-10-01" />
-      <column name="fecha_fin" value="2020-11-01" />
+      <column name="fecha_inicio" value="2020-09-30T22:00:00Z" />
+      <column name="fecha_fin" value="2020-11-01T22:59:59Z" />
       <column name="observaciones" value="null" />
     </insert>
     <insert tableName="convocatoria_concepto_gasto_codigo_ec">
       <column name="id" valueSequenceNext="convocatoria_concepto_gasto_codigo_ec_seq" />
       <column name="convocatoria_concepto_gasto_id" value="4" />
       <column name="codigo_economico_ref" value="cod-eco-012" />
-      <column name="fecha_inicio" value="2020-11-01" />
-      <column name="fecha_fin" value="2020-12-01" />
+      <column name="fecha_inicio" value="2020-10-30T22:00:00Z" />
+      <column name="fecha_fin" value="2020-12-01T22:59:59Z" />
       <column name="observaciones" value="null" />
     </insert>
     <insert tableName="convocatoria_concepto_gasto_codigo_ec">
       <column name="id" valueSequenceNext="convocatoria_concepto_gasto_codigo_ec_seq" />
       <column name="convocatoria_concepto_gasto_id" value="6" />
       <column name="codigo_economico_ref" value="cod-eco-014" />
-      <column name="fecha_inicio" value="2020-12-01" />
-      <column name="fecha_fin" value="2021-12-01" />
+      <column name="fecha_inicio" value="2020-11-30T23:00:00Z" />
+      <column name="fecha_fin" value="2021-12-01T22:59:59Z" />
       <column name="observaciones" value="null" />
     </insert>
   </changeSet>
@@ -2352,67 +2359,15 @@ industries" />
   </changeSet>
 
 
-  <changeSet context="dev" author="master" id="0000000000000-estado_solicitud">
-    <insert tableName="estado_solicitud">
-      <column name="id" valueSequenceNext="estado_solicitud_seq" />
-      <column name="id_solicitud" value="1" />
-      <column name="estado" value="BORRADOR" />
-      <column name="fecha_estado" value="2021-02-01 16:17:27.789" />
-      <column name="comentario" value="null" />
-    </insert>
-    <insert tableName="estado_solicitud">
-      <column name="id" valueSequenceNext="estado_solicitud_seq" />
-      <column name="id_solicitud" value="2" />
-      <column name="estado" value="BORRADOR" />
-      <column name="fecha_estado" value="2021-02-01 16:56:12.217" />
-      <column name="comentario" value="null" />
-    </insert>
-    <insert tableName="estado_solicitud">
-      <column name="id" valueSequenceNext="estado_solicitud_seq" />
-      <column name="id_solicitud" value="3" />
-      <column name="estado" value="BORRADOR" />
-      <column name="fecha_estado" value="2021-02-01 17:29:09.713" />
-      <column name="comentario" value="null" />
-    </insert>
-    <insert tableName="estado_solicitud">
-      <column name="id" valueSequenceNext="estado_solicitud_seq" />
-      <column name="id_solicitud" value="4" />
-      <column name="estado" value="BORRADOR" />
-      <column name="fecha_estado" value="2021-02-01 17:41:44.396" />
-      <column name="comentario" value="null" />
-    </insert>
-    <insert tableName="estado_solicitud">
-      <column name="id" valueSequenceNext="estado_solicitud_seq" />
-      <column name="id_solicitud" value="5" />
-      <column name="estado" value="BORRADOR" />
-      <column name="fecha_estado" value="2021-02-02 09:43:15.301" />
-      <column name="comentario" value="null" />
-    </insert>
-    <insert tableName="estado_solicitud">
-      <column name="id" valueSequenceNext="estado_solicitud_seq" />
-      <column name="id_solicitud" value="6" />
-      <column name="estado" value="BORRADOR" />
-      <column name="fecha_estado" value="2021-02-03 12:56:26.504" />
-      <column name="comentario" value="null" />
-    </insert>
-    <insert tableName="estado_solicitud">
-      <column name="id" valueSequenceNext="estado_solicitud_seq" />
-      <column name="id_solicitud" value="7" />
-      <column name="estado" value="BORRADOR" />
-      <column name="fecha_estado" value="2021-02-03 18:28:58.118" />
-      <column name="comentario" value="null" />
-    </insert>
-  </changeSet>
-
   <changeSet context="dev" author="master" id="0000000000000-solicitud">
     <insert tableName="solicitud">
       <column name="id" valueSequenceNext="solicitud_seq" />
       <column name="codigo_externo" value="" />
       <column name="codigo_registro_interno" value="SGI_SLC1202102011617" />
-      <column name="estado_solicitud_id" value="1" />
+      <column name="estado_solicitud_id" value="null" />
       <column name="convocatoria_id" value="1" />
-      <column name="creador_ref" value="user-010" />
-      <column name="solicitante_ref" value="user-001" />
+      <column name="creador_ref" value="10" />
+      <column name="solicitante_ref" value="1" />
       <column name="observaciones" value="" />
       <column name="convocatoria_externa" value="" />
       <column name="unidad_gestion_ref" value="UGI" />
@@ -2423,10 +2378,10 @@ industries" />
       <column name="id" valueSequenceNext="solicitud_seq" />
       <column name="codigo_externo" value="" />
       <column name="codigo_registro_interno" value="SGI_SLC2202102011656" />
-      <column name="estado_solicitud_id" value="2" />
+      <column name="estado_solicitud_id" value="null" />
       <column name="convocatoria_id" value="1" />
-      <column name="creador_ref" value="user-010" />
-      <column name="solicitante_ref" value="user-002" />
+      <column name="creador_ref" value="10" />
+      <column name="solicitante_ref" value="2" />
       <column name="observaciones" value="" />
       <column name="convocatoria_externa" value="" />
       <column name="unidad_gestion_ref" value="UGI" />
@@ -2437,10 +2392,10 @@ industries" />
       <column name="id" valueSequenceNext="solicitud_seq" />
       <column name="codigo_externo" value="" />
       <column name="codigo_registro_interno" value="SGI_SLC3202102011729" />
-      <column name="estado_solicitud_id" value="3" />
+      <column name="estado_solicitud_id" value="null" />
       <column name="convocatoria_id" value="2" />
-      <column name="creador_ref" value="user-009" />
-      <column name="solicitante_ref" value="user-001" />
+      <column name="creador_ref" value="9" />
+      <column name="solicitante_ref" value="1" />
       <column name="observaciones" value="" />
       <column name="convocatoria_externa" value="" />
       <column name="unidad_gestion_ref" value="OPE" />
@@ -2451,10 +2406,10 @@ industries" />
       <column name="id" valueSequenceNext="solicitud_seq" />
       <column name="codigo_externo" value="" />
       <column name="codigo_registro_interno" value="SGI_SLC4202102011741" />
-      <column name="estado_solicitud_id" value="4" />
+      <column name="estado_solicitud_id" value="null" />
       <column name="convocatoria_id" value="2" />
-      <column name="creador_ref" value="user-009" />
-      <column name="solicitante_ref" value="user-003" />
+      <column name="creador_ref" value="9" />
+      <column name="solicitante_ref" value="3" />
       <column name="observaciones" value="" />
       <column name="convocatoria_externa" value="" />
       <column name="unidad_gestion_ref" value="OPE" />
@@ -2465,10 +2420,10 @@ industries" />
       <column name="id" valueSequenceNext="solicitud_seq" />
       <column name="codigo_externo" value="" />
       <column name="codigo_registro_interno" value="SGI_SLC5202102020943" />
-      <column name="estado_solicitud_id" value="5" />
+      <column name="estado_solicitud_id" value="null" />
       <column name="convocatoria_id" value="4" />
-      <column name="creador_ref" value="user-009" />
-      <column name="solicitante_ref" value="user-004" />
+      <column name="creador_ref" value="9" />
+      <column name="solicitante_ref" value="4" />
       <column name="observaciones" value="" />
       <column name="convocatoria_externa" value="" />
       <column name="unidad_gestion_ref" value="OPE" />
@@ -2479,10 +2434,10 @@ industries" />
       <column name="id" valueSequenceNext="solicitud_seq" />
       <column name="codigo_externo" value="llll" />
       <column name="codigo_registro_interno" value="SGI_SLC6202102031256" />
-      <column name="estado_solicitud_id" value="6" />
+      <column name="estado_solicitud_id" value="null" />
       <column name="convocatoria_id" value="null" />
-      <column name="creador_ref" value="user-009" />
-      <column name="solicitante_ref" value="user-001" />
+      <column name="creador_ref" value="9" />
+      <column name="solicitante_ref" value="1" />
       <column name="observaciones" value="" />
       <column name="convocatoria_externa" value="LIFE 2020- CLIMATE ACTION- CCA" />
       <column name="unidad_gestion_ref" value="OPE" />
@@ -2493,10 +2448,10 @@ industries" />
       <column name="id" valueSequenceNext="solicitud_seq" />
       <column name="codigo_externo" value="" />
       <column name="codigo_registro_interno" value="SGI_SLC7202102031828" />
-      <column name="estado_solicitud_id" value="7" />
+      <column name="estado_solicitud_id" value="null" />
       <column name="convocatoria_id" value="2" />
-      <column name="creador_ref" value="user-009" />
-      <column name="solicitante_ref" value="user-004" />
+      <column name="creador_ref" value="9" />
+      <column name="solicitante_ref" value="4" />
       <column name="observaciones" value="" />
       <column name="convocatoria_externa" value="" />
       <column name="unidad_gestion_ref" value="OPE" />
@@ -2505,18 +2460,100 @@ industries" />
     </insert>
   </changeSet>
 
+  <changeSet context="dev" author="master" id="0000000000000-estado_solicitud">
+    <insert tableName="estado_solicitud">
+      <column name="id" valueSequenceNext="estado_solicitud_seq" />
+      <column name="solicitud_id" value="1" />
+      <column name="estado" value="BORRADOR" />
+      <column name="fecha_estado" value="2021-01-31T23:00:00Z" />
+      <column name="comentario" value="null" />
+    </insert>
+    <insert tableName="estado_solicitud">
+      <column name="id" valueSequenceNext="estado_solicitud_seq" />
+      <column name="solicitud_id" value="2" />
+      <column name="estado" value="BORRADOR" />
+      <column name="fecha_estado" value="2021-01-31T23:00:00Z" />
+      <column name="comentario" value="null" />
+    </insert>
+    <insert tableName="estado_solicitud">
+      <column name="id" valueSequenceNext="estado_solicitud_seq" />
+      <column name="solicitud_id" value="3" />
+      <column name="estado" value="BORRADOR" />
+      <column name="fecha_estado" value="2021-01-31T23:00:00Z" />
+      <column name="comentario" value="null" />
+    </insert>
+    <insert tableName="estado_solicitud">
+      <column name="id" valueSequenceNext="estado_solicitud_seq" />
+      <column name="solicitud_id" value="4" />
+      <column name="estado" value="BORRADOR" />
+      <column name="fecha_estado" value="2021-01-31T23:00:00Z" />
+      <column name="comentario" value="null" />
+    </insert>
+    <insert tableName="estado_solicitud">
+      <column name="id" valueSequenceNext="estado_solicitud_seq" />
+      <column name="solicitud_id" value="5" />
+      <column name="estado" value="BORRADOR" />
+      <column name="fecha_estado" value="2021-02-01T23:00:00Z" />
+      <column name="comentario" value="null" />
+    </insert>
+    <insert tableName="estado_solicitud">
+      <column name="id" valueSequenceNext="estado_solicitud_seq" />
+      <column name="solicitud_id" value="6" />
+      <column name="estado" value="BORRADOR" />
+      <column name="fecha_estado" value="2021-02-02T23:00:00Z" />
+      <column name="comentario" value="null" />
+    </insert>
+    <insert tableName="estado_solicitud">
+      <column name="id" valueSequenceNext="estado_solicitud_seq" />
+      <column name="solicitud_id" value="7" />
+      <column name="estado" value="BORRADOR" />
+      <column name="fecha_estado" value="2021-02-02T23:00:00Z" />
+      <column name="comentario" value="null" />
+    </insert>
+  </changeSet>
+
+  <changeSet context="dev" author="master" id="0000000000000-solicitud-estado-solicitud">
+    <update tableName="solicitud">
+      <column name="estado_solicitud_id" value="1" />
+      <where>id=1</where>
+    </update>
+    <update tableName="solicitud">
+      <column name="estado_solicitud_id" value="2" />
+      <where>id=2</where>
+    </update>
+    <update tableName="solicitud">
+      <column name="estado_solicitud_id" value="3" />
+      <where>id=3</where>
+    </update>
+    <update tableName="solicitud">
+      <column name="estado_solicitud_id" value="4" />
+      <where>id=4</where>
+    </update>
+    <update tableName="solicitud">
+      <column name="estado_solicitud_id" value="5" />
+      <where>id=5</where>
+    </update>
+    <update tableName="solicitud">
+      <column name="estado_solicitud_id" value="6" />
+      <where>id=6</where>
+    </update>
+    <update tableName="solicitud">
+      <column name="estado_solicitud_id" value="7" />
+      <where>id=7</where>
+    </update>
+  </changeSet>
 
   <changeSet context="dev" author="master" id="0000000000000-solicitud_modalidad">
     <insert tableName="solicitud_modalidad">
       <column name="id" valueSequenceNext="solicitud_modalidad_seq" />
       <column name="solicitud_id" value="3" />
-      <column name="entidad_ref" value="ent-005" />
+      <column name="entidad_ref" value="5" />
       <column name="programa_id" value="43" />
     </insert>
     <insert tableName="solicitud_modalidad">
       <column name="id" valueSequenceNext="solicitud_modalidad_seq" />
       <column name="solicitud_id" value="4" />
-      <column name="entidad_ref" value="ent-005" />
+      <column name="entidad_ref" value="5" />
       <column name="programa_id" value="43" />
     </insert>
   </changeSet>
@@ -2538,7 +2575,7 @@ industries" />
       <column name="id" valueSequenceNext="solicitud_hito_seq" />
       <column name="solicitud_id" value="4" />
       <column name="tipo_hito_id" value="6" />
-      <column name="fecha" value="2021-02-01" />
+      <column name="fecha" value="2021-01-31T23:00:00Z" />
       <column name="comentario" value="null" />
       <column name="genera_aviso" value="false" />
     </insert>
@@ -2547,16 +2584,40 @@ industries" />
   <changeSet context="dev" author="master" id="0000000000000-rol_socio">
     <insert tableName="rol_socio">
       <column name="id" valueSequenceNext="rol_socio_seq" />
-      <column name="abreviatura" value="LEAD" />
-      <column name="nombre" value="Socio coordinador" />
+      <column name="abreviatura" value="COORD" />
+      <column name="nombre" value="Coordinador" />
       <column name="descripcion" value="null" />
       <column name="coordinador" value="true" />
       <column name="activo" value="true" />
     </insert>
     <insert tableName="rol_socio">
       <column name="id" valueSequenceNext="rol_socio_seq" />
-      <column name="abreviatura" value="COL" />
-      <column name="nombre" value="Socio colaborador" />
+      <column name="abreviatura" value="SOCIO" />
+      <column name="nombre" value="Socio" />
+      <column name="descripcion" value="null" />
+      <column name="coordinador" value="false" />
+      <column name="activo" value="true" />
+    </insert>
+    <insert tableName="rol_socio">
+      <column name="id" valueSequenceNext="rol_socio_seq" />
+      <column name="abreviatura" value="TERPA" />
+      <column name="nombre" value="Tercera parte" />
+      <column name="descripcion" value="null" />
+      <column name="coordinador" value="false" />
+      <column name="activo" value="true" />
+    </insert>
+    <insert tableName="rol_socio">
+      <column name="id" valueSequenceNext="rol_socio_seq" />
+      <column name="abreviatura" value="PARTN" />
+      <column name="nombre" value="Partner organisation" />
+      <column name="descripcion" value="null" />
+      <column name="coordinador" value="false" />
+      <column name="activo" value="true" />
+    </insert>
+    <insert tableName="rol_socio">
+      <column name="id" valueSequenceNext="rol_socio_seq" />
+      <column name="abreviatura" value="OTROS" />
+      <column name="nombre" value="Otros" />
       <column name="descripcion" value="null" />
       <column name="coordinador" value="false" />
       <column name="activo" value="true" />
@@ -2572,7 +2633,6 @@ industries" />
       <column name="rol_principal" value="true" />
       <column name="responsable_economico" value="false" />
       <column name="equipo" value="INVESTIGACION" />
-      <column name="colectivo_ref" value="null" />
       <column name="activo" value="true" />
     </insert>
     <insert tableName="rol_proyecto">
@@ -2583,44 +2643,37 @@ industries" />
       <column name="rol_principal" value="false" />
       <column name="responsable_economico" value="false" />
       <column name="equipo" value="INVESTIGACION" />
-      <column name="colectivo_ref" value="null" />
       <column name="activo" value="true" />
     </insert>
   </changeSet>
 
-  <changeSet context="dev" author="master" id="0000000000000-estado_proyecto">
-    <insert tableName="estado_proyecto">
-      <column name="id" valueSequenceNext="estado_proyecto_seq" />
-      <column name="id_proyecto" value="1" />
-      <column name="estado" value="BORRADOR" />
-      <column name="fecha_estado" value="2021-02-01 17:51:14.481" />
-      <column name="comentario" value="null" />
+  <changeSet context="dev" author="master" id="0000000000000-rol_proyecto_colectivo">
+    <insert tableName="rol_proyecto_colectivo">
+      <column name="id" valueSequenceNext="rol_proyecto_colectivo_seq" />
+      <column name="colectivo_ref" value="1" />
+      <column name="rol_proyecto_id" valueComputed="1" />
     </insert>
-    <insert tableName="estado_proyecto">
-      <column name="id" valueSequenceNext="estado_proyecto_seq" />
-      <column name="id_proyecto" value="2" />
-      <column name="estado" value="BORRADOR" />
-      <column name="fecha_estado" value="2021-02-01 17:56:11.935" />
-      <column name="comentario" value="null" />
+    <insert tableName="rol_proyecto_colectivo">
+      <column name="id" valueSequenceNext="rol_proyecto_colectivo_seq" />
+      <column name="colectivo_ref" value="2" />
+      <column name="rol_proyecto_id" valueComputed="1" />
     </insert>
-    <insert tableName="estado_proyecto">
-      <column name="id" valueSequenceNext="estado_proyecto_seq" />
-      <column name="id_proyecto" value="3" />
-      <column name="estado" value="BORRADOR" />
-      <column name="fecha_estado" value="2021-02-02 10:53:13.658" />
-      <column name="comentario" value="null" />
+    <insert tableName="rol_proyecto_colectivo">
+      <column name="id" valueSequenceNext="rol_proyecto_colectivo_seq" />
+      <column name="colectivo_ref" value="1" />
+      <column name="rol_proyecto_id" valueComputed="2" />
     </insert>
   </changeSet>
 
   <changeSet context="dev" author="master" id="0000000000000-proyecto">
     <insert tableName="proyecto">
       <column name="id" valueSequenceNext="proyecto_seq" />
-      <column name="estado_proyecto_id" value="1" />
+      <column name="estado_proyecto_id" value="null" />
       <column name="titulo" value="Proyecto 1 CGF/OPE-1" />
       <column name="acronimo" value="PCGFOPE1" />
       <column name="codigo_externo" value="PCGFOPE1" />
-      <column name="fecha_inicio" value="2021-02-01" />
-      <column name="fecha_fin" value="2022-12-31" />
+      <column name="fecha_inicio" value="2021-01-31T23:00:00Z" />
+      <column name="fecha_fin" value="2022-12-31T22:59:59Z" />
       <column name="unidad_gestion_ref" value="OPE" />
       <column name="modelo_ejecucion_id" value="7" />
       <column name="tipo_finalidad_id" value="1" />
@@ -2632,7 +2685,6 @@ industries" />
       <column name="clasificacion_cvn" value="COMPETITIVOS" />
       <column name="colaborativo" value="false" />
       <column name="coordinador_externo" value="false" />
-      <column name="uni_subcontratada" value="false" />
       <column name="timesheet" value="true" />
       <column name="paquetes_trabajo" value="false" />
       <column name="coste_hora" value="true" />
@@ -2648,12 +2700,12 @@ industries" />
     </insert>
     <insert tableName="proyecto">
       <column name="id" valueSequenceNext="proyecto_seq" />
-      <column name="estado_proyecto_id" value="2" />
+      <column name="estado_proyecto_id" value="null" />
       <column name="titulo" value="Título proyecto CGF/OPE2" />
       <column name="acronimo" value="PCGFOPE2" />
       <column name="codigo_externo" value="PCGFOPE2" />
-      <column name="fecha_inicio" value="2021-02-01" />
-      <column name="fecha_fin" value="2023-12-05" />
+      <column name="fecha_inicio" value="2021-01-31T23:00:00Z" />
+      <column name="fecha_fin" value="2023-12-05T22:59:59Z" />
       <column name="unidad_gestion_ref" value="OPE" />
       <column name="modelo_ejecucion_id" value="7" />
       <column name="tipo_finalidad_id" value="1" />
@@ -2665,7 +2717,6 @@ industries" />
       <column name="clasificacion_cvn" value="COMPETITIVOS" />
       <column name="colaborativo" value="true" />
       <column name="coordinador_externo" value="false" />
-      <column name="uni_subcontratada" value="false" />
       <column name="timesheet" value="true" />
       <column name="paquetes_trabajo" value="true" />
       <column name="coste_hora" value="true" />
@@ -2681,12 +2732,12 @@ industries" />
     </insert>
     <insert tableName="proyecto">
       <column name="id" valueSequenceNext="proyecto_seq" />
-      <column name="estado_proyecto_id" value="3" />
+      <column name="estado_proyecto_id" value="null" />
       <column name="titulo" value="Proyecto conv CGF/OPE-3" />
       <column name="acronimo" value="PCOPE-3" />
       <column name="codigo_externo" value="PCOPE-3" />
-      <column name="fecha_inicio" value="2021-02-02" />
-      <column name="fecha_fin" value="2021-04-30" />
+      <column name="fecha_inicio" value="2021-02-01T23:00:00Z" />
+      <column name="fecha_fin" value="2021-04-30T21:59:59Z" />
       <column name="unidad_gestion_ref" value="OPE" />
       <column name="modelo_ejecucion_id" value="7" />
       <column name="tipo_finalidad_id" value="1" />
@@ -2698,7 +2749,6 @@ industries" />
       <column name="clasificacion_cvn" value="COMPETITIVOS" />
       <column name="colaborativo" value="true" />
       <column name="coordinador_externo" value="true" />
-      <column name="uni_subcontratada" value="false" />
       <column name="timesheet" value="true" />
       <column name="paquetes_trabajo" value="true" />
       <column name="coste_hora" value="true" />
@@ -2714,11 +2764,50 @@ industries" />
     </insert>
   </changeSet>
 
+  <changeSet context="dev" author="master" id="0000000000000-estado_proyecto">
+    <insert tableName="estado_proyecto">
+      <column name="id" valueSequenceNext="estado_proyecto_seq" />
+      <column name="proyecto_id" value="1" />
+      <column name="estado" value="BORRADOR" />
+      <column name="fecha_estado" value="2021-01-31T23:00:00Z" />
+      <column name="comentario" value="null" />
+    </insert>
+    <insert tableName="estado_proyecto">
+      <column name="id" valueSequenceNext="estado_proyecto_seq" />
+      <column name="proyecto_id" value="2" />
+      <column name="estado" value="BORRADOR" />
+      <column name="fecha_estado" value="2021-01-31T23:00:00Z" />
+      <column name="comentario" value="null" />
+    </insert>
+    <insert tableName="estado_proyecto">
+      <column name="id" valueSequenceNext="estado_proyecto_seq" />
+      <column name="proyecto_id" value="3" />
+      <column name="estado" value="BORRADOR" />
+      <column name="fecha_estado" value="2021-02-01T23:00:00Z" />
+      <column name="comentario" value="null" />
+    </insert>
+  </changeSet>
+
+  <changeSet context="dev" author="master" id="0000000000000-proyecto-estado-proyecto">
+    <update tableName="proyecto">
+      <column name="estado_proyecto_id" value="1" />
+      <where>id=1</where>
+    </update>
+    <update tableName="proyecto">
+      <column name="estado_proyecto_id" value="2" />
+      <where>id=2</where>
+    </update>
+    <update tableName="proyecto">
+      <column name="estado_proyecto_id" value="3" />
+      <where>id=3</where>
+    </update>
+  </changeSet>
+
   <changeSet context="dev" author="master" id="0000000000000-proyecto_entidad_financiadora">
     <insert tableName="proyecto_entidad_financiadora">
       <column name="id" valueSequenceNext="proyecto_entidad_financiadora_seq" />
       <column name="proyecto_id" value="1" />
-      <column name="entidad_ref" value="ent-005" />
+      <column name="entidad_ref" value="5" />
       <column name="fuente_financiacion_id" value="4" />
       <column name="tipo_financiacion_id" value="1" />
       <column name="porcentaje_financiacion" value="80" />
@@ -2727,7 +2816,7 @@ industries" />
     <insert tableName="proyecto_entidad_financiadora">
       <column name="id" valueSequenceNext="proyecto_entidad_financiadora_seq" />
       <column name="proyecto_id" value="2" />
-      <column name="entidad_ref" value="ent-005" />
+      <column name="entidad_ref" value="5" />
       <column name="fuente_financiacion_id" value="4" />
       <column name="tipo_financiacion_id" value="1" />
       <column name="porcentaje_financiacion" value="100" />
@@ -2736,7 +2825,7 @@ industries" />
     <insert tableName="proyecto_entidad_financiadora">
       <column name="id" valueSequenceNext="proyecto_entidad_financiadora_seq" />
       <column name="proyecto_id" value="2" />
-      <column name="entidad_ref" value="ent-007" />
+      <column name="entidad_ref" value="7" />
       <column name="fuente_financiacion_id" value="2" />
       <column name="tipo_financiacion_id" value="2" />
       <column name="porcentaje_financiacion" value="20" />
@@ -2744,16 +2833,14 @@ industries" />
     </insert>
   </changeSet>
 
-  <changeSet context="dev" author="master" id="0000000000000-solicitud_proyecto_datos">
-    <insert tableName="solicitud_proyecto_datos">
-      <column name="id" valueSequenceNext="solicitud_proyecto_datos_seq" />
-      <column name="solicitud_id" value="1" />
+  <changeSet context="dev" author="master" id="0000000000000-solicitud_proyecto">
+    <insert tableName="solicitud_proyecto">
+      <column name="id" value="1" />
       <column name="titulo" value="Proyecto solicitud 1" />
       <column name="acronimo" value="PS1" />
       <column name="duracion" value="24" />
       <column name="colaborativo" value="false" />
       <column name="coordinador_externo" value="false" />
-      <column name="uni_subcontratada" value="false" />
       <column name="objetivos" value="null" />
       <column name="intereses" value="null" />
       <column name="resultados_previstos" value="null" />
@@ -2762,15 +2849,13 @@ industries" />
       <column name="envio_etica" value="null" />
       <column name="presupuesto_por_entidades" value="false" />
     </insert>
-    <insert tableName="solicitud_proyecto_datos">
-      <column name="id" valueSequenceNext="solicitud_proyecto_datos_seq" />
-      <column name="solicitud_id" value="2" />
+    <insert tableName="solicitud_proyecto">
+      <column name="id" value="2" />
       <column name="titulo" value="Proyecto solicitud 2" />
       <column name="acronimo" value="PS2" />
       <column name="duracion" value="24" />
       <column name="colaborativo" value="true" />
       <column name="coordinador_externo" value="false" />
-      <column name="uni_subcontratada" value="false" />
       <column name="objetivos" value="null" />
       <column name="intereses" value="null" />
       <column name="resultados_previstos" value="null" />
@@ -2779,15 +2864,13 @@ industries" />
       <column name="envio_etica" value="null" />
       <column name="presupuesto_por_entidades" value="false" />
     </insert>
-    <insert tableName="solicitud_proyecto_datos">
-      <column name="id" valueSequenceNext="solicitud_proyecto_datos_seq" />
-      <column name="solicitud_id" value="3" />
+    <insert tableName="solicitud_proyecto">
+      <column name="id" value="3" />
       <column name="titulo" value="Proyecto Solicitud 1 conv CGF/OPE-01" />
       <column name="acronimo" value="PS1OPE1" />
       <column name="duracion" value="36" />
       <column name="colaborativo" value="true" />
       <column name="coordinador_externo" value="false" />
-      <column name="uni_subcontratada" value="false" />
       <column name="objetivos" value="null" />
       <column name="intereses" value="null" />
       <column name="resultados_previstos" value="null" />
@@ -2796,15 +2879,13 @@ industries" />
       <column name="envio_etica" value="null" />
       <column name="presupuesto_por_entidades" value="false" />
     </insert>
-    <insert tableName="solicitud_proyecto_datos">
-      <column name="id" valueSequenceNext="solicitud_proyecto_datos_seq" />
-      <column name="solicitud_id" value="4" />
+    <insert tableName="solicitud_proyecto">
+      <column name="id" value="4" />
       <column name="titulo" value="Proyecto Solicitud 2 conv CGF/OPE-01" />
       <column name="acronimo" value="PS2OPE1" />
       <column name="duracion" value="24" />
       <column name="colaborativo" value="false" />
       <column name="coordinador_externo" value="false" />
-      <column name="uni_subcontratada" value="false" />
       <column name="objetivos" value="null" />
       <column name="intereses" value="null" />
       <column name="resultados_previstos" value="null" />
@@ -2813,15 +2894,13 @@ industries" />
       <column name="envio_etica" value="null" />
       <column name="presupuesto_por_entidades" value="false" />
     </insert>
-    <insert tableName="solicitud_proyecto_datos">
-      <column name="id" valueSequenceNext="solicitud_proyecto_datos_seq" />
-      <column name="solicitud_id" value="6" />
+    <insert tableName="solicitud_proyecto">
+      <column name="id" value="6" />
       <column name="titulo" value="Life solicitud de proyecto" />
       <column name="acronimo" value="PRopuesta life" />
       <column name="duracion" value="48" />
       <column name="colaborativo" value="true" />
       <column name="coordinador_externo" value="false" />
-      <column name="uni_subcontratada" value="false" />
       <column name="objetivos" value="null" />
       <column name="intereses" value="null" />
       <column name="resultados_previstos" value="null" />
@@ -2851,10 +2930,10 @@ industries" />
       <column name="id" valueSequenceNext="proyecto_prorroga_seq" />
       <column name="proyecto_id" value="2" />
       <column name="num_prorroga" value="1" />
-      <column name="fecha_concesion" value="2021-02-02" />
+      <column name="fecha_concesion" value="2021-02-01T23:00:00Z" />
       <column name="tipo" value="TIEMPO" />
       <column name="importe" value="null" />
-      <column name="fecha_fin" value="2023-12-05" />
+      <column name="fecha_fin" value="2023-12-05T22:59:59Z" />
       <column name="observaciones" value="" />
     </insert>
   </changeSet>
@@ -2862,7 +2941,7 @@ industries" />
   <changeSet context="dev" author="master" id="0000000000000-solicitud_proyecto_presupuesto">
     <insert tableName="solicitud_proyecto_presupuesto">
       <column name="id" valueSequenceNext="solicitud_proyecto_presupuesto_seq" />
-      <column name="solicitud_proyecto_datos_id" value="1" />
+      <column name="solicitud_proyecto_id" value="1" />
       <column name="concepto_gasto_id" valueComputed="1" />
       <column name="entidad_ref" value="null" />
       <column name="anualidad" value="2021" />
@@ -2872,7 +2951,7 @@ industries" />
     </insert>
     <insert tableName="solicitud_proyecto_presupuesto">
       <column name="id" valueSequenceNext="solicitud_proyecto_presupuesto_seq" />
-      <column name="solicitud_proyecto_datos_id" value="1" />
+      <column name="solicitud_proyecto_id" value="1" />
       <column name="concepto_gasto_id" valueComputed="1" />
       <column name="entidad_ref" value="null" />
       <column name="anualidad" value="2022" />
@@ -2882,7 +2961,7 @@ industries" />
     </insert>
     <insert tableName="solicitud_proyecto_presupuesto">
       <column name="id" valueSequenceNext="solicitud_proyecto_presupuesto_seq" />
-      <column name="solicitud_proyecto_datos_id" value="3" />
+      <column name="solicitud_proyecto_id" value="3" />
       <column name="concepto_gasto_id" valueComputed="1" />
       <column name="entidad_ref" value="null" />
       <column name="anualidad" value="2020" />
@@ -2892,7 +2971,7 @@ industries" />
     </insert>
     <insert tableName="solicitud_proyecto_presupuesto">
       <column name="id" valueSequenceNext="solicitud_proyecto_presupuesto_seq" />
-      <column name="solicitud_proyecto_datos_id" value="3" />
+      <column name="solicitud_proyecto_id" value="3" />
       <column name="concepto_gasto_id" valueComputed="1" />
       <column name="entidad_ref" value="null" />
       <column name="anualidad" value="2022" />
@@ -2902,7 +2981,7 @@ industries" />
     </insert>
     <insert tableName="solicitud_proyecto_presupuesto">
       <column name="id" valueSequenceNext="solicitud_proyecto_presupuesto_seq" />
-      <column name="solicitud_proyecto_datos_id" value="3" />
+      <column name="solicitud_proyecto_id" value="3" />
       <column name="concepto_gasto_id" valueComputed="3" />
       <column name="entidad_ref" value="null" />
       <column name="anualidad" value="2021" />
@@ -2916,40 +2995,40 @@ industries" />
   <changeSet context="dev" author="master" id="0000000000000-solicitud_proyecto_equipo">
     <insert tableName="solicitud_proyecto_equipo">
       <column name="id" valueSequenceNext="solicitud_proyecto_equipo_seq" />
-      <column name="solicitud_proyecto_datos_id" value="1" />
-      <column name="persona_ref" value="user-001" />
+      <column name="solicitud_proyecto_id" value="1" />
+      <column name="persona_ref" value="1" />
       <column name="rol_proyecto_id" value="1" />
       <column name="mes_inicio" value="1" />
       <column name="mes_fin" value="24" />
     </insert>
     <insert tableName="solicitud_proyecto_equipo">
       <column name="id" valueSequenceNext="solicitud_proyecto_equipo_seq" />
-      <column name="solicitud_proyecto_datos_id" value="2" />
-      <column name="persona_ref" value="user-002" />
+      <column name="solicitud_proyecto_id" value="2" />
+      <column name="persona_ref" value="2" />
       <column name="rol_proyecto_id" value="1" />
       <column name="mes_inicio" value="1" />
       <column name="mes_fin" value="24" />
     </insert>
     <insert tableName="solicitud_proyecto_equipo">
       <column name="id" valueSequenceNext="solicitud_proyecto_equipo_seq" />
-      <column name="solicitud_proyecto_datos_id" value="2" />
-      <column name="persona_ref" value="user-004" />
+      <column name="solicitud_proyecto_id" value="2" />
+      <column name="persona_ref" value="4" />
       <column name="rol_proyecto_id" value="2" />
       <column name="mes_inicio" value="1" />
       <column name="mes_fin" value="24" />
     </insert>
     <insert tableName="solicitud_proyecto_equipo">
       <column name="id" valueSequenceNext="solicitud_proyecto_equipo_seq" />
-      <column name="solicitud_proyecto_datos_id" value="3" />
-      <column name="persona_ref" value="user-001" />
+      <column name="solicitud_proyecto_id" value="3" />
+      <column name="persona_ref" value="1" />
       <column name="rol_proyecto_id" value="1" />
       <column name="mes_inicio" value="1" />
       <column name="mes_fin" value="36" />
     </insert>
     <insert tableName="solicitud_proyecto_equipo">
       <column name="id" valueSequenceNext="solicitud_proyecto_equipo_seq" />
-      <column name="solicitud_proyecto_datos_id" value="3" />
-      <column name="persona_ref" value="user-002" />
+      <column name="solicitud_proyecto_id" value="3" />
+      <column name="persona_ref" value="2" />
       <column name="rol_proyecto_id" value="2" />
       <column name="mes_inicio" value="1" />
       <column name="mes_fin" value="36" />
@@ -2959,9 +3038,9 @@ industries" />
   <changeSet context="dev" author="master" id="0000000000000-solicitud_proyecto_socio">
     <insert tableName="solicitud_proyecto_socio">
       <column name="id" valueSequenceNext="solicitud_proyecto_socio_seq" />
-      <column name="solicitud_proyecto_datos_id" value="2" />
+      <column name="solicitud_proyecto_id" value="2" />
       <column name="rol_socio_id" value="2" />
-      <column name="empresa_ref" value="ent-009" />
+      <column name="empresa_ref" value="9" />
       <column name="mes_inicio" value="1" />
       <column name="mes_fin" value="24" />
       <column name="num_investigadores" value="4" />
@@ -2969,9 +3048,9 @@ industries" />
     </insert>
     <insert tableName="solicitud_proyecto_socio">
       <column name="id" valueSequenceNext="solicitud_proyecto_socio_seq" />
-      <column name="solicitud_proyecto_datos_id" value="3" />
+      <column name="solicitud_proyecto_id" value="3" />
       <column name="rol_socio_id" value="2" />
-      <column name="empresa_ref" value="ent-004" />
+      <column name="empresa_ref" value="4" />
       <column name="mes_inicio" value="1" />
       <column name="mes_fin" value="24" />
       <column name="num_investigadores" value="5" />
@@ -2979,9 +3058,9 @@ industries" />
     </insert>
     <insert tableName="solicitud_proyecto_socio">
       <column name="id" valueSequenceNext="solicitud_proyecto_socio_seq" />
-      <column name="solicitud_proyecto_datos_id" value="3" />
+      <column name="solicitud_proyecto_id" value="3" />
       <column name="rol_socio_id" value="2" />
-      <column name="empresa_ref" value="ent-003" />
+      <column name="empresa_ref" value="3" />
       <column name="mes_inicio" value="1" />
       <column name="mes_fin" value="36" />
       <column name="num_investigadores" value="3" />
@@ -2990,28 +3069,28 @@ industries" />
   </changeSet>
 
 
-  <changeSet context="dev" author="master" id="0000000000000-solicitud_proyecto_equipo_socio">
-    <insert tableName="solicitud_proyecto_equipo_socio">
+  <changeSet context="dev" author="master" id="0000000000000-solicitud_proyecto_socio_equipo">
+    <insert tableName="solicitud_proyecto_socio_equipo">
       <column name="id" valueSequenceNext="solicitud_proyecto_equipo_socio_seq" />
       <column name="solicitud_proyecto_socio_id" value="1" />
-      <column name="persona_ref" value="user-003" />
+      <column name="persona_ref" value="3" />
       <column name="rol_proyecto_id" value="1" />
       <column name="mes_inicio" value="1" />
       <column name="mes_fin" value="24" />
     </insert>
-    <insert tableName="solicitud_proyecto_equipo_socio">
+    <insert tableName="solicitud_proyecto_socio_equipo">
       <column name="id" valueSequenceNext="solicitud_proyecto_equipo_socio_seq" />
       <column name="solicitud_proyecto_socio_id" value="2" />
-      <column name="persona_ref" value="user-003" />
+      <column name="persona_ref" value="3" />
       <column name="rol_proyecto_id" value="1" />
       <column name="mes_inicio" value="1" />
       <column name="mes_fin" value="24" />
     </insert>
   </changeSet>
 
-  <changeSet context="dev" author="master" id="0000000000000-solicitud_proyecto_periodo_justificacion">
-    <insert tableName="solicitud_proyecto_periodo_justificacion">
-      <column name="id" valueSequenceNext="solicitud_proyecto_periodo_justificacion_seq" />
+  <changeSet context="dev" author="master" id="0000000000000-solicitud_proyecto_socio_periodo_justificacion">
+    <insert tableName="solicitud_proyecto_socio_periodo_justificacion">
+      <column name="id" valueSequenceNext="solicitud_proyecto_socio_periodo_justificacion_seq" />
       <column name="solicitud_proyecto_socio_id" value="1" />
       <column name="num_periodo" value="1" />
       <column name="mes_inicial" value="1" />
@@ -3020,8 +3099,8 @@ industries" />
       <column name="fecha_fin" value="null" />
       <column name="observaciones" value="null" />
     </insert>
-    <insert tableName="solicitud_proyecto_periodo_justificacion">
-      <column name="id" valueSequenceNext="solicitud_proyecto_periodo_justificacion_seq" />
+    <insert tableName="solicitud_proyecto_socio_periodo_justificacion">
+      <column name="id" valueSequenceNext="solicitud_proyecto_socio_periodo_justificacion_seq" />
       <column name="solicitud_proyecto_socio_id" value="1" />
       <column name="num_periodo" value="2" />
       <column name="mes_inicial" value="13" />
@@ -3032,23 +3111,23 @@ industries" />
     </insert>
   </changeSet>
 
-  <changeSet context="dev" author="master" id="0000000000000-solicitud_proyecto_periodo_pago">
-    <insert tableName="solicitud_proyecto_periodo_pago">
-      <column name="id" valueSequenceNext="solicitud_proyecto_periodo_pago_seq" />
+  <changeSet context="dev" author="master" id="0000000000000-solicitud_proyecto_socio_periodo_pago">
+    <insert tableName="solicitud_proyecto_socio_periodo_pago">
+      <column name="id" valueSequenceNext="solicitud_proyecto_socio_periodo_pago_seq" />
       <column name="solicitud_proyecto_socio_id" value="1" />
       <column name="num_periodo" value="1" />
       <column name="importe" value="120000.00" />
       <column name="mes" value="12" />
     </insert>
-    <insert tableName="solicitud_proyecto_periodo_pago">
-      <column name="id" valueSequenceNext="solicitud_proyecto_periodo_pago_seq" />
+    <insert tableName="solicitud_proyecto_socio_periodo_pago">
+      <column name="id" valueSequenceNext="solicitud_proyecto_socio_periodo_pago_seq" />
       <column name="solicitud_proyecto_socio_id" value="2" />
       <column name="num_periodo" value="1" />
       <column name="importe" value="25000.00" />
       <column name="mes" value="12" />
     </insert>
-    <insert tableName="solicitud_proyecto_periodo_pago">
-      <column name="id" valueSequenceNext="solicitud_proyecto_periodo_pago_seq" />
+    <insert tableName="solicitud_proyecto_socio_periodo_pago">
+      <column name="id" valueSequenceNext="solicitud_proyecto_socio_periodo_pago_seq" />
       <column name="solicitud_proyecto_socio_id" value="2" />
       <column name="num_periodo" value="2" />
       <column name="importe" value="12000.00" />
@@ -3061,7 +3140,7 @@ industries" />
       <column name="id" valueSequenceNext="proyecto_hito_seq" />
       <column name="proyecto_id" value="2" />
       <column name="tipo_hito_id" value="3" />
-      <column name="fecha" value="2021-02-11" />
+      <column name="fecha" value="2021-02-11T00:00:00Z" />
       <column name="comentario" value="null" />
       <column name="genera_aviso" value="true" />
     </insert>
@@ -3072,8 +3151,8 @@ industries" />
       <column name="id" valueSequenceNext="proyecto_paquete_trabajo_seq" />
       <column name="proyecto_id" value="2" />
       <column name="nombre" value="WP1" />
-      <column name="fecha_inicio" value="2021-02-02" />
-      <column name="fecha_fin" value="2021-05-28" />
+      <column name="fecha_inicio" value="2021-02-01T23:00:00Z" />
+      <column name="fecha_fin" value="2021-05-28T21:59:59Z" />
       <column name="persona_mes" value="1.4" />
       <column name="descripcion" value="null" />
     </insert>
@@ -3095,12 +3174,12 @@ industries" />
     <insert tableName="proyecto_entidad_gestora">
       <column name="id" valueSequenceNext="proyecto_entidad_gestora_seq" />
       <column name="proyecto_id" value="1" />
-      <column name="entidad_ref" value="ent-005" />
+      <column name="entidad_ref" value="5" />
     </insert>
     <insert tableName="proyecto_entidad_gestora">
       <column name="id" valueSequenceNext="proyecto_entidad_gestora_seq" />
       <column name="proyecto_id" value="2" />
-      <column name="entidad_ref" value="ent-003" />
+      <column name="entidad_ref" value="3" />
     </insert>
   </changeSet>
 
@@ -3108,21 +3187,21 @@ industries" />
     <insert tableName="proyecto_entidad_convocante">
       <column name="id" valueSequenceNext="proyecto_entidad_convocante_seq" />
       <column name="proyecto_id" value="1" />
-      <column name="entidad_ref" value="ent-005" />
+      <column name="entidad_ref" value="5" />
       <column name="programa_convocatoria_id" value="34" />
       <column name="programa_id" value="null" />
     </insert>
     <insert tableName="proyecto_entidad_convocante">
       <column name="id" valueSequenceNext="proyecto_entidad_convocante_seq" />
       <column name="proyecto_id" value="2" />
-      <column name="entidad_ref" value="ent-005" />
+      <column name="entidad_ref" value="5" />
       <column name="programa_convocatoria_id" value="27" />
       <column name="programa_id" value="null" />
     </insert>
     <insert tableName="proyecto_entidad_convocante">
       <column name="id" valueSequenceNext="proyecto_entidad_convocante_seq" />
       <column name="proyecto_id" value="3" />
-      <column name="entidad_ref" value="ent-005" />
+      <column name="entidad_ref" value="5" />
       <column name="programa_convocatoria_id" value="51" />
       <column name="programa_id" value="null" />
     </insert>

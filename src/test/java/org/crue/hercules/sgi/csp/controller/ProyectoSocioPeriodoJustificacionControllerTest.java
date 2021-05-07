@@ -1,7 +1,6 @@
 package org.crue.hercules.sgi.csp.controller;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,10 +8,9 @@ import com.fasterxml.jackson.core.type.TypeReference;
 
 import org.assertj.core.api.Assertions;
 import org.crue.hercules.sgi.csp.exceptions.ProyectoSocioPeriodoJustificacionNotFoundException;
-import org.crue.hercules.sgi.csp.model.ProyectoSocio;
 import org.crue.hercules.sgi.csp.model.ProyectoSocioPeriodoJustificacion;
 import org.crue.hercules.sgi.csp.service.ProyectoSocioPeriodoJustificacionService;
-import org.crue.hercules.sgi.csp.service.SocioPeriodoJustificacionDocumentoService;
+import org.crue.hercules.sgi.csp.service.ProyectoSocioPeriodoJustificacionDocumentoService;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
@@ -42,7 +40,7 @@ public class ProyectoSocioPeriodoJustificacionControllerTest extends BaseControl
   private ProyectoSocioPeriodoJustificacionService service;
 
   @MockBean
-  private SocioPeriodoJustificacionDocumentoService socioPeriodoJustificacionDocumentoService;
+  private ProyectoSocioPeriodoJustificacionDocumentoService proyectoSocioPeriodoJustificacionDocumentoService;
 
   private static final String PATH_PARAMETER_ID = "/{id}";
   private static final String CONTROLLER_BASE_PATH = "/proyectosocioperiodojustificaciones";
@@ -73,8 +71,8 @@ public class ProyectoSocioPeriodoJustificacionControllerTest extends BaseControl
         // then: new ProyectoSocioPeriodoJustificacion is created
         .andExpect(MockMvcResultMatchers.status().isCreated())
         .andExpect(MockMvcResultMatchers.jsonPath("id").isNotEmpty())
-        .andExpect(MockMvcResultMatchers.jsonPath("proyectoSocio.id")
-            .value(proyectoSocioPeriodoJustificacion.getProyectoSocio().getId()))
+        .andExpect(MockMvcResultMatchers.jsonPath("proyectoSocioId")
+            .value(proyectoSocioPeriodoJustificacion.getProyectoSocioId()))
         .andExpect(MockMvcResultMatchers.jsonPath("fechaInicio")
             .value(proyectoSocioPeriodoJustificacion.getFechaInicio().toString()))
         .andExpect(MockMvcResultMatchers.jsonPath("fechaFin")
@@ -111,7 +109,7 @@ public class ProyectoSocioPeriodoJustificacionControllerTest extends BaseControl
     ProyectoSocioPeriodoJustificacion updatedProyectoSocioPeriodoJustificacion = generarMockProyectoSocioPeriodoJustificacion(
         4L);
 
-    updatedProyectoSocioPeriodoJustificacion.setFechaRecepcion(LocalDate.now());
+    updatedProyectoSocioPeriodoJustificacion.setFechaRecepcion(Instant.now());
 
     mockMvc
         .perform(MockMvcRequestBuilders
@@ -164,12 +162,12 @@ public class ProyectoSocioPeriodoJustificacionControllerTest extends BaseControl
         // and the requested ProyectoSocioPeriodoJustificacion is resturned as JSON
         // object
         .andExpect(MockMvcResultMatchers.jsonPath("id").value(1L))
-        .andExpect(MockMvcResultMatchers.jsonPath("proyectoSocio.id").value(1L))
+        .andExpect(MockMvcResultMatchers.jsonPath("proyectoSocioId").value(1L))
         .andExpect(MockMvcResultMatchers.jsonPath("numPeriodo").value(1))
-        .andExpect(MockMvcResultMatchers.jsonPath("fechaInicio").value("2020-10-10"))
-        .andExpect(MockMvcResultMatchers.jsonPath("fechaFin").value("2021-10-10"))
-        .andExpect(MockMvcResultMatchers.jsonPath("fechaInicioPresentacion").value("2020-10-10T00:00:00"))
-        .andExpect(MockMvcResultMatchers.jsonPath("fechaFinPresentacion").value("2020-11-20T00:00:00"))
+        .andExpect(MockMvcResultMatchers.jsonPath("fechaInicio").value("2020-10-10T00:00:00Z"))
+        .andExpect(MockMvcResultMatchers.jsonPath("fechaFin").value("2021-10-10T23:59:59Z"))
+        .andExpect(MockMvcResultMatchers.jsonPath("fechaInicioPresentacion").value("2020-10-10T00:00:00Z"))
+        .andExpect(MockMvcResultMatchers.jsonPath("fechaFinPresentacion").value("2020-11-20T23:59:59Z"))
         .andExpect(MockMvcResultMatchers.jsonPath("observaciones").value("observaciones-1"));
   }
 
@@ -198,8 +196,8 @@ public class ProyectoSocioPeriodoJustificacionControllerTest extends BaseControl
 
   @Test
   @WithMockUser(username = "user", authorities = { "CSP-CENTGES-V" })
-  public void findAllSocioPeriodoJustificacionDocumento_ReturnsPage() throws Exception {
-    // given: Una lista con 37 SocioPeriodoJustificacionDocumento para la
+  public void findAllProyectoSocioPeriodoJustificacionDocumento_ReturnsPage() throws Exception {
+    // given: Una lista con 37 ProyectoSocioPeriodoJustificacionDocumento para la
     // ProyectoSocioPeriodoJustificacion
     Long proyectoSocioId = 1L;
 
@@ -212,7 +210,7 @@ public class ProyectoSocioPeriodoJustificacionControllerTest extends BaseControl
     Integer pageSize = 10;
 
     BDDMockito
-        .given(socioPeriodoJustificacionDocumentoService.findAllByProyectoSocioPeriodoJustificacion(
+        .given(proyectoSocioPeriodoJustificacionDocumentoService.findAllByProyectoSocioPeriodoJustificacion(
             ArgumentMatchers.<Long>any(), ArgumentMatchers.<String>any(), ArgumentMatchers.<Pageable>any()))
         .willAnswer((InvocationOnMock invocation) -> {
           Pageable pageable = invocation.getArgument(2, Pageable.class);
@@ -232,7 +230,8 @@ public class ProyectoSocioPeriodoJustificacionControllerTest extends BaseControl
     // when: Get page=3 with pagesize=10
     MvcResult requestResult = mockMvc
         .perform(MockMvcRequestBuilders
-            .get(CONTROLLER_BASE_PATH + PATH_PARAMETER_ID + "/socioperiodojustificaciondocumentos", proyectoSocioId)
+            .get(CONTROLLER_BASE_PATH + PATH_PARAMETER_ID + "/proyectosocioperiodojustificaciondocumentos",
+                proyectoSocioId)
             .with(SecurityMockMvcRequestPostProcessors.csrf()).header("X-Page", page).header("X-Page-Size", pageSize)
             .accept(MediaType.APPLICATION_JSON))
         .andDo(MockMvcResultHandlers.print())
@@ -269,7 +268,7 @@ public class ProyectoSocioPeriodoJustificacionControllerTest extends BaseControl
     Integer pageSize = 10;
 
     BDDMockito
-        .given(socioPeriodoJustificacionDocumentoService.findAllByProyectoSocioPeriodoJustificacion(
+        .given(proyectoSocioPeriodoJustificacionDocumentoService.findAllByProyectoSocioPeriodoJustificacion(
             ArgumentMatchers.<Long>any(), ArgumentMatchers.<String>any(), ArgumentMatchers.<Pageable>any()))
         .willAnswer((InvocationOnMock invocation) -> {
           Pageable pageable = invocation.getArgument(2, Pageable.class);
@@ -281,7 +280,8 @@ public class ProyectoSocioPeriodoJustificacionControllerTest extends BaseControl
     // when: Get page=0 with pagesize=10
     mockMvc
         .perform(MockMvcRequestBuilders
-            .get(CONTROLLER_BASE_PATH + PATH_PARAMETER_ID + "/socioperiodojustificaciondocumentos", proyectoSocioId)
+            .get(CONTROLLER_BASE_PATH + PATH_PARAMETER_ID + "/proyectosocioperiodojustificaciondocumentos",
+                proyectoSocioId)
             .with(SecurityMockMvcRequestPostProcessors.csrf()).header("X-Page", page).header("X-Page-Size", pageSize)
             .accept(MediaType.APPLICATION_JSON))
         .andDo(MockMvcResultHandlers.print())
@@ -297,17 +297,14 @@ public class ProyectoSocioPeriodoJustificacionControllerTest extends BaseControl
    * @return el objeto ProyectoSocioPeriodoJustificacion
    */
   private ProyectoSocioPeriodoJustificacion generarMockProyectoSocioPeriodoJustificacion(Long id) {
-    ProyectoSocio proyectoSocio = new ProyectoSocio();
-    proyectoSocio.setId(id == null ? 1 : id);
-
     ProyectoSocioPeriodoJustificacion proyectoSocioPeriodoJustificacion = new ProyectoSocioPeriodoJustificacion();
     proyectoSocioPeriodoJustificacion.setId(id);
-    proyectoSocioPeriodoJustificacion.setProyectoSocio(proyectoSocio);
+    proyectoSocioPeriodoJustificacion.setProyectoSocioId(id == null ? 1 : id);
     proyectoSocioPeriodoJustificacion.setNumPeriodo(1);
-    proyectoSocioPeriodoJustificacion.setFechaInicio(LocalDate.of(2020, 10, 10));
-    proyectoSocioPeriodoJustificacion.setFechaFin(LocalDate.of(2021, 10, 10));
-    proyectoSocioPeriodoJustificacion.setFechaInicioPresentacion(LocalDateTime.of(2020, 10, 10, 0, 0));
-    proyectoSocioPeriodoJustificacion.setFechaFinPresentacion(LocalDateTime.of(2020, 11, 20, 0, 0));
+    proyectoSocioPeriodoJustificacion.setFechaInicio(Instant.parse("2020-10-10T00:00:00Z"));
+    proyectoSocioPeriodoJustificacion.setFechaFin(Instant.parse("2021-10-10T23:59:59Z"));
+    proyectoSocioPeriodoJustificacion.setFechaInicioPresentacion(Instant.parse("2020-10-10T00:00:00Z"));
+    proyectoSocioPeriodoJustificacion.setFechaFinPresentacion(Instant.parse("2020-11-20T23:59:59Z"));
     proyectoSocioPeriodoJustificacion.setObservaciones("observaciones-" + id);
 
     return proyectoSocioPeriodoJustificacion;

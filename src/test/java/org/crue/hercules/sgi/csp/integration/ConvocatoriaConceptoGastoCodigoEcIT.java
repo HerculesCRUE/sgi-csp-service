@@ -1,12 +1,10 @@
 package org.crue.hercules.sgi.csp.integration;
 
-import java.time.LocalDate;
+import java.time.Instant;
+import java.time.Period;
 import java.util.Collections;
 
 import org.assertj.core.api.Assertions;
-import org.crue.hercules.sgi.csp.model.ConceptoGasto;
-import org.crue.hercules.sgi.csp.model.Convocatoria;
-import org.crue.hercules.sgi.csp.model.ConvocatoriaConceptoGasto;
 import org.crue.hercules.sgi.csp.model.ConvocatoriaConceptoGastoCodigoEc;
 import org.crue.hercules.sgi.framework.test.security.Oauth2WireMockInitializer;
 import org.crue.hercules.sgi.framework.test.security.Oauth2WireMockInitializer.TokenBuilder;
@@ -58,7 +56,7 @@ public class ConvocatoriaConceptoGastoCodigoEcIT {
   public void create_ReturnsConvocatoriaConceptoGastoCodigoEc() throws Exception {
     // given: new ConvocatoriaConceptoGastoCodigoEc
     ConvocatoriaConceptoGastoCodigoEc newConvocatoriaConceptoGastoCodigoEc = generarMockConvocatoriaConceptoGastoCodigoEc(
-        null, true);
+        null);
     // when: create ConvocatoriaConceptoGastoCodigoEc
     final ResponseEntity<ConvocatoriaConceptoGastoCodigoEc> response = restTemplate.exchange(CONTROLLER_BASE_PATH,
         HttpMethod.POST, buildRequest(null, newConvocatoriaConceptoGastoCodigoEc),
@@ -68,9 +66,8 @@ public class ConvocatoriaConceptoGastoCodigoEcIT {
     Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
     ConvocatoriaConceptoGastoCodigoEc responseData = response.getBody();
     Assertions.assertThat(responseData.getId()).as("getId()").isNotNull();
-    Assertions.assertThat(responseData.getConvocatoriaConceptoGasto().getId())
-        .as("getConvocatoriaConceptoGasto().getId()")
-        .isEqualTo(newConvocatoriaConceptoGastoCodigoEc.getConvocatoriaConceptoGasto().getId());
+    Assertions.assertThat(responseData.getConvocatoriaConceptoGastoId()).as("getConvocatoriaConceptoGastoId()")
+        .isEqualTo(newConvocatoriaConceptoGastoCodigoEc.getConvocatoriaConceptoGastoId());
 
   }
 
@@ -80,7 +77,7 @@ public class ConvocatoriaConceptoGastoCodigoEcIT {
   public void update_ReturnsConvocatoriaConceptoGastoCodigoEc() throws Exception {
     Long idConvocatoriaConceptoGastoCodigoEc = 1L;
     ConvocatoriaConceptoGastoCodigoEc convocatoriaConceptoGasto = generarMockConvocatoriaConceptoGastoCodigoEc(
-        idConvocatoriaConceptoGastoCodigoEc, true);
+        idConvocatoriaConceptoGastoCodigoEc);
 
     final ResponseEntity<ConvocatoriaConceptoGastoCodigoEc> response = restTemplate.exchange(
         CONTROLLER_BASE_PATH + PATH_PARAMETER_ID, HttpMethod.PUT, buildRequest(null, convocatoriaConceptoGasto),
@@ -91,9 +88,8 @@ public class ConvocatoriaConceptoGastoCodigoEcIT {
     ConvocatoriaConceptoGastoCodigoEc convocatoriaConceptoGastoActualizado = response.getBody();
     Assertions.assertThat(convocatoriaConceptoGastoActualizado.getId()).as("getId()").isNotNull();
 
-    Assertions.assertThat(convocatoriaConceptoGastoActualizado.getConvocatoriaConceptoGasto().getId())
-        .as("getConvocatoriaConceptoGasto().getId()")
-        .isEqualTo(convocatoriaConceptoGasto.getConvocatoriaConceptoGasto().getId());
+    Assertions.assertThat(convocatoriaConceptoGastoActualizado.getConvocatoriaConceptoGastoId())
+        .as("getConvocatoriaConceptoGastoId()").isEqualTo(convocatoriaConceptoGasto.getConvocatoriaConceptoGastoId());
 
   }
 
@@ -124,8 +120,8 @@ public class ConvocatoriaConceptoGastoCodigoEcIT {
 
     ConvocatoriaConceptoGastoCodigoEc convocatoriaConceptoGasto = response.getBody();
     Assertions.assertThat(convocatoriaConceptoGasto.getId()).as("getId()").isNotNull();
-    Assertions.assertThat(convocatoriaConceptoGasto.getConvocatoriaConceptoGasto().getId())
-        .as("getConvocatoria().getId()").isEqualTo(1L);
+    Assertions.assertThat(convocatoriaConceptoGasto.getConvocatoriaConceptoGastoId())
+        .as("getConvocatoriaConceptoGastoId()").isEqualTo(1L);
   }
 
   /**
@@ -135,29 +131,13 @@ public class ConvocatoriaConceptoGastoCodigoEcIT {
    * @param permitido boolean permitido
    * @return el objeto ConvocatoriaConceptoGastoCodigoEc
    */
-  private ConvocatoriaConceptoGastoCodigoEc generarMockConvocatoriaConceptoGastoCodigoEc(Long id, Boolean permitido) {
-
-    Convocatoria convocatoria = new Convocatoria();
-    convocatoria.setId(id == null ? 1 : id);
-
-    ConceptoGasto conceptoGasto = new ConceptoGasto();
-    conceptoGasto.setId(id == null ? 1 : id);
-    conceptoGasto.setActivo(true);
-    conceptoGasto.setDescripcion("descripcion-00" + (id == null ? 1 : id));
-    conceptoGasto.setNombre("nombre-00" + (id == null ? 1 : id));
-
-    ConvocatoriaConceptoGasto convocatoriaConceptoGasto = new ConvocatoriaConceptoGasto();
-    convocatoriaConceptoGasto.setId((id == null ? 1 : id));
-    convocatoriaConceptoGasto.setConvocatoria(convocatoria);
-    convocatoriaConceptoGasto.setConceptoGasto(conceptoGasto);
-    convocatoriaConceptoGasto.setPermitido(permitido);
-
+  private ConvocatoriaConceptoGastoCodigoEc generarMockConvocatoriaConceptoGastoCodigoEc(Long id) {
     ConvocatoriaConceptoGastoCodigoEc convocatoriaConceptoGastoCodigoEc = new ConvocatoriaConceptoGastoCodigoEc();
     convocatoriaConceptoGastoCodigoEc.setId(id);
-    convocatoriaConceptoGastoCodigoEc.setConvocatoriaConceptoGasto(convocatoriaConceptoGasto);
+    convocatoriaConceptoGastoCodigoEc.setConvocatoriaConceptoGastoId(id == null ? 1 : id);
     convocatoriaConceptoGastoCodigoEc.setCodigoEconomicoRef("cod-" + (id == null ? 1 : id));
-    convocatoriaConceptoGastoCodigoEc.setFechaInicio(LocalDate.now().minusDays(1));
-    convocatoriaConceptoGastoCodigoEc.setFechaFin(LocalDate.now());
+    convocatoriaConceptoGastoCodigoEc.setFechaInicio(Instant.now().minus(Period.ofDays(1)));
+    convocatoriaConceptoGastoCodigoEc.setFechaFin(Instant.now());
 
     return convocatoriaConceptoGastoCodigoEc;
   }

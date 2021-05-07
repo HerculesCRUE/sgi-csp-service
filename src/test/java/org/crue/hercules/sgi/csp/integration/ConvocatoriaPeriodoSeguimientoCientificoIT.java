@@ -1,13 +1,12 @@
 package org.crue.hercules.sgi.csp.integration;
 
 import java.net.URI;
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import org.assertj.core.api.Assertions;
-import org.crue.hercules.sgi.csp.model.Convocatoria;
 import org.crue.hercules.sgi.csp.model.ConvocatoriaPeriodoSeguimientoCientifico;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -88,7 +87,7 @@ public class ConvocatoriaPeriodoSeguimientoCientificoIT extends BaseIT {
     List<ConvocatoriaPeriodoSeguimientoCientifico> responseData = response.getBody();
     Assertions.assertThat(responseData.get(0).getId()).as("get(0).getId()")
         .isEqualTo(updatedConvocatoriaPeriodoSeguimientoCientifico.getId());
-    Assertions.assertThat(responseData.get(0).getConvocatoria().getId()).as("get(0).getConvocatoria().getId()")
+    Assertions.assertThat(responseData.get(0).getConvocatoriaId()).as("get(0).getConvocatoriaId()")
         .isEqualTo(convocatoriaId);
     Assertions.assertThat(responseData.get(0).getMesInicial()).as("get(0).getMesInicial()")
         .isEqualTo(updatedConvocatoriaPeriodoSeguimientoCientifico.getMesInicial());
@@ -102,7 +101,7 @@ public class ConvocatoriaPeriodoSeguimientoCientificoIT extends BaseIT {
     Assertions.assertThat(responseData.get(0).getObservaciones()).as("get(0).getObservaciones()")
         .isEqualTo(updatedConvocatoriaPeriodoSeguimientoCientifico.getObservaciones());
 
-    Assertions.assertThat(responseData.get(1).getConvocatoria().getId()).as("get(1).getConvocatoria().getId()")
+    Assertions.assertThat(responseData.get(1).getConvocatoriaId()).as("get(1).getConvocatoriaId()")
         .isEqualTo(convocatoriaId);
     Assertions.assertThat(responseData.get(1).getMesInicial()).as("get(1).getMesInicial()")
         .isEqualTo(newConvocatoriaPeriodoSeguimientoCientifico.getMesInicial());
@@ -156,14 +155,14 @@ public class ConvocatoriaPeriodoSeguimientoCientificoIT extends BaseIT {
     Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     ConvocatoriaPeriodoSeguimientoCientifico responseData = response.getBody();
     Assertions.assertThat(responseData.getId()).as("getId()").isEqualTo(1);
-    Assertions.assertThat(responseData.getConvocatoria().getId()).as("getConvocatoria().getId()").isEqualTo(1);
+    Assertions.assertThat(responseData.getConvocatoriaId()).as("getConvocatoriaId()").isEqualTo(1);
     Assertions.assertThat(responseData.getNumPeriodo()).as("getNumPeriodo()").isEqualTo(1);
     Assertions.assertThat(responseData.getMesInicial()).as("getMesInicial()").isEqualTo(1);
     Assertions.assertThat(responseData.getMesFinal()).as("getMesFinal()").isEqualTo(2);
     Assertions.assertThat(responseData.getFechaInicioPresentacion()).as("getFechaInicioPresentacion()")
-        .isEqualTo("2020-01-01");
+        .isEqualTo(Instant.parse("2020-01-01T00:00:00Z"));
     Assertions.assertThat(responseData.getFechaFinPresentacion()).as("getFechaFinPresentacion()")
-        .isEqualTo("2020-02-01");
+        .isEqualTo(Instant.parse("2020-02-01T23:59:59Z"));
     Assertions.assertThat(responseData.getObservaciones()).as("getObservaciones()")
         .isEqualTo("observaciones-meses-01-02");
   }
@@ -180,17 +179,14 @@ public class ConvocatoriaPeriodoSeguimientoCientificoIT extends BaseIT {
    */
   private ConvocatoriaPeriodoSeguimientoCientifico generarMockConvocatoriaPeriodoSeguimientoCientifico(Long id,
       Integer mesInicial, Integer mesFinal, Long convocatoriaId) {
-    Convocatoria convocatoria = new Convocatoria();
-    convocatoria.setId(convocatoriaId == null ? 1 : convocatoriaId);
-
     ConvocatoriaPeriodoSeguimientoCientifico convocatoriaPeriodoSeguimientoCientifico = new ConvocatoriaPeriodoSeguimientoCientifico();
     convocatoriaPeriodoSeguimientoCientifico.setId(id);
-    convocatoriaPeriodoSeguimientoCientifico.setConvocatoria(convocatoria);
+    convocatoriaPeriodoSeguimientoCientifico.setConvocatoriaId(convocatoriaId == null ? 1 : convocatoriaId);
     convocatoriaPeriodoSeguimientoCientifico.setNumPeriodo(1);
     convocatoriaPeriodoSeguimientoCientifico.setMesInicial(mesInicial);
     convocatoriaPeriodoSeguimientoCientifico.setMesFinal(mesFinal);
-    convocatoriaPeriodoSeguimientoCientifico.setFechaInicioPresentacion(LocalDate.of(2020, 10, 10));
-    convocatoriaPeriodoSeguimientoCientifico.setFechaFinPresentacion(LocalDate.of(2020, 11, 20));
+    convocatoriaPeriodoSeguimientoCientifico.setFechaInicioPresentacion(Instant.parse("2020-10-10T00:00:00Z"));
+    convocatoriaPeriodoSeguimientoCientifico.setFechaFinPresentacion(Instant.parse("2020-11-20T23:59:59Z"));
     convocatoriaPeriodoSeguimientoCientifico.setObservaciones("observaciones-" + id);
 
     return convocatoriaPeriodoSeguimientoCientifico;

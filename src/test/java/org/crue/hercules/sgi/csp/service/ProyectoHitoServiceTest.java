@@ -1,7 +1,7 @@
 package org.crue.hercules.sgi.csp.service;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -58,12 +58,14 @@ public class ProyectoHitoServiceTest extends BaseServiceTest {
   @Test
   public void create_ReturnsProyectoHito() {
     // given: Un nuevo ProyectoHito
+    Long proyectoId = 1L;
+    Proyecto proyecto = generarMockProyecto(proyectoId);
     ProyectoHito proyectoHito = generarMockProyectoHito(1L);
     proyectoHito.setId(null);
 
     BDDMockito.given(proyectoRepository.existsById(ArgumentMatchers.<Long>any())).willReturn(Boolean.TRUE);
     BDDMockito.given(proyectoRepository.getModeloEjecucion(ArgumentMatchers.<Long>any()))
-        .willReturn(Optional.of(proyectoHito.getProyecto().getModeloEjecucion()));
+        .willReturn(Optional.of(proyecto.getModeloEjecucion()));
     BDDMockito
         .given(modeloTipoHitoRepository.findByModeloEjecucionIdAndTipoHitoId(ArgumentMatchers.<Long>any(),
             ArgumentMatchers.<Long>any()))
@@ -81,8 +83,8 @@ public class ProyectoHitoServiceTest extends BaseServiceTest {
     // then: El ProyectoHito se crea correctamente
     Assertions.assertThat(proyectoHitoCreado).as("isNotNull()").isNotNull();
     Assertions.assertThat(proyectoHitoCreado.getId()).as("getId()").isNotNull();
-    Assertions.assertThat(proyectoHitoCreado.getProyecto().getId()).as("getProyecto().getId()")
-        .isEqualTo(proyectoHito.getProyecto().getId());
+    Assertions.assertThat(proyectoHitoCreado.getProyectoId()).as("getProyectoId()")
+        .isEqualTo(proyectoHito.getProyectoId());
     Assertions.assertThat(proyectoHitoCreado.getFecha()).as("getFecha()").isEqualTo(proyectoHito.getFecha());
     Assertions.assertThat(proyectoHitoCreado.getComentario()).as("getComentario()")
         .isEqualTo(proyectoHito.getComentario());
@@ -95,14 +97,16 @@ public class ProyectoHitoServiceTest extends BaseServiceTest {
   @Test
   public void create_WithFechaAnterior_SaveGeneraAvisoFalse() {
     // given: Un nuevo ProyectoHito con fecha pasada
+    Long proyectoId = 1L;
+    Proyecto proyecto = generarMockProyecto(proyectoId);
     ProyectoHito proyectoHito = generarMockProyectoHito(1L);
     proyectoHito.setId(null);
     proyectoHito.setGeneraAviso(Boolean.TRUE);
-    proyectoHito.setFecha(LocalDate.now().minusDays(2));
+    proyectoHito.setFecha(Instant.now().minus(Period.ofDays(2)));
 
     BDDMockito.given(proyectoRepository.existsById(ArgumentMatchers.<Long>any())).willReturn(Boolean.TRUE);
     BDDMockito.given(proyectoRepository.getModeloEjecucion(ArgumentMatchers.<Long>any()))
-        .willReturn(Optional.of(proyectoHito.getProyecto().getModeloEjecucion()));
+        .willReturn(Optional.of(proyecto.getModeloEjecucion()));
     BDDMockito
         .given(modeloTipoHitoRepository.findByModeloEjecucionIdAndTipoHitoId(ArgumentMatchers.<Long>any(),
             ArgumentMatchers.<Long>any()))
@@ -120,8 +124,8 @@ public class ProyectoHitoServiceTest extends BaseServiceTest {
     // then: El ProyectoHito se crea correctamente con GenerarAviso como FALSE
     Assertions.assertThat(proyectoHitoCreado).as("isNotNull()").isNotNull();
     Assertions.assertThat(proyectoHitoCreado.getId()).as("getId()").isNotNull();
-    Assertions.assertThat(proyectoHitoCreado.getProyecto().getId()).as("getProyecto().getId()")
-        .isEqualTo(proyectoHito.getProyecto().getId());
+    Assertions.assertThat(proyectoHitoCreado.getProyectoId()).as("getProyectoId()")
+        .isEqualTo(proyectoHito.getProyectoId());
     Assertions.assertThat(proyectoHitoCreado.getFecha()).as("getFecha()").isEqualTo(proyectoHito.getFecha());
     Assertions.assertThat(proyectoHitoCreado.getComentario()).as("getComentario()")
         .isEqualTo(proyectoHito.getComentario());
@@ -147,7 +151,7 @@ public class ProyectoHitoServiceTest extends BaseServiceTest {
     // given: a ProyectoHito without ProyectoId
     ProyectoHito proyectoHito = generarMockProyectoHito(1L);
     proyectoHito.setId(null);
-    proyectoHito.setProyecto(null);
+    proyectoHito.setProyectoId(null);
 
     Assertions.assertThatThrownBy(
         // when: create ProyectoHito
@@ -205,9 +209,11 @@ public class ProyectoHitoServiceTest extends BaseServiceTest {
   @Test
   public void create_WithoutModeloEjecucion_ThrowsIllegalArgumentException() {
     // given: ProyectoHito con Proyecto sin Modelo de Ejecucion
+    Long proyectoId = 1L;
+    Proyecto proyecto = generarMockProyecto(proyectoId);
     ProyectoHito proyectoHito = generarMockProyectoHito(1L);
     proyectoHito.setId(null);
-    proyectoHito.getProyecto().setModeloEjecucion(null);
+    proyecto.setModeloEjecucion(null);
 
     BDDMockito.given(proyectoRepository.existsById(ArgumentMatchers.<Long>any())).willReturn(Boolean.TRUE);
 
@@ -243,12 +249,14 @@ public class ProyectoHitoServiceTest extends BaseServiceTest {
   public void create_WithDisabledModeloTipoHito_ThrowsIllegalArgumentException() {
     // given: ProyectoHito con la asignación de TipoHito al Modelo de Ejecucion
     // de la proyecto inactiva
+    Long proyectoId = 1L;
+    Proyecto proyecto = generarMockProyecto(proyectoId);
     ProyectoHito proyectoHito = generarMockProyectoHito(1L);
     proyectoHito.setId(null);
 
     BDDMockito.given(proyectoRepository.existsById(ArgumentMatchers.<Long>any())).willReturn(Boolean.TRUE);
     BDDMockito.given(proyectoRepository.getModeloEjecucion(ArgumentMatchers.<Long>any()))
-        .willReturn(Optional.of(proyectoHito.getProyecto().getModeloEjecucion()));
+        .willReturn(Optional.of(proyecto.getModeloEjecucion()));
     BDDMockito
         .given(modeloTipoHitoRepository.findByModeloEjecucionIdAndTipoHitoId(ArgumentMatchers.<Long>any(),
             ArgumentMatchers.<Long>any()))
@@ -260,19 +268,21 @@ public class ProyectoHitoServiceTest extends BaseServiceTest {
         // then: throw exception as ModeloTipoHito is disabled
         .isInstanceOf(IllegalArgumentException.class)
         .hasMessage("ModeloTipoHito '%s' no está activo para el ModeloEjecucion '%s'",
-            proyectoHito.getTipoHito().getNombre(), proyectoHito.getProyecto().getModeloEjecucion().getNombre());
+            proyectoHito.getTipoHito().getNombre(), proyecto.getModeloEjecucion().getNombre());
   }
 
   @Test
   public void create_WithDisabledTipoHito_ThrowsIllegalArgumentException() {
     // given: ProyectoHito TipoHito disabled
+    Long proyectoId = 1L;
+    Proyecto proyecto = generarMockProyecto(proyectoId);
     ProyectoHito proyectoHito = generarMockProyectoHito(1L);
     proyectoHito.setId(null);
     proyectoHito.getTipoHito().setActivo(Boolean.FALSE);
 
     BDDMockito.given(proyectoRepository.existsById(ArgumentMatchers.<Long>any())).willReturn(Boolean.TRUE);
     BDDMockito.given(proyectoRepository.getModeloEjecucion(ArgumentMatchers.<Long>any()))
-        .willReturn(Optional.of(proyectoHito.getProyecto().getModeloEjecucion()));
+        .willReturn(Optional.of(proyecto.getModeloEjecucion()));
     BDDMockito
         .given(modeloTipoHitoRepository.findByModeloEjecucionIdAndTipoHitoId(ArgumentMatchers.<Long>any(),
             ArgumentMatchers.<Long>any()))
@@ -289,20 +299,22 @@ public class ProyectoHitoServiceTest extends BaseServiceTest {
   @Test
   public void create_WithFechaYTipoHitoDuplicado_ThrowsIllegalArgumentException() {
     // given: a ProyectoHito fecha duplicada
+    Long proyectoId = 1L;
+    Proyecto proyecto = generarMockProyecto(proyectoId);
     ProyectoHito proyectoHitoExistente = generarMockProyectoHito(2L);
     ProyectoHito proyectoHito = generarMockProyectoHito(1L);
     proyectoHito.setId(null);
 
     BDDMockito.given(proyectoRepository.existsById(ArgumentMatchers.<Long>any())).willReturn(Boolean.TRUE);
     BDDMockito.given(proyectoRepository.getModeloEjecucion(ArgumentMatchers.<Long>any()))
-        .willReturn(Optional.of(proyectoHito.getProyecto().getModeloEjecucion()));
+        .willReturn(Optional.of(proyecto.getModeloEjecucion()));
     BDDMockito
         .given(modeloTipoHitoRepository.findByModeloEjecucionIdAndTipoHitoId(ArgumentMatchers.<Long>any(),
             ArgumentMatchers.<Long>any()))
         .willReturn(Optional.of(generarMockModeloTipoHito(1L, proyectoHito, Boolean.TRUE)));
     BDDMockito
         .given(repository.findByProyectoIdAndFechaAndTipoHitoId(ArgumentMatchers.<Long>any(),
-            ArgumentMatchers.<LocalDate>any(), ArgumentMatchers.<Long>any()))
+            ArgumentMatchers.<Instant>any(), ArgumentMatchers.<Long>any()))
         .willReturn(Optional.of(proyectoHitoExistente));
 
     Assertions.assertThatThrownBy(
@@ -315,6 +327,8 @@ public class ProyectoHitoServiceTest extends BaseServiceTest {
   @Test
   public void update_ReturnsProyectoHito() {
     // given: Un nuevo ProyectoHito con el tipoHito actualizado
+    Long proyectoId = 1L;
+    Proyecto proyecto = generarMockProyecto(proyectoId);
     ProyectoHito proyectoHito = generarMockProyectoHito(1L);
     ProyectoHito proyectoHitoActualizado = generarMockProyectoHito(1L);
     proyectoHitoActualizado.setTipoHito(generarMockTipoHito(2L, Boolean.TRUE));
@@ -323,7 +337,7 @@ public class ProyectoHitoServiceTest extends BaseServiceTest {
 
     BDDMockito.given(proyectoRepository.existsById(ArgumentMatchers.<Long>any())).willReturn(Boolean.TRUE);
     BDDMockito.given(proyectoRepository.getModeloEjecucion(ArgumentMatchers.<Long>any()))
-        .willReturn(Optional.of(proyectoHito.getProyecto().getModeloEjecucion()));
+        .willReturn(Optional.of(proyecto.getModeloEjecucion()));
     BDDMockito
         .given(modeloTipoHitoRepository.findByModeloEjecucionIdAndTipoHitoId(ArgumentMatchers.<Long>any(),
             ArgumentMatchers.<Long>any()))
@@ -338,8 +352,7 @@ public class ProyectoHitoServiceTest extends BaseServiceTest {
     // then: El ProyectoHito se actualiza correctamente.
     Assertions.assertThat(updated).as("isNotNull()").isNotNull();
     Assertions.assertThat(updated.getId()).as("getId()").isEqualTo(proyectoHito.getId());
-    Assertions.assertThat(updated.getProyecto().getId()).as("getProyecto().getId()")
-        .isEqualTo(proyectoHito.getProyecto().getId());
+    Assertions.assertThat(updated.getProyectoId()).as("getProyectoId()").isEqualTo(proyectoHito.getProyectoId());
     Assertions.assertThat(updated.getComentario()).as("getComentario()")
         .isEqualTo(proyectoHitoActualizado.getComentario());
     Assertions.assertThat(updated.getTipoHito().getId()).as("getTipoHito().getId()")
@@ -352,17 +365,19 @@ public class ProyectoHitoServiceTest extends BaseServiceTest {
   @Test
   public void update_WithFechaAnterior_SaveGeneraAvisoFalse() {
     // given: Un nuevo ProyectoHito con el la fecha anterior
+    Long proyectoId = 1L;
+    Proyecto proyecto = generarMockProyecto(proyectoId);
     ProyectoHito proyectoHito = generarMockProyectoHito(1L);
     ProyectoHito proyectoHitoActualizado = generarMockProyectoHito(1L);
     proyectoHitoActualizado.setTipoHito(generarMockTipoHito(2L, Boolean.TRUE));
-    proyectoHitoActualizado.setFecha(LocalDate.now().minusDays(2));
+    proyectoHitoActualizado.setFecha(Instant.now().minus(Period.ofDays(2)));
     proyectoHitoActualizado.setGeneraAviso(Boolean.TRUE);
 
     BDDMockito.given(repository.findById(ArgumentMatchers.<Long>any())).willReturn(Optional.of(proyectoHito));
 
     BDDMockito.given(proyectoRepository.existsById(ArgumentMatchers.<Long>any())).willReturn(Boolean.TRUE);
     BDDMockito.given(proyectoRepository.getModeloEjecucion(ArgumentMatchers.<Long>any()))
-        .willReturn(Optional.of(proyectoHito.getProyecto().getModeloEjecucion()));
+        .willReturn(Optional.of(proyecto.getModeloEjecucion()));
     BDDMockito
         .given(modeloTipoHitoRepository.findByModeloEjecucionIdAndTipoHitoId(ArgumentMatchers.<Long>any(),
             ArgumentMatchers.<Long>any()))
@@ -377,8 +392,7 @@ public class ProyectoHitoServiceTest extends BaseServiceTest {
     // then: El ProyectoHito se actualiza correctamente.
     Assertions.assertThat(updated).as("isNotNull()").isNotNull();
     Assertions.assertThat(updated.getId()).as("getId()").isEqualTo(proyectoHito.getId());
-    Assertions.assertThat(updated.getProyecto().getId()).as("getProyecto().getId()")
-        .isEqualTo(proyectoHito.getProyecto().getId());
+    Assertions.assertThat(updated.getProyectoId()).as("getProyectoId()").isEqualTo(proyectoHito.getProyectoId());
     Assertions.assertThat(updated.getComentario()).as("getComentario()").isEqualTo(proyectoHito.getComentario());
     Assertions.assertThat(updated.getTipoHito().getId()).as("getTipoHito().getId()")
         .isEqualTo(proyectoHito.getTipoHito().getId());
@@ -403,7 +417,7 @@ public class ProyectoHitoServiceTest extends BaseServiceTest {
     // given: a ProyectoHito without ProyectoId
     ProyectoHito proyectoHito = generarMockProyectoHito(1L);
     proyectoHito.setComentario("comentario modificado");
-    proyectoHito.setProyecto(null);
+    proyectoHito.setProyectoId(null);
 
     Assertions.assertThatThrownBy(
         // when: update ProyectoHito
@@ -463,10 +477,12 @@ public class ProyectoHitoServiceTest extends BaseServiceTest {
   @Test
   public void update_WithoutModeloEjecucion_ThrowsIllegalArgumentException() {
     // given: ProyectoHito con Proyecto sin Modelo de Ejecucion
+    Long proyectoId = 1L;
+    Proyecto proyecto = generarMockProyecto(proyectoId);
     ProyectoHito proyectoHitoOriginal = generarMockProyectoHito(1L);
     ProyectoHito proyectoHito = generarMockProyectoHito(1L);
     proyectoHito.setComentario("comentario modificado");
-    proyectoHito.getProyecto().setModeloEjecucion(null);
+    proyecto.setModeloEjecucion(null);
 
     BDDMockito.given(repository.findById(ArgumentMatchers.<Long>any())).willReturn(Optional.of(proyectoHitoOriginal));
     BDDMockito.given(proyectoRepository.existsById(ArgumentMatchers.<Long>any())).willReturn(Boolean.TRUE);
@@ -505,6 +521,8 @@ public class ProyectoHitoServiceTest extends BaseServiceTest {
   public void update_WithDisabledModeloTipoHito_ThrowsIllegalArgumentException() {
     // given: ProyectoHito con la asignación de TipoHito al Modelo de Ejecucion
     // de la proyecto inactiva
+    Long proyectoId = 1L;
+    Proyecto proyecto = generarMockProyecto(proyectoId);
     ProyectoHito proyectoHitoOriginal = generarMockProyectoHito(1L);
     ProyectoHito proyectoHito = generarMockProyectoHito(1L);
     proyectoHito.setComentario("comentario modificado");
@@ -512,7 +530,7 @@ public class ProyectoHitoServiceTest extends BaseServiceTest {
     BDDMockito.given(repository.findById(ArgumentMatchers.<Long>any())).willReturn(Optional.of(proyectoHitoOriginal));
     BDDMockito.given(proyectoRepository.existsById(ArgumentMatchers.<Long>any())).willReturn(Boolean.TRUE);
     BDDMockito.given(proyectoRepository.getModeloEjecucion(ArgumentMatchers.<Long>any()))
-        .willReturn(Optional.of(proyectoHito.getProyecto().getModeloEjecucion()));
+        .willReturn(Optional.of(proyecto.getModeloEjecucion()));
     BDDMockito
         .given(modeloTipoHitoRepository.findByModeloEjecucionIdAndTipoHitoId(ArgumentMatchers.<Long>any(),
             ArgumentMatchers.<Long>any()))
@@ -524,12 +542,14 @@ public class ProyectoHitoServiceTest extends BaseServiceTest {
         // then: throw exception as ModeloTipoHito is disabled
         .isInstanceOf(IllegalArgumentException.class)
         .hasMessage("ModeloTipoHito '%s' no está activo para el ModeloEjecucion '%s'",
-            proyectoHito.getTipoHito().getNombre(), proyectoHito.getProyecto().getModeloEjecucion().getNombre());
+            proyectoHito.getTipoHito().getNombre(), proyecto.getModeloEjecucion().getNombre());
   }
 
   @Test
   public void update_WithDisabledTipoHito_ThrowsIllegalArgumentException() {
     // given: ProyectoHito TipoHito disabled
+    Long proyectoId = 1L;
+    Proyecto proyecto = generarMockProyecto(proyectoId);
     ProyectoHito proyectoHitoOriginal = generarMockProyectoHito(1L);
     ProyectoHito proyectoHito = generarMockProyectoHito(1L);
     proyectoHito.setComentario("comentario modificado");
@@ -538,7 +558,7 @@ public class ProyectoHitoServiceTest extends BaseServiceTest {
     BDDMockito.given(repository.findById(ArgumentMatchers.<Long>any())).willReturn(Optional.of(proyectoHitoOriginal));
     BDDMockito.given(proyectoRepository.existsById(ArgumentMatchers.<Long>any())).willReturn(Boolean.TRUE);
     BDDMockito.given(proyectoRepository.getModeloEjecucion(ArgumentMatchers.<Long>any()))
-        .willReturn(Optional.of(proyectoHito.getProyecto().getModeloEjecucion()));
+        .willReturn(Optional.of(proyecto.getModeloEjecucion()));
     BDDMockito
         .given(modeloTipoHitoRepository.findByModeloEjecucionIdAndTipoHitoId(ArgumentMatchers.<Long>any(),
             ArgumentMatchers.<Long>any()))
@@ -555,6 +575,8 @@ public class ProyectoHitoServiceTest extends BaseServiceTest {
   @Test
   public void update_WithFechaYTipoHitoDuplicado_ThrowsIllegalArgumentException() {
     // given: Un ProyectoHito a actualizar con fecha duplicada
+    Long proyectoId = 1L;
+    Proyecto proyecto = generarMockProyecto(proyectoId);
     ProyectoHito proyectoHitoExistente = generarMockProyectoHito(2L);
     ProyectoHito proyectoHitoOriginal = generarMockProyectoHito(1L);
     ProyectoHito proyectoHito = generarMockProyectoHito(1L);
@@ -564,7 +586,7 @@ public class ProyectoHitoServiceTest extends BaseServiceTest {
 
     BDDMockito.given(proyectoRepository.existsById(ArgumentMatchers.<Long>any())).willReturn(Boolean.TRUE);
     BDDMockito.given(proyectoRepository.getModeloEjecucion(ArgumentMatchers.<Long>any()))
-        .willReturn(Optional.of(proyectoHito.getProyecto().getModeloEjecucion()));
+        .willReturn(Optional.of(proyecto.getModeloEjecucion()));
     BDDMockito
         .given(modeloTipoHitoRepository.findByModeloEjecucionIdAndTipoHitoId(ArgumentMatchers.<Long>any(),
             ArgumentMatchers.<Long>any()))
@@ -725,8 +747,8 @@ public class ProyectoHitoServiceTest extends BaseServiceTest {
     proyecto.setCodigoExterno("cod-externo-" + (id != null ? String.format("%03d", id) : "001"));
     proyecto.setObservaciones("observaciones-proyecto-" + String.format("%03d", id));
     proyecto.setUnidadGestionRef("OPE");
-    proyecto.setFechaInicio(LocalDate.now());
-    proyecto.setFechaFin(LocalDate.now());
+    proyecto.setFechaInicio(Instant.now());
+    proyecto.setFechaFin(Instant.now());
     proyecto.setModeloEjecucion(modeloEjecucion);
     proyecto.setFinalidad(tipoFinalidad);
     proyecto.setAmbitoGeografico(tipoAmbitoGeografico);
@@ -751,8 +773,8 @@ public class ProyectoHitoServiceTest extends BaseServiceTest {
     estadoProyecto.setId(id);
     estadoProyecto.setComentario("estado-proyecto-" + String.format("%03d", id));
     estadoProyecto.setEstado(EstadoProyecto.Estado.BORRADOR);
-    estadoProyecto.setFechaEstado(LocalDateTime.now());
-    estadoProyecto.setIdProyecto(1L);
+    estadoProyecto.setFechaEstado(Instant.now());
+    estadoProyecto.setProyectoId(1L);
 
     return estadoProyecto;
   }
@@ -785,12 +807,14 @@ public class ProyectoHitoServiceTest extends BaseServiceTest {
    */
   private ModeloTipoHito generarMockModeloTipoHito(Long id, ProyectoHito proyectoHito, Boolean activo) {
 
-    return ModeloTipoHito.builder()//
-        .id(id)//
-        .modeloEjecucion(proyectoHito.getProyecto().getModeloEjecucion())//
-        .tipoHito(proyectoHito.getTipoHito())//
-        .activo(activo)//
+    // @formatter:off
+    return ModeloTipoHito.builder()
+        .id(id)
+        .modeloEjecucion(generarMockProyecto(proyectoHito.getProyectoId()).getModeloEjecucion())
+        .tipoHito(proyectoHito.getTipoHito())
+        .activo(activo)
         .build();
+    // @formatter:on
   }
 
   /**
@@ -801,13 +825,15 @@ public class ProyectoHitoServiceTest extends BaseServiceTest {
    */
   private ProyectoHito generarMockProyectoHito(Long id) {
 
-    return ProyectoHito.builder()//
-        .id(id)//
-        .proyecto(generarMockProyecto(1L))//
-        .fecha(LocalDate.of(2020, 10, 19))//
-        .comentario("comentario-proyecto-hito" + String.format("%03d", id))//
-        .generaAviso(Boolean.TRUE)//
-        .tipoHito(generarMockTipoHito(1L, Boolean.TRUE))//
+    // @formatter:off
+    return ProyectoHito.builder()
+        .id(id)
+        .proyectoId(1L)
+        .fecha(Instant.parse("2020-10-19T00:00:00Z"))
+        .comentario("comentario-proyecto-hito" + String.format("%03d", id))
+        .generaAviso(Boolean.TRUE)
+        .tipoHito(generarMockTipoHito(1L, Boolean.TRUE))
         .build();
+    // @formatter:on
   }
 }

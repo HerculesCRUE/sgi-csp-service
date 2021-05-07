@@ -1,6 +1,7 @@
 package org.crue.hercules.sgi.csp.service;
 
-import java.time.LocalDate;
+import java.time.Instant;
+import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -9,7 +10,6 @@ import org.assertj.core.api.Assertions;
 import org.crue.hercules.sgi.csp.exceptions.ConvocatoriaConceptoGastoCodigoEcNotFoundException;
 import org.crue.hercules.sgi.csp.exceptions.ConvocatoriaConceptoGastoNotFoundException;
 import org.crue.hercules.sgi.csp.model.ConceptoGasto;
-import org.crue.hercules.sgi.csp.model.Convocatoria;
 import org.crue.hercules.sgi.csp.model.ConvocatoriaConceptoGasto;
 import org.crue.hercules.sgi.csp.model.ConvocatoriaConceptoGastoCodigoEc;
 import org.crue.hercules.sgi.csp.repository.ConvocatoriaConceptoGastoCodigoEcRepository;
@@ -65,7 +65,7 @@ public class ConvocatoriaConceptoGastoCodigoEcServiceTest extends BaseServiceTes
     // given: Un nuevo ConvocatoriaConceptoGastoCodigoEc sin convocatoria
     ConvocatoriaConceptoGastoCodigoEc convocatoriaConceptoGastoCodigoEc = generarMockConvocatoriaConceptoGastoCodigoEc(
         null);
-    convocatoriaConceptoGastoCodigoEc.getConvocatoriaConceptoGasto().setId(null);
+    convocatoriaConceptoGastoCodigoEc.setConvocatoriaConceptoGastoId(null);
 
     // when: Creamos el ConvocatoriaConceptoGastoCodigoEc
     // then: Lanza una excepcion porque la convocatoria es null
@@ -93,7 +93,8 @@ public class ConvocatoriaConceptoGastoCodigoEcServiceTest extends BaseServiceTes
     // given: Un nuevo ConvocatoriaConceptoGastoCodigoEc Fecha Inicio > fechaFin
     ConvocatoriaConceptoGastoCodigoEc convocatoriaConceptoGastoCodigoEc = generarMockConvocatoriaConceptoGastoCodigoEc(
         null);
-    convocatoriaConceptoGastoCodigoEc.setFechaInicio(convocatoriaConceptoGastoCodigoEc.getFechaFin().plusDays(1));
+    convocatoriaConceptoGastoCodigoEc
+        .setFechaInicio(convocatoriaConceptoGastoCodigoEc.getFechaFin().plus(Period.ofDays(1)));
 
     // when: Creamos el ConvocatoriaConceptoGastoCodigoEc
     // then: Lanza una excepcion porque fecha fin debe ser posterior a fecha inicio
@@ -105,6 +106,9 @@ public class ConvocatoriaConceptoGastoCodigoEcServiceTest extends BaseServiceTes
   @Test
   public void create_DuplicatedCodigoOverlapsDates_ThrowsIllegalArgumentException() {
     // given: a ConvocatoriaConceptoGastoCodigoEc duplicate codigo Overlaps Dates
+    Long convocatoriaConceptoGastoId = 1L;
+    ConvocatoriaConceptoGasto convocatoriaConceptoGasto = generarMockConvocatoriaConceptoGasto(
+        convocatoriaConceptoGastoId);
     ConvocatoriaConceptoGastoCodigoEc newConvocatoriaConceptoGastoCodigoEc = generarMockConvocatoriaConceptoGastoCodigoEc(
         1L);
     newConvocatoriaConceptoGastoCodigoEc.setId(null);
@@ -118,7 +122,7 @@ public class ConvocatoriaConceptoGastoCodigoEcServiceTest extends BaseServiceTes
     solapadas.add(existingConvocatoriaConceptoGastoCodigoEc);
 
     BDDMockito.given(convocatoriaConceptoGastoRepository.findById(ArgumentMatchers.anyLong()))
-        .willReturn(Optional.of(newConvocatoriaConceptoGastoCodigoEc.getConvocatoriaConceptoGasto()));
+        .willReturn(Optional.of(convocatoriaConceptoGasto));
 
     BDDMockito.given(convocatoriaService.modificable(ArgumentMatchers.<Long>any(), ArgumentMatchers.<String>any()))
         .willReturn(Boolean.TRUE);
@@ -139,11 +143,14 @@ public class ConvocatoriaConceptoGastoCodigoEcServiceTest extends BaseServiceTes
   public void update_WithIdNotExist_ThrowsConvocatoriaConceptoGastoCodigoEcNotFoundException() {
     // given: Un ConvocatoriaConceptoGastoCodigoEc actualizado con un id que no
     // existe
+    Long convocatoriaConceptoGastoId = 1L;
+    ConvocatoriaConceptoGasto convocatoriaConceptoGasto = generarMockConvocatoriaConceptoGasto(
+        convocatoriaConceptoGastoId);
     ConvocatoriaConceptoGastoCodigoEc convocatoriaConceptoGastoCodigoEc = generarMockConvocatoriaConceptoGastoCodigoEc(
         1L);
 
     BDDMockito.given(convocatoriaConceptoGastoRepository.findById(ArgumentMatchers.anyLong()))
-        .willReturn(Optional.of(convocatoriaConceptoGastoCodigoEc.getConvocatoriaConceptoGasto()));
+        .willReturn(Optional.of(convocatoriaConceptoGasto));
 
     // when: Actualizamos el ConvocatoriaConceptoGastoCodigoEc
     // then: Lanza una excepcion porque el ConvocatoriaConceptoGastoCodigoEc no
@@ -185,7 +192,8 @@ public class ConvocatoriaConceptoGastoCodigoEcServiceTest extends BaseServiceTes
     // given: ConvocatoriaConceptoGastoCodigoEc Fecha Inicio > fechaFin
     ConvocatoriaConceptoGastoCodigoEc convocatoriaConceptoGastoCodigoEc = generarMockConvocatoriaConceptoGastoCodigoEc(
         1L);
-    convocatoriaConceptoGastoCodigoEc.setFechaInicio(convocatoriaConceptoGastoCodigoEc.getFechaFin().plusDays(1));
+    convocatoriaConceptoGastoCodigoEc
+        .setFechaInicio(convocatoriaConceptoGastoCodigoEc.getFechaFin().plus(Period.ofDays(1)));
 
     // when: Modificamos ConvocatoriaConceptoGastoCodigoEc
     // then: Lanza una excepcion porque fecha fin debe ser posterior a fecha inicio
@@ -198,6 +206,9 @@ public class ConvocatoriaConceptoGastoCodigoEcServiceTest extends BaseServiceTes
   public void update_AnyButDatesWhenModificableReturnsFalse_ThrowsIllegalArgumentException() {
     // given: a ConvocatoriaConceptoGastoCodigoEc update Any data but dates when
     // modificable return false
+    Long convocatoriaConceptoGastoId = 1L;
+    ConvocatoriaConceptoGasto convocatoriaConceptoGasto = generarMockConvocatoriaConceptoGasto(
+        convocatoriaConceptoGastoId);
     ConvocatoriaConceptoGastoCodigoEc convocatoriaConceptoGastoCodigoEc = generarMockConvocatoriaConceptoGastoCodigoEc(
         1L);
     ConvocatoriaConceptoGastoCodigoEc convocatoriaConceptoGastoCodigoEcActualizado = generarMockConvocatoriaConceptoGastoCodigoEc(
@@ -205,7 +216,7 @@ public class ConvocatoriaConceptoGastoCodigoEcServiceTest extends BaseServiceTes
     convocatoriaConceptoGastoCodigoEcActualizado.setObservaciones("observaciones-modificadas");
 
     BDDMockito.given(convocatoriaConceptoGastoRepository.findById(ArgumentMatchers.anyLong()))
-        .willReturn(Optional.of(convocatoriaConceptoGastoCodigoEc.getConvocatoriaConceptoGasto()));
+        .willReturn(Optional.of(convocatoriaConceptoGasto));
     BDDMockito.given(repository.findById(ArgumentMatchers.anyLong()))
         .willReturn(Optional.of(convocatoriaConceptoGastoCodigoEc));
     BDDMockito.given(convocatoriaService.modificable(ArgumentMatchers.anyLong(), ArgumentMatchers.<String>any()))
@@ -222,6 +233,9 @@ public class ConvocatoriaConceptoGastoCodigoEcServiceTest extends BaseServiceTes
   @Test
   public void update_DuplicatedCodigoOverlapsDates_ThrowsIllegalArgumentException() {
     // given: a ConvocatoriaConceptoGastoCodigoEc duplicate codigo Overlaps Dates
+    Long convocatoriaConceptoGastoId = 1L;
+    ConvocatoriaConceptoGasto convocatoriaConceptoGasto = generarMockConvocatoriaConceptoGasto(
+        convocatoriaConceptoGastoId);
     ConvocatoriaConceptoGastoCodigoEc convocatoriaConceptoGastoCodigoEc = generarMockConvocatoriaConceptoGastoCodigoEc(
         1L);
     ConvocatoriaConceptoGastoCodigoEc convocatoriaConceptoGastoCodigoEcActualizado = generarMockConvocatoriaConceptoGastoCodigoEc(
@@ -230,7 +244,7 @@ public class ConvocatoriaConceptoGastoCodigoEcServiceTest extends BaseServiceTes
     solapadas.add(generarMockConvocatoriaConceptoGastoCodigoEc(2L));
 
     BDDMockito.given(convocatoriaConceptoGastoRepository.findById(ArgumentMatchers.anyLong()))
-        .willReturn(Optional.of(convocatoriaConceptoGastoCodigoEc.getConvocatoriaConceptoGasto()));
+        .willReturn(Optional.of(convocatoriaConceptoGasto));
     BDDMockito.given(repository.findById(ArgumentMatchers.anyLong()))
         .willReturn(Optional.of(convocatoriaConceptoGastoCodigoEc));
 
@@ -252,15 +266,18 @@ public class ConvocatoriaConceptoGastoCodigoEcServiceTest extends BaseServiceTes
   @Test
   public void update_DuplicatedCodigoNotOverlapsDates_NotThrowAnyException() {
     // given: a ConvocatoriaConceptoGastoCodigoEc duplicate codigo Dates OK
+    Long convocatoriaConceptoGastoId = 1L;
+    ConvocatoriaConceptoGasto convocatoriaConceptoGasto = generarMockConvocatoriaConceptoGasto(
+        convocatoriaConceptoGastoId);
     ConvocatoriaConceptoGastoCodigoEc convocatoriaConceptoGastoCodigoEc = generarMockConvocatoriaConceptoGastoCodigoEc(
         1L);
     ConvocatoriaConceptoGastoCodigoEc convocatoriaConceptoGastoCodigoEcActualizado = generarMockConvocatoriaConceptoGastoCodigoEc(
         1L);
-    convocatoriaConceptoGastoCodigoEcActualizado.setFechaFin(LocalDate.of(2050, 10, 10));
+    convocatoriaConceptoGastoCodigoEcActualizado.setFechaFin(Instant.parse("2050-10-10T23:59:59Z"));
     List<ConvocatoriaConceptoGastoCodigoEc> solapadas = new ArrayList<ConvocatoriaConceptoGastoCodigoEc>();
 
     BDDMockito.given(convocatoriaConceptoGastoRepository.findById(ArgumentMatchers.anyLong()))
-        .willReturn(Optional.of(convocatoriaConceptoGastoCodigoEc.getConvocatoriaConceptoGasto()));
+        .willReturn(Optional.of(convocatoriaConceptoGasto));
     BDDMockito.given(repository.findById(ArgumentMatchers.anyLong()))
         .willReturn(Optional.of(convocatoriaConceptoGastoCodigoEc));
 
@@ -284,7 +301,12 @@ public class ConvocatoriaConceptoGastoCodigoEcServiceTest extends BaseServiceTes
   public void delete_WithExistingId_NoReturnsAnyException() {
     // given: existing convocatoriaConceptoGasto
     Long id = 1L;
+    Long convocatoriaConceptoGastoId = 1L;
+    ConvocatoriaConceptoGasto convocatoriaConceptoGasto = generarMockConvocatoriaConceptoGasto(
+        convocatoriaConceptoGastoId);
 
+    BDDMockito.given(convocatoriaConceptoGastoRepository.findById(ArgumentMatchers.anyLong()))
+        .willReturn(Optional.of(convocatoriaConceptoGasto));
     BDDMockito.given(repository.findById(ArgumentMatchers.anyLong()))
         .willReturn(Optional.of(generarMockConvocatoriaConceptoGastoCodigoEc(id)));
     BDDMockito.given(convocatoriaService.modificable(ArgumentMatchers.<Long>any(), ArgumentMatchers.<String>any()))
@@ -329,7 +351,12 @@ public class ConvocatoriaConceptoGastoCodigoEcServiceTest extends BaseServiceTes
     // given: existing ConvocatoriaConceptoGastoCodigoEc when modificable returns
     // false
     Long id = 1L;
+    Long convocatoriaConceptoGastoId = 1L;
+    ConvocatoriaConceptoGasto convocatoriaConceptoGasto = generarMockConvocatoriaConceptoGasto(
+        convocatoriaConceptoGastoId);
 
+    BDDMockito.given(convocatoriaConceptoGastoRepository.findById(ArgumentMatchers.anyLong()))
+        .willReturn(Optional.of(convocatoriaConceptoGasto));
     BDDMockito.given(repository.findById(ArgumentMatchers.anyLong()))
         .willReturn(Optional.of(generarMockConvocatoriaConceptoGastoCodigoEc(id)));
     BDDMockito.given(convocatoriaService.modificable(ArgumentMatchers.<Long>any(), ArgumentMatchers.<String>any()))
@@ -357,8 +384,8 @@ public class ConvocatoriaConceptoGastoCodigoEcServiceTest extends BaseServiceTes
     Assertions.assertThat(convocatoriaConceptoGastoCodigoEc.getId()).as("getId()").isEqualTo(idBuscado);
     Assertions.assertThat(convocatoriaConceptoGastoCodigoEc.getCodigoEconomicoRef()).as("getCodigoEconomicoRef()")
         .isEqualTo("Cod-1");
-    Assertions.assertThat(convocatoriaConceptoGastoCodigoEc.getConvocatoriaConceptoGasto().getId())
-        .as("getConvocatoriaConceptoGasto()").isEqualTo(1L);
+    Assertions.assertThat(convocatoriaConceptoGastoCodigoEc.getConvocatoriaConceptoGastoId())
+        .as("getConvocatoriaConceptoGastoId()").isEqualTo(1L);
 
   }
 
@@ -374,18 +401,7 @@ public class ConvocatoriaConceptoGastoCodigoEcServiceTest extends BaseServiceTes
         .isInstanceOf(ConvocatoriaConceptoGastoCodigoEcNotFoundException.class);
   }
 
-  /**
-   * Función que devuelve un objeto ConvocatoriaConceptoGastoCodigoEc
-   * 
-   * @param id     id del ConvocatoriaConceptoGastoCodigoEc
-   * @param nombre nombre del ConvocatoriaConceptoGastoCodigoEc
-   * @return el objeto ConvocatoriaConceptoGastoCodigoEc
-   */
-  private ConvocatoriaConceptoGastoCodigoEc generarMockConvocatoriaConceptoGastoCodigoEc(Long id) {
-
-    Convocatoria convocatoria = new Convocatoria();
-    convocatoria.setId(id == null ? 1 : id);
-
+  private ConvocatoriaConceptoGasto generarMockConvocatoriaConceptoGasto(Long id) {
     ConceptoGasto conceptoGasto = new ConceptoGasto();
     conceptoGasto.setId(id == null ? 1 : id);
 
@@ -393,7 +409,7 @@ public class ConvocatoriaConceptoGastoCodigoEcServiceTest extends BaseServiceTes
 
     ConvocatoriaConceptoGasto convocatoriaConceptoGasto = new ConvocatoriaConceptoGasto();
     convocatoriaConceptoGasto.setId((id == null ? 1 : id));
-    convocatoriaConceptoGasto.setConvocatoria(convocatoria);
+    convocatoriaConceptoGasto.setConvocatoriaId(id == null ? 1 : id);
     convocatoriaConceptoGasto.setObservaciones("Obs-" + (id == null ? 1 : id));
     convocatoriaConceptoGasto.setConceptoGasto(conceptoGasto);
     convocatoriaConceptoGasto.setImporteMaximo(400.0);
@@ -402,12 +418,23 @@ public class ConvocatoriaConceptoGastoCodigoEcServiceTest extends BaseServiceTes
     convocatoriaConceptoGasto.setPermitido(true);
     convocatoriaConceptoGasto.setPorcentajeCosteIndirecto(3);
 
+    return convocatoriaConceptoGasto;
+  }
+
+  /**
+   * Función que devuelve un objeto ConvocatoriaConceptoGastoCodigoEc
+   * 
+   * @param id     id del ConvocatoriaConceptoGastoCodigoEc
+   * @param nombre nombre del ConvocatoriaConceptoGastoCodigoEc
+   * @return el objeto ConvocatoriaConceptoGastoCodigoEc
+   */
+  private ConvocatoriaConceptoGastoCodigoEc generarMockConvocatoriaConceptoGastoCodigoEc(Long id) {
     ConvocatoriaConceptoGastoCodigoEc convocatoriaConceptoGastoCodigoEc = new ConvocatoriaConceptoGastoCodigoEc();
     convocatoriaConceptoGastoCodigoEc.setId(id);
     convocatoriaConceptoGastoCodigoEc.setCodigoEconomicoRef("Cod-" + (id == null ? 1 : id));
-    convocatoriaConceptoGastoCodigoEc.setConvocatoriaConceptoGasto(convocatoriaConceptoGasto);
-    convocatoriaConceptoGastoCodigoEc.setFechaInicio(LocalDate.now().minusDays(1));
-    convocatoriaConceptoGastoCodigoEc.setFechaFin(LocalDate.now());
+    convocatoriaConceptoGastoCodigoEc.setConvocatoriaConceptoGastoId(id == null ? 1 : id);
+    convocatoriaConceptoGastoCodigoEc.setFechaInicio(Instant.now().minus(Period.ofDays(1)));
+    convocatoriaConceptoGastoCodigoEc.setFechaFin(Instant.now());
 
     return convocatoriaConceptoGastoCodigoEc;
   }

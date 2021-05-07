@@ -1,6 +1,6 @@
 package org.crue.hercules.sgi.csp.repository.predicate;
 
-import java.time.LocalDate;
+import java.time.Instant;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -63,17 +63,14 @@ public class ConvocatoriaPredicateResolver implements SgiRSQLPredicateResolver<C
     }
     boolean applyFilter = Boolean.parseBoolean(node.getArguments().get(0));
     if (!applyFilter) {
-      return null;
+      return cb.equal(cb.literal("1"), cb.literal("1"));
     }
 
-    Predicate plazoInicio = cb.lessThanOrEqualTo(
-        root.get(Convocatoria_.configuracionSolicitud).get(ConfiguracionSolicitud_.fasePresentacionSolicitudes)
-            .get(ConvocatoriaFase_.fechaInicio).as(java.time.LocalDate.class),
-        LocalDate.now());
-    Predicate plazoFin = cb.greaterThanOrEqualTo(
-        root.get(Convocatoria_.configuracionSolicitud).get(ConfiguracionSolicitud_.fasePresentacionSolicitudes)
-            .get(ConvocatoriaFase_.fechaFin).as(java.time.LocalDate.class),
-        LocalDate.now());
+    Instant now = Instant.now();
+    Predicate plazoInicio = cb.lessThanOrEqualTo(root.get(Convocatoria_.configuracionSolicitud)
+        .get(ConfiguracionSolicitud_.fasePresentacionSolicitudes).get(ConvocatoriaFase_.fechaInicio), now);
+    Predicate plazoFin = cb.greaterThanOrEqualTo(root.get(Convocatoria_.configuracionSolicitud)
+        .get(ConfiguracionSolicitud_.fasePresentacionSolicitudes).get(ConvocatoriaFase_.fechaFin), now);
     return cb.and(plazoInicio, plazoFin);
   }
 
@@ -87,10 +84,10 @@ public class ConvocatoriaPredicateResolver implements SgiRSQLPredicateResolver<C
   public Predicate toPredicate(ComparisonNode node, Root<Convocatoria> root, CriteriaQuery<?> query,
       CriteriaBuilder criteriaBuilder) {
     switch (Property.fromCode(node.getSelector())) {
-      case PLAZO_PRESENTACION_SOLICITUD:
-        return buildInPlazoPresentacionSolicitudes(node, root, query, criteriaBuilder);
-      default:
-        return null;
+    case PLAZO_PRESENTACION_SOLICITUD:
+      return buildInPlazoPresentacionSolicitudes(node, root, query, criteriaBuilder);
+    default:
+      return null;
     }
   }
 }

@@ -1,6 +1,6 @@
 package org.crue.hercules.sgi.csp.model;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -14,11 +14,14 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "convocatoria_fase")
@@ -42,11 +45,10 @@ public class ConvocatoriaFase extends BaseEntity {
   @SequenceGenerator(name = "convocatoria_fase_seq", sequenceName = "convocatoria_fase_seq", allocationSize = 1)
   private Long id;
 
-  /** Convocatoria */
-  @ManyToOne
-  @JoinColumn(name = "convocatoria_id", nullable = false, foreignKey = @ForeignKey(name = "FK_CONVOCATORIAFASE_CONVOCATORIA"))
+  /** Convocatoria Id */
+  @Column(name = "convocatoria_id", nullable = false)
   @NotNull
-  private Convocatoria convocatoria;
+  private Long convocatoriaId;
 
   /** Tipo Fase */
   @ManyToOne
@@ -57,15 +59,21 @@ public class ConvocatoriaFase extends BaseEntity {
   /** Fecha Inicio. */
   @Column(name = "fecha_inicio", nullable = false)
   @NotNull
-  private LocalDateTime fechaInicio;
+  private Instant fechaInicio;
 
   /** Fecha Fin. */
   @Column(name = "fecha_fin", nullable = false)
   @NotNull
-  private LocalDateTime fechaFin;
+  private Instant fechaFin;
 
   /** Observaciones. */
   @Column(name = "observaciones", length = 2000)
   private String observaciones;
 
+  // Relation mappings for JPA metamodel generation only
+  @ManyToOne
+  @JoinColumn(name = "convocatoria_id", insertable = false, updatable = false, foreignKey = @ForeignKey(name = "FK_CONVOCATORIAFASE_CONVOCATORIA"))
+  @Getter(AccessLevel.NONE)
+  @Setter(AccessLevel.NONE)
+  private final Convocatoria convocatoria = null;
 }

@@ -1,7 +1,6 @@
 package org.crue.hercules.sgi.csp.model;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -16,11 +15,14 @@ import javax.persistence.Table;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "proyecto_periodo_seguimiento")
@@ -43,21 +45,20 @@ public class ProyectoPeriodoSeguimiento extends BaseEntity {
   @SequenceGenerator(name = "proyecto_periodo_seguimiento_seq", sequenceName = "proyecto_periodo_seguimiento_seq", allocationSize = 1)
   private Long id;
 
-  /** Proyecto */
-  @ManyToOne
-  @JoinColumn(name = "proyecto_id", nullable = false, foreignKey = @ForeignKey(name = "FK_PROYECTOPERIODOSEGUIMIENTO_PROYECTO"))
+  /** Proyecto Id */
+  @Column(name = "proyecto_id", nullable = false)
   @NotNull
-  private Proyecto proyecto;
+  private Long proyectoId;
 
   /** Fecha inicio. */
   @Column(name = "fecha_inicio", nullable = false)
   @NotNull
-  private LocalDate fechaInicio;
+  private Instant fechaInicio;
 
   /** Fecha fin. */
   @Column(name = "fecha_fin", nullable = false)
   @NotNull
-  private LocalDate fechaFin;
+  private Instant fechaFin;
 
   /** Número periodo. */
   @Column(name = "num_periodo", nullable = false)
@@ -67,14 +68,20 @@ public class ProyectoPeriodoSeguimiento extends BaseEntity {
 
   /** Fecha inicio presentación. */
   @Column(name = "fecha_inicio_presentacion", nullable = true)
-  private LocalDateTime fechaInicioPresentacion;
+  private Instant fechaInicioPresentacion;
 
   /** Fecha fin. */
   @Column(name = "fecha_fin_presentacion", nullable = true)
-  private LocalDateTime fechaFinPresentacion;
+  private Instant fechaFinPresentacion;
 
   /** Observaciones */
   @Column(name = "observaciones", length = 2000, nullable = true)
   private String observaciones;
 
+  // Relation mappings for JPA metamodel generation only
+  @ManyToOne
+  @JoinColumn(name = "proyecto_id", insertable = false, updatable = false, foreignKey = @ForeignKey(name = "FK_PROYECTOPERIODOSEGUIMIENTO_PROYECTO"))
+  @Getter(AccessLevel.NONE)
+  @Setter(AccessLevel.NONE)
+  private final Proyecto proyecto = null;
 }

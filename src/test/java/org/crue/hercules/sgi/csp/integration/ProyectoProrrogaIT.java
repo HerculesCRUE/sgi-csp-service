@@ -2,7 +2,7 @@ package org.crue.hercules.sgi.csp.integration;
 
 import java.math.BigDecimal;
 import java.net.URI;
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 
@@ -46,8 +46,8 @@ public class ProyectoProrrogaIT extends BaseIT {
 
   @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:scripts/modelo_ejecucion.sql",
       "classpath:scripts/modelo_unidad.sql", "classpath:scripts/tipo_finalidad.sql",
-      "classpath:scripts/tipo_ambito_geografico.sql", "classpath:scripts/estado_proyecto.sql",
-      "classpath:scripts/proyecto.sql" })
+      "classpath:scripts/tipo_ambito_geografico.sql", "classpath:scripts/proyecto.sql",
+      "classpath:scripts/estado_proyecto.sql" })
   @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:cleanup.sql")
   @Test
   public void create_ReturnsProyectoProrroga() throws Exception {
@@ -63,8 +63,8 @@ public class ProyectoProrrogaIT extends BaseIT {
     Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
     ProyectoProrroga responseData = response.getBody();
     Assertions.assertThat(responseData.getId()).as("getId()").isNotNull();
-    Assertions.assertThat(responseData.getProyecto().getId()).as("getProyecto().getId()")
-        .isEqualTo(newProyectoProrroga.getProyecto().getId());
+    Assertions.assertThat(responseData.getProyectoId()).as("getProyectoId()")
+        .isEqualTo(newProyectoProrroga.getProyectoId());
     Assertions.assertThat(responseData.getFechaConcesion()).as("getFechaConcesion()")
         .isEqualTo(newProyectoProrroga.getFechaConcesion());
     Assertions.assertThat(responseData.getNumProrroga()).as("getNumProrroga()")
@@ -79,8 +79,8 @@ public class ProyectoProrrogaIT extends BaseIT {
 
   @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:scripts/modelo_ejecucion.sql",
       "classpath:scripts/modelo_unidad.sql", "classpath:scripts/tipo_finalidad.sql",
-      "classpath:scripts/tipo_ambito_geografico.sql", "classpath:scripts/estado_proyecto.sql",
-      "classpath:scripts/proyecto.sql", "classpath:scripts/proyecto_prorroga.sql" })
+      "classpath:scripts/tipo_ambito_geografico.sql", "classpath:scripts/proyecto.sql",
+      "classpath:scripts/estado_proyecto.sql", "classpath:scripts/proyecto_prorroga.sql" })
   @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:cleanup.sql")
   @Test
   public void update_ReturnsProyectoProrroga() throws Exception {
@@ -95,12 +95,12 @@ public class ProyectoProrrogaIT extends BaseIT {
 
     ProyectoProrroga proyectoProrrogaActualizado = response.getBody();
     Assertions.assertThat(proyectoProrrogaActualizado.getId()).as("getId()").isEqualTo(idProyectoProrroga);
-    Assertions.assertThat(proyectoProrrogaActualizado.getProyecto().getId()).as("getProyecto().getId()").isEqualTo(1L);
+    Assertions.assertThat(proyectoProrrogaActualizado.getProyectoId()).as("getProyectoId()").isEqualTo(1L);
     Assertions.assertThat(proyectoProrrogaActualizado.getFechaConcesion()).as("getFechaConcesion()")
-        .isEqualTo(LocalDate.of(2020, 06, 01));
+        .isEqualTo(Instant.parse("2020-06-01T00:00:00Z"));
     Assertions.assertThat(proyectoProrrogaActualizado.getNumProrroga()).as("getNumProrroga()").isEqualTo(1);
     Assertions.assertThat(proyectoProrrogaActualizado.getFechaFin()).as("getFechaFin()")
-        .isEqualTo(LocalDate.of(2021, 12, 31));
+        .isEqualTo(Instant.parse("2021-12-31T23:59:59Z"));
     Assertions.assertThat(proyectoProrrogaActualizado.getTipo()).as("getTipo()")
         .isEqualTo(ProyectoProrroga.Tipo.TIEMPO_IMPORTE);
     Assertions.assertThat(proyectoProrrogaActualizado.getImporte()).as("getImporte()")
@@ -112,8 +112,8 @@ public class ProyectoProrrogaIT extends BaseIT {
 
   @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:scripts/modelo_ejecucion.sql",
       "classpath:scripts/modelo_unidad.sql", "classpath:scripts/tipo_finalidad.sql",
-      "classpath:scripts/tipo_ambito_geografico.sql", "classpath:scripts/estado_proyecto.sql",
-      "classpath:scripts/proyecto.sql", "classpath:scripts/proyecto_prorroga.sql",
+      "classpath:scripts/tipo_ambito_geografico.sql", "classpath:scripts/proyecto.sql",
+      "classpath:scripts/estado_proyecto.sql", "classpath:scripts/proyecto_prorroga.sql",
       "classpath:scripts/tipo_documento.sql", "classpath:scripts/tipo_fase.sql",
       "classpath:scripts/modelo_tipo_fase.sql", "classpath:scripts/modelo_tipo_documento.sql",
       "classpath:scripts/prorroga_documento.sql" })
@@ -130,8 +130,8 @@ public class ProyectoProrrogaIT extends BaseIT {
 
   @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:scripts/modelo_ejecucion.sql",
       "classpath:scripts/modelo_unidad.sql", "classpath:scripts/tipo_finalidad.sql",
-      "classpath:scripts/tipo_ambito_geografico.sql", "classpath:scripts/estado_proyecto.sql",
-      "classpath:scripts/proyecto.sql", "classpath:scripts/proyecto_prorroga.sql" })
+      "classpath:scripts/tipo_ambito_geografico.sql", "classpath:scripts/proyecto.sql",
+      "classpath:scripts/estado_proyecto.sql", "classpath:scripts/proyecto_prorroga.sql" })
   @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:cleanup.sql")
   @Test
   public void existsById_Returns200() throws Exception {
@@ -158,8 +158,8 @@ public class ProyectoProrrogaIT extends BaseIT {
 
   @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:scripts/modelo_ejecucion.sql",
       "classpath:scripts/modelo_unidad.sql", "classpath:scripts/tipo_finalidad.sql",
-      "classpath:scripts/tipo_ambito_geografico.sql", "classpath:scripts/estado_proyecto.sql",
-      "classpath:scripts/proyecto.sql", "classpath:scripts/proyecto_prorroga.sql" })
+      "classpath:scripts/tipo_ambito_geografico.sql", "classpath:scripts/proyecto.sql",
+      "classpath:scripts/estado_proyecto.sql", "classpath:scripts/proyecto_prorroga.sql" })
   @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:cleanup.sql")
   @Test
   public void findById_ReturnsProyectoProrroga() throws Exception {
@@ -173,11 +173,12 @@ public class ProyectoProrrogaIT extends BaseIT {
     ProyectoProrroga proyectoProrroga = response.getBody();
     Assertions.assertThat(proyectoProrroga.getId()).as("getId()").isNotNull();
     Assertions.assertThat(proyectoProrroga.getId()).as("getId()").isEqualTo(idProyectoProrroga);
-    Assertions.assertThat(proyectoProrroga.getProyecto().getId()).as("getProyecto().getId()").isEqualTo(1L);
+    Assertions.assertThat(proyectoProrroga.getProyectoId()).as("getProyectoId()").isEqualTo(1L);
     Assertions.assertThat(proyectoProrroga.getFechaConcesion()).as("getFechaConcesion()")
-        .isEqualTo(LocalDate.of(2020, 01, 01));
+        .isEqualTo(Instant.parse("2020-01-01T00:00:00Z"));
     Assertions.assertThat(proyectoProrroga.getNumProrroga()).as("getNumProrroga()").isEqualTo(1);
-    Assertions.assertThat(proyectoProrroga.getFechaFin()).as("getFechaFin()").isEqualTo(LocalDate.of(2020, 02, 01));
+    Assertions.assertThat(proyectoProrroga.getFechaFin()).as("getFechaFin()")
+        .isEqualTo(Instant.parse("2020-02-01T23:59:59Z"));
     Assertions.assertThat(proyectoProrroga.getTipo()).as("getTipo()").isEqualTo(ProyectoProrroga.Tipo.TIEMPO_IMPORTE);
     Assertions.assertThat(proyectoProrroga.getImporte()).as("getImporte()").isEqualTo(BigDecimal.valueOf(123.45));
     Assertions.assertThat(proyectoProrroga.getObservaciones()).as("getObservaciones()")
@@ -193,8 +194,8 @@ public class ProyectoProrrogaIT extends BaseIT {
 
   @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:scripts/modelo_ejecucion.sql",
       "classpath:scripts/modelo_unidad.sql", "classpath:scripts/tipo_finalidad.sql",
-      "classpath:scripts/tipo_ambito_geografico.sql", "classpath:scripts/estado_proyecto.sql",
-      "classpath:scripts/proyecto.sql", "classpath:scripts/proyecto_prorroga.sql",
+      "classpath:scripts/tipo_ambito_geografico.sql", "classpath:scripts/proyecto.sql",
+      "classpath:scripts/estado_proyecto.sql", "classpath:scripts/proyecto_prorroga.sql",
       "classpath:scripts/tipo_documento.sql", "classpath:scripts/tipo_fase.sql",
       "classpath:scripts/modelo_tipo_fase.sql", "classpath:scripts/modelo_tipo_documento.sql",
       "classpath:scripts/prorroga_documento.sql" })
@@ -243,15 +244,17 @@ public class ProyectoProrrogaIT extends BaseIT {
    */
   private ProyectoProrroga generarMockProyectoProrroga(Long id, Long proyectoId) {
 
-    return ProyectoProrroga.builder()//
-        .id(id)//
-        .proyecto(Proyecto.builder().id(proyectoId).build())//
-        .numProrroga(1)//
-        .fechaConcesion(LocalDate.of(2020, 06, 01))//
-        .tipo(ProyectoProrroga.Tipo.TIEMPO_IMPORTE)//
-        .fechaFin(LocalDate.of(2021, 12, 31))//
-        .importe(BigDecimal.valueOf(123.45))//
-        .observaciones("observaciones-proyecto-prorroga-" + (id == null ? "" : String.format("%03d", id)))//
+    // @formatter:off
+    return ProyectoProrroga.builder()
+        .id(id)
+        .proyectoId(proyectoId)
+        .numProrroga(1)
+        .fechaConcesion(Instant.parse("2020-06-01T00:00:00Z"))
+        .tipo(ProyectoProrroga.Tipo.TIEMPO_IMPORTE)
+        .fechaFin(Instant.parse("2021-12-31T23:59:59Z"))
+        .importe(BigDecimal.valueOf(123.45))
+        .observaciones("observaciones-proyecto-prorroga-" + (id == null ? "" : String.format("%03d", id)))
         .build();
+    // @formatter:on
   }
 }

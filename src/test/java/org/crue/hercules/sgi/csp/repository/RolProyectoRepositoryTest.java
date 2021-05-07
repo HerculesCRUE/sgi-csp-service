@@ -37,8 +37,6 @@ public class RolProyectoRepositoryTest extends BaseRepositoryTest {
     Assertions.assertThat(responseData.getResponsableEconomico()).as("getResponsableEconomico()")
         .isEqualTo(rolProyecto1.getResponsableEconomico());
     Assertions.assertThat(responseData.getEquipo()).as("getEquipo()").isEqualTo(rolProyecto1.getEquipo());
-    Assertions.assertThat(responseData.getColectivoRef()).as("getColectivoRef()")
-        .isEqualTo(rolProyecto1.getColectivoRef());
     Assertions.assertThat(responseData.getActivo()).as("getActivo()").isEqualTo(Boolean.TRUE);
   }
 
@@ -78,8 +76,6 @@ public class RolProyectoRepositoryTest extends BaseRepositoryTest {
     Assertions.assertThat(responseData.getResponsableEconomico()).as("getResponsableEconomico()")
         .isEqualTo(rolProyecto1.getResponsableEconomico());
     Assertions.assertThat(responseData.getEquipo()).as("getEquipo()").isEqualTo(rolProyecto1.getEquipo());
-    Assertions.assertThat(responseData.getColectivoRef()).as("getColectivoRef()")
-        .isEqualTo(rolProyecto1.getColectivoRef());
     Assertions.assertThat(responseData.getActivo()).as("getActivo()").isEqualTo(Boolean.TRUE);
   }
 
@@ -103,16 +99,17 @@ public class RolProyectoRepositoryTest extends BaseRepositoryTest {
    */
   private RolProyecto generarMockRolProyecto(String suffix, Boolean activo) {
 
-    RolProyecto rolProyecto = RolProyecto.builder()//
-        .abreviatura(suffix)//
-        .nombre("nombre-" + suffix)//
-        .descripcion("descripcion-" + suffix)//
-        .rolPrincipal(Boolean.FALSE)//
-        .responsableEconomico(Boolean.FALSE)//
-        .equipo(RolProyecto.Equipo.INVESTIGACION)//
-        .colectivoRef("PDI")//
-        .activo(activo)//
+    // @formatter:off
+    RolProyecto rolProyecto = RolProyecto.builder()
+        .abreviatura(suffix)
+        .nombre("nombre-" + suffix)
+        .descripcion("descripcion-" + suffix)
+        .rolPrincipal(Boolean.FALSE)
+        .responsableEconomico(Boolean.FALSE)
+        .equipo(RolProyecto.Equipo.INVESTIGACION)
+        .activo(activo)
         .build();
+    // @formatter:on
     return entityManager.persistAndFlush(rolProyecto);
   }
 }

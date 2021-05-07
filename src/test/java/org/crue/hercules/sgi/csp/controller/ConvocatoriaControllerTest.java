@@ -1,7 +1,7 @@
 package org.crue.hercules.sgi.csp.controller;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.time.Period;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -181,15 +181,18 @@ public class ConvocatoriaControllerTest extends BaseControllerTest {
         .andExpect(MockMvcResultMatchers.jsonPath("modeloEjecucion.id")
             .value(convocatoriaExistente.getModeloEjecucion().getId()))
         .andExpect(MockMvcResultMatchers.jsonPath("codigo").value(convocatoriaExistente.getCodigo()))
-        .andExpect(MockMvcResultMatchers.jsonPath("anio").value(convocatoriaExistente.getAnio()))
+        .andExpect(MockMvcResultMatchers.jsonPath("fechaPublicacion")
+            .value(convocatoriaExistente.getFechaPublicacion().toString()))
+        .andExpect(MockMvcResultMatchers.jsonPath("fechaProvisional")
+            .value(convocatoriaExistente.getFechaProvisional().toString()))
+        .andExpect(MockMvcResultMatchers.jsonPath("fechaConcesion")
+            .value(convocatoriaExistente.getFechaConcesion().toString()))
         .andExpect(MockMvcResultMatchers.jsonPath("titulo").value(convocatoria.getTitulo()))
         .andExpect(MockMvcResultMatchers.jsonPath("objeto").value(convocatoriaExistente.getObjeto()))
         .andExpect(MockMvcResultMatchers.jsonPath("observaciones").value(convocatoria.getObservaciones()))
         .andExpect(MockMvcResultMatchers.jsonPath("finalidad.id").value(convocatoriaExistente.getFinalidad().getId()))
         .andExpect(MockMvcResultMatchers.jsonPath("regimenConcurrencia.id")
             .value(convocatoriaExistente.getRegimenConcurrencia().getId()))
-        .andExpect(
-            MockMvcResultMatchers.jsonPath("destinatarios").value(Convocatoria.Destinatarios.INDIVIDUAL.toString()))
         .andExpect(MockMvcResultMatchers.jsonPath("colaborativos").value(convocatoriaExistente.getColaborativos()))
         .andExpect(MockMvcResultMatchers.jsonPath("estado").value(Convocatoria.Estado.REGISTRADA.toString()))
         .andExpect(MockMvcResultMatchers.jsonPath("duracion").value(convocatoriaExistente.getDuracion()))
@@ -247,7 +250,12 @@ public class ConvocatoriaControllerTest extends BaseControllerTest {
         .andExpect(MockMvcResultMatchers.jsonPath("modeloEjecucion.id")
             .value(convocatoriaBorradorExistente.getModeloEjecucion().getId()))
         .andExpect(MockMvcResultMatchers.jsonPath("codigo").value(convocatoriaBorradorExistente.getCodigo()))
-        .andExpect(MockMvcResultMatchers.jsonPath("anio").value(convocatoriaBorradorExistente.getAnio()))
+        .andExpect(MockMvcResultMatchers.jsonPath("fechaPublicacion")
+            .value(convocatoriaBorradorExistente.getFechaPublicacion().toString()))
+        .andExpect(MockMvcResultMatchers.jsonPath("fechaProvisional")
+            .value(convocatoriaBorradorExistente.getFechaProvisional().toString()))
+        .andExpect(MockMvcResultMatchers.jsonPath("fechaConcesion")
+            .value(convocatoriaBorradorExistente.getFechaConcesion().toString()))
         .andExpect(MockMvcResultMatchers.jsonPath("titulo").value(convocatoriaBorradorExistente.getTitulo()))
         .andExpect(MockMvcResultMatchers.jsonPath("objeto").value(convocatoriaBorradorExistente.getObjeto()))
         .andExpect(
@@ -256,8 +264,6 @@ public class ConvocatoriaControllerTest extends BaseControllerTest {
             MockMvcResultMatchers.jsonPath("finalidad.id").value(convocatoriaBorradorExistente.getFinalidad().getId()))
         .andExpect(MockMvcResultMatchers.jsonPath("regimenConcurrencia.id")
             .value(convocatoriaBorradorExistente.getRegimenConcurrencia().getId()))
-        .andExpect(
-            MockMvcResultMatchers.jsonPath("destinatarios").value(Convocatoria.Destinatarios.INDIVIDUAL.toString()))
         .andExpect(
             MockMvcResultMatchers.jsonPath("colaborativos").value(convocatoriaBorradorExistente.getColaborativos()))
         .andExpect(MockMvcResultMatchers.jsonPath("estado").value(Convocatoria.Estado.REGISTRADA.toString()))
@@ -1086,9 +1092,9 @@ public class ConvocatoriaControllerTest extends BaseControllerTest {
 
     ConvocatoriaFase convocatoriaFase = new ConvocatoriaFase();
     convocatoriaFase.setId(id);
-    convocatoriaFase.setConvocatoria(Convocatoria.builder().id(id).activo(Boolean.TRUE).codigo("codigo" + id).build());
-    convocatoriaFase.setFechaInicio(LocalDateTime.now());
-    convocatoriaFase.setFechaFin(LocalDateTime.now().plusDays(1L));
+    convocatoriaFase.setConvocatoriaId(id);
+    convocatoriaFase.setFechaInicio(Instant.now());
+    convocatoriaFase.setFechaFin(Instant.now().plus(Period.ofDays(1)));
     convocatoriaFase.setTipoFase(
         TipoFase.builder().nombre("tipoFase" + id).descripcion("descripcionFase" + id).activo(Boolean.TRUE).build());
     convocatoriaFase.setObservaciones("observaciones" + id);
@@ -1513,15 +1519,18 @@ public class ConvocatoriaControllerTest extends BaseControllerTest {
         .andExpect(
             MockMvcResultMatchers.jsonPath("modeloEjecucion.id").value(newConvocatoria.getModeloEjecucion().getId()))
         .andExpect(MockMvcResultMatchers.jsonPath("codigo").value(newConvocatoria.getCodigo()))
-        .andExpect(MockMvcResultMatchers.jsonPath("anio").value(newConvocatoria.getAnio()))
+        .andExpect(
+            MockMvcResultMatchers.jsonPath("fechaPublicacion").value(newConvocatoria.getFechaPublicacion().toString()))
+        .andExpect(
+            MockMvcResultMatchers.jsonPath("fechaProvisional").value(newConvocatoria.getFechaProvisional().toString()))
+        .andExpect(
+            MockMvcResultMatchers.jsonPath("fechaConcesion").value(newConvocatoria.getFechaConcesion().toString()))
         .andExpect(MockMvcResultMatchers.jsonPath("titulo").value(newConvocatoria.getTitulo()))
         .andExpect(MockMvcResultMatchers.jsonPath("objeto").value(newConvocatoria.getObjeto()))
         .andExpect(MockMvcResultMatchers.jsonPath("observaciones").value(newConvocatoria.getObservaciones()))
         .andExpect(MockMvcResultMatchers.jsonPath("finalidad.id").value(newConvocatoria.getFinalidad().getId()))
         .andExpect(MockMvcResultMatchers.jsonPath("regimenConcurrencia.id")
             .value(newConvocatoria.getRegimenConcurrencia().getId()))
-        .andExpect(
-            MockMvcResultMatchers.jsonPath("destinatarios").value(Convocatoria.Destinatarios.INDIVIDUAL.toString()))
         .andExpect(MockMvcResultMatchers.jsonPath("colaborativos").value(newConvocatoria.getColaborativos()))
         .andExpect(MockMvcResultMatchers.jsonPath("estado").value(Convocatoria.Estado.REGISTRADA.toString()))
         .andExpect(MockMvcResultMatchers.jsonPath("duracion").value(newConvocatoria.getDuracion()))
@@ -1642,17 +1651,18 @@ public class ConvocatoriaControllerTest extends BaseControllerTest {
 
     Long convocatoriaId = 1L;
     List<ConvocatoriaPeriodoSeguimientoCientifico> listaConvocatoriaPeriodoSeguimientoCientifico = new LinkedList<ConvocatoriaPeriodoSeguimientoCientifico>();
-    Convocatoria convocatoria = Convocatoria.builder().id(Long.valueOf(1L)).build();
     for (int i = 1, j = 2; i <= 100; i++, j += 2) {
-      listaConvocatoriaPeriodoSeguimientoCientifico.add(ConvocatoriaPeriodoSeguimientoCientifico//
-          .builder()//
-          .id(Long.valueOf(i))//
-          .convocatoria(convocatoria)//
-          .numPeriodo(i - 1)//
-          .mesInicial((i * 2) - 1)//
-          .mesFinal(j * 1)//
-          .observaciones("observaciones-" + i)//
+      // @formatter:off
+      listaConvocatoriaPeriodoSeguimientoCientifico.add(ConvocatoriaPeriodoSeguimientoCientifico
+          .builder()
+          .id(Long.valueOf(i))
+          .convocatoriaId(convocatoriaId)
+          .numPeriodo(i - 1)
+          .mesInicial((i * 2) - 1)
+          .mesFinal(j * 1)
+          .observaciones("observaciones-" + i)
           .build());
+      // @formatter:on
     }
 
     Integer page = 3;
@@ -1759,61 +1769,64 @@ public class ConvocatoriaControllerTest extends BaseControllerTest {
   private Convocatoria generarMockConvocatoria(Long convocatoriaId, Long unidadGestionId, Long modeloEjecucionId,
       Long modeloTipoFinalidadId, Long tipoRegimenConcurrenciaId, Long tipoAmbitoGeogragicoId, Boolean activo) {
 
+    // @formatter:off
     ModeloEjecucion modeloEjecucion = (modeloEjecucionId == null) ? null
-        : ModeloEjecucion.builder()//
-            .id(modeloEjecucionId)//
-            .nombre("nombreModeloEjecucion-" + String.format("%03d", modeloEjecucionId))//
-            .activo(Boolean.TRUE)//
+        : ModeloEjecucion.builder()
+            .id(modeloEjecucionId)
+            .nombre("nombreModeloEjecucion-" + String.format("%03d", modeloEjecucionId))
+            .activo(Boolean.TRUE)
             .build();
 
     TipoFinalidad tipoFinalidad = (modeloTipoFinalidadId == null) ? null
-        : TipoFinalidad.builder()//
-            .id(modeloTipoFinalidadId)//
-            .nombre("nombreTipoFinalidad-" + String.format("%03d", modeloTipoFinalidadId))//
-            .activo(Boolean.TRUE)//
+        : TipoFinalidad.builder()
+            .id(modeloTipoFinalidadId)
+            .nombre("nombreTipoFinalidad-" + String.format("%03d", modeloTipoFinalidadId))
+            .activo(Boolean.TRUE)
             .build();
 
     ModeloTipoFinalidad modeloTipoFinalidad = (modeloTipoFinalidadId == null) ? null
-        : ModeloTipoFinalidad.builder()//
-            .id(modeloTipoFinalidadId)//
-            .modeloEjecucion(modeloEjecucion)//
-            .tipoFinalidad(tipoFinalidad)//
-            .activo(Boolean.TRUE)//
+        : ModeloTipoFinalidad.builder()
+            .id(modeloTipoFinalidadId)
+            .modeloEjecucion(modeloEjecucion)
+            .tipoFinalidad(tipoFinalidad)
+            .activo(Boolean.TRUE)
             .build();
 
     TipoRegimenConcurrencia tipoRegimenConcurrencia = (tipoRegimenConcurrenciaId == null) ? null
-        : TipoRegimenConcurrencia.builder()//
-            .id(tipoRegimenConcurrenciaId)//
-            .nombre("nombreTipoRegimenConcurrencia-" + String.format("%03d", tipoRegimenConcurrenciaId))//
-            .activo(Boolean.TRUE)//
+        : TipoRegimenConcurrencia.builder()
+            .id(tipoRegimenConcurrenciaId)
+            .nombre("nombreTipoRegimenConcurrencia-" + String.format("%03d", tipoRegimenConcurrenciaId))
+            .activo(Boolean.TRUE)
             .build();
 
     TipoAmbitoGeografico tipoAmbitoGeografico = (tipoAmbitoGeogragicoId == null) ? null
-        : TipoAmbitoGeografico.builder()//
-            .id(tipoAmbitoGeogragicoId)//
-            .nombre("nombreTipoAmbitoGeografico-" + String.format("%03d", tipoAmbitoGeogragicoId))//
-            .activo(Boolean.TRUE)//
+        : TipoAmbitoGeografico.builder()
+            .id(tipoAmbitoGeogragicoId)
+            .nombre("nombreTipoAmbitoGeografico-" + String.format("%03d", tipoAmbitoGeogragicoId))
+            .activo(Boolean.TRUE)
             .build();
 
-    Convocatoria convocatoria = Convocatoria.builder()//
-        .id(convocatoriaId)//
-        .unidadGestionRef((unidadGestionId == null) ? null : "unidad-" + String.format("%03d", unidadGestionId))//
-        .modeloEjecucion(modeloEjecucion)//
-        .codigo("codigo-" + String.format("%03d", convocatoriaId))//
-        .anio(2020)//
-        .titulo("titulo-" + String.format("%03d", convocatoriaId))//
-        .objeto("objeto-" + String.format("%03d", convocatoriaId))//
-        .observaciones("observaciones-" + String.format("%03d", convocatoriaId))//
-        .finalidad((modeloTipoFinalidad == null) ? null : modeloTipoFinalidad.getTipoFinalidad())//
-        .regimenConcurrencia(tipoRegimenConcurrencia)//
-        .destinatarios(Convocatoria.Destinatarios.INDIVIDUAL)//
-        .colaborativos(Boolean.TRUE)//
-        .estado(Convocatoria.Estado.REGISTRADA)//
-        .duracion(12)//
-        .ambitoGeografico(tipoAmbitoGeografico)//
-        .clasificacionCVN(ClasificacionCVN.AYUDAS)//
-        .activo(activo)//
+    Convocatoria convocatoria = Convocatoria.builder()
+        .id(convocatoriaId)
+        .unidadGestionRef((unidadGestionId == null) ? null : "unidad-" + String.format("%03d", unidadGestionId))
+        .modeloEjecucion(modeloEjecucion)
+        .codigo("codigo-" + String.format("%03d", convocatoriaId))
+        .fechaPublicacion(Instant.parse("2021-08-01T00:00:00Z"))
+        .fechaProvisional(Instant.parse("2021-08-01T00:00:00Z"))
+        .fechaConcesion(Instant.parse("2021-08-01T00:00:00Z"))
+        .titulo("titulo-" + String.format("%03d", convocatoriaId))
+        .objeto("objeto-" + String.format("%03d", convocatoriaId))
+        .observaciones("observaciones-" + String.format("%03d", convocatoriaId))
+        .finalidad((modeloTipoFinalidad == null) ? null : modeloTipoFinalidad.getTipoFinalidad())
+        .regimenConcurrencia(tipoRegimenConcurrencia)
+        .colaborativos(Boolean.TRUE)
+        .estado(Convocatoria.Estado.REGISTRADA)
+        .duracion(12)
+        .ambitoGeografico(tipoAmbitoGeografico)
+        .clasificacionCVN(ClasificacionCVN.AYUDAS)
+        .activo(activo)
         .build();
+    // @formatter:on
 
     return convocatoria;
   }
@@ -1829,8 +1842,8 @@ public class ConvocatoriaControllerTest extends BaseControllerTest {
   private ConvocatoriaEntidadGestora generarConvocatoriaEntidadGestora(Long convocatoriaEntidadGestoraId,
       Long convocatoriaId, String entidadRef) {
 
-    return ConvocatoriaEntidadGestora.builder().id(convocatoriaEntidadGestoraId)
-        .convocatoria(Convocatoria.builder().id(convocatoriaId).build()).entidadRef(entidadRef).build();
+    return ConvocatoriaEntidadGestora.builder().id(convocatoriaEntidadGestoraId).convocatoriaId(convocatoriaId)
+        .entidadRef(entidadRef).build();
 
   }
 
@@ -2169,8 +2182,7 @@ public class ConvocatoriaControllerTest extends BaseControllerTest {
   private ConvocatoriaAreaTematica generarConvocatoriaAreaTematica(Long convocatoriaAreaTematicaId, Long convocatoriaId,
       Long areaTematicaId) {
 
-    return ConvocatoriaAreaTematica.builder().id(convocatoriaAreaTematicaId)
-        .convocatoria(Convocatoria.builder().id(convocatoriaId).build())
+    return ConvocatoriaAreaTematica.builder().id(convocatoriaAreaTematicaId).convocatoriaId(convocatoriaId)
         .areaTematica(AreaTematica.builder().id(areaTematicaId).build())
         .observaciones("observaciones-" + convocatoriaAreaTematicaId).build();
   }
@@ -2182,15 +2194,12 @@ public class ConvocatoriaControllerTest extends BaseControllerTest {
    * @return el objeto ConvocatoriaEntidadConvocante
    */
   private ConvocatoriaEntidadConvocante generarMockConvocatoriaEntidadConvocante(Long id) {
-    Convocatoria convocatoria = new Convocatoria();
-    convocatoria.setId(id);
-
     Programa programa = new Programa();
     programa.setId(id);
 
     ConvocatoriaEntidadConvocante convocatoriaEntidadConvocante = new ConvocatoriaEntidadConvocante();
     convocatoriaEntidadConvocante.setId(id);
-    convocatoriaEntidadConvocante.setConvocatoria(convocatoria);
+    convocatoriaEntidadConvocante.setConvocatoriaId((id == null ? 0 : id));
     convocatoriaEntidadConvocante.setEntidadRef("entidad-" + (id == null ? 0 : id));
     convocatoriaEntidadConvocante.setPrograma(programa);
 
@@ -2204,17 +2213,14 @@ public class ConvocatoriaControllerTest extends BaseControllerTest {
    * @return el objeto ConvocatoriaHito
    */
   private ConvocatoriaHito generarMockConvocatoriaHito(Long id) {
-    Convocatoria convocatoria = new Convocatoria();
-    convocatoria.setId(id == null ? 1 : id);
-
     TipoHito tipoHito = new TipoHito();
     tipoHito.setId(id == null ? 1 : id);
     tipoHito.setActivo(true);
 
     ConvocatoriaHito convocatoriaHito = new ConvocatoriaHito();
     convocatoriaHito.setId(id);
-    convocatoriaHito.setConvocatoria(convocatoria);
-    convocatoriaHito.setFecha(LocalDate.of(2020, 10, 19));
+    convocatoriaHito.setConvocatoriaId(id == null ? 1 : id);
+    convocatoriaHito.setFecha(Instant.parse("2020-10-19T00:00:00Z"));
     convocatoriaHito.setComentario("comentario-" + id);
     convocatoriaHito.setGeneraAviso(true);
     convocatoriaHito.setTipoHito(tipoHito);
@@ -2230,20 +2236,21 @@ public class ConvocatoriaControllerTest extends BaseControllerTest {
    */
   private ConvocatoriaDocumento generarMockConvocatoriaDocumento(Long id) {
 
-    Convocatoria convocatoria = Convocatoria.builder().id(1L).build();
     TipoFase tipoFase = TipoFase.builder().id(id).build();
     TipoDocumento tipoDocumento = TipoDocumento.builder().id(id).build();
 
-    return ConvocatoriaDocumento.builder()//
-        .id(id)//
-        .convocatoria(convocatoria)//
-        .tipoFase(tipoFase)//
-        .tipoDocumento(tipoDocumento)//
-        .nombre("nombre doc-" + id)//
-        .publico(Boolean.TRUE)//
-        .observaciones("observaciones-" + id)//
-        .documentoRef("documentoRef" + id)//
+    // @formatter:off
+    return ConvocatoriaDocumento.builder()
+        .id(id)
+        .convocatoriaId(1L)
+        .tipoFase(tipoFase)
+        .tipoDocumento(tipoDocumento)
+        .nombre("nombre doc-" + id)
+        .publico(Boolean.TRUE)
+        .observaciones("observaciones-" + id)
+        .documentoRef("documentoRef" + id)
         .build();
+    // @formatter:on
   }
 
   /**
@@ -2256,8 +2263,7 @@ public class ConvocatoriaControllerTest extends BaseControllerTest {
 
     ConvocatoriaEnlace convocatoriaEnlace = new ConvocatoriaEnlace();
     convocatoriaEnlace.setId(id);
-    convocatoriaEnlace
-        .setConvocatoria(Convocatoria.builder().id(id).activo(Boolean.TRUE).codigo("codigo" + id).build());
+    convocatoriaEnlace.setConvocatoriaId(id);
     convocatoriaEnlace.setDescripcion("descripcion-" + id);
     convocatoriaEnlace.setUrl("www.url" + id + ".es");
     convocatoriaEnlace.setTipoEnlace(TipoEnlace.builder().id(id).nombre("tipoEnlace" + id)
@@ -2273,9 +2279,6 @@ public class ConvocatoriaControllerTest extends BaseControllerTest {
    * @return el objeto ConvocatoriaEntidadFinanciadora
    */
   private ConvocatoriaEntidadFinanciadora generarMockConvocatoriaEntidadFinanciadora(Long id) {
-    Convocatoria convocatoria = new Convocatoria();
-    convocatoria.setId(id == null ? 1 : id);
-
     FuenteFinanciacion fuenteFinanciacion = new FuenteFinanciacion();
     fuenteFinanciacion.setId(id == null ? 1 : id);
     fuenteFinanciacion.setActivo(true);
@@ -2289,7 +2292,7 @@ public class ConvocatoriaControllerTest extends BaseControllerTest {
 
     ConvocatoriaEntidadFinanciadora convocatoriaEntidadFinanciadora = new ConvocatoriaEntidadFinanciadora();
     convocatoriaEntidadFinanciadora.setId(id);
-    convocatoriaEntidadFinanciadora.setConvocatoria(convocatoria);
+    convocatoriaEntidadFinanciadora.setConvocatoriaId(id == null ? 1 : id);
     convocatoriaEntidadFinanciadora.setEntidadRef("entidad-" + (id == null ? 0 : id));
     convocatoriaEntidadFinanciadora.setFuenteFinanciacion(fuenteFinanciacion);
     convocatoriaEntidadFinanciadora.setTipoFinanciacion(tipoFinanciacion);
@@ -2305,17 +2308,14 @@ public class ConvocatoriaControllerTest extends BaseControllerTest {
    * @return el objeto ConvocatoriaPeriodoJustificacion
    */
   private ConvocatoriaPeriodoJustificacion generarMockConvocatoriaPeriodoJustificacion(Long id) {
-    Convocatoria convocatoria = new Convocatoria();
-    convocatoria.setId(id == null ? 1 : id);
-
     ConvocatoriaPeriodoJustificacion convocatoriaPeriodoJustificacion = new ConvocatoriaPeriodoJustificacion();
     convocatoriaPeriodoJustificacion.setId(id);
-    convocatoriaPeriodoJustificacion.setConvocatoria(convocatoria);
+    convocatoriaPeriodoJustificacion.setConvocatoriaId(id == null ? 1 : id);
     convocatoriaPeriodoJustificacion.setNumPeriodo(1);
     convocatoriaPeriodoJustificacion.setMesInicial(1);
     convocatoriaPeriodoJustificacion.setMesFinal(2);
-    convocatoriaPeriodoJustificacion.setFechaInicioPresentacion(LocalDate.of(2020, 10, 10));
-    convocatoriaPeriodoJustificacion.setFechaFinPresentacion(LocalDate.of(2020, 11, 20));
+    convocatoriaPeriodoJustificacion.setFechaInicioPresentacion(Instant.parse("2020-10-10T00:00:00Z"));
+    convocatoriaPeriodoJustificacion.setFechaFinPresentacion(Instant.parse("2020-11-20T23:59:59Z"));
     convocatoriaPeriodoJustificacion.setObservaciones("observaciones-" + id);
     convocatoriaPeriodoJustificacion.setTipo(ConvocatoriaPeriodoJustificacion.Tipo.PERIODICO);
 
@@ -2329,9 +2329,6 @@ public class ConvocatoriaControllerTest extends BaseControllerTest {
    * @return el objeto ConvocatoriaConceptoGasto
    */
   private ConvocatoriaConceptoGasto generarMockConvocatoriaConceptoGasto(Long id, Boolean permitido) {
-    Convocatoria convocatoria = new Convocatoria();
-    convocatoria.setId(id == null ? 1 : id);
-
     ConceptoGasto conceptoGasto = new ConceptoGasto();
     conceptoGasto.setId(id == null ? 1 : id);
     conceptoGasto.setActivo(true);
@@ -2339,7 +2336,7 @@ public class ConvocatoriaControllerTest extends BaseControllerTest {
     ConvocatoriaConceptoGasto convocatoriaConceptoGasto = new ConvocatoriaConceptoGasto();
     convocatoriaConceptoGasto.setId(id);
     convocatoriaConceptoGasto.setConceptoGasto(conceptoGasto);
-    convocatoriaConceptoGasto.setConvocatoria(convocatoria);
+    convocatoriaConceptoGasto.setConvocatoriaId(id == null ? 1 : id);
     convocatoriaConceptoGasto.setImporteMaximo(20.0);
     convocatoriaConceptoGasto.setMesInicial(1);
     convocatoriaConceptoGasto.setMesFinal(4);

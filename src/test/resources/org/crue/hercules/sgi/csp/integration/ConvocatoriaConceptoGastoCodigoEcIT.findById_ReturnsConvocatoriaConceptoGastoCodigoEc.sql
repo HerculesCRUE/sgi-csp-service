@@ -18,8 +18,8 @@ INSERT INTO csp.tipo_ambito_geografico (id, nombre, activo) VALUES (1, 'nombre-0
 
 -- CONVOCATORIA
 INSERT INTO csp.convocatoria
-(id, unidad_gestion_ref, modelo_ejecucion_id, codigo, anio, titulo, objeto, observaciones, tipo_finalidad_id, tipo_regimen_concurrencia_id, destinatarios, colaborativos, estado, duracion, tipo_ambito_geografico_id, clasificacion_cvn, activo)
-VALUES(1, 'unidad-001', 1, 'codigo-001', 2020, 'titulo-001', 'objeto-001', 'observaciones-001', 1, 1, 'INDIVIDUAL', true, 'REGISTRADA', 12, 1, 'AYUDAS', true);
+(id, unidad_gestion_ref, modelo_ejecucion_id, codigo, fecha_publicacion, fecha_provisional, fecha_concesion, titulo, objeto, observaciones, tipo_finalidad_id, tipo_regimen_concurrencia_id, colaborativos, estado, duracion, tipo_ambito_geografico_id, clasificacion_cvn, activo)
+VALUES(1, 'unidad-001', 1, 'codigo-001', '2021-10-15T23:59:59Z', '2021-10-16T23:59:59Z', '2021-10-17T23:59:59Z', 'titulo-001', 'objeto-001', 'observaciones-001', 1, 1, true, 'REGISTRADA', 12, 1, 'AYUDAS', true);
 
 --CONCEPTO GASTO
 insert into csp.concepto_gasto (id,nombre,descripcion,activo) values (1,'conceptoGasto-1','descripcion-1',true);
@@ -28,4 +28,4 @@ insert into csp.concepto_gasto (id,nombre,descripcion,activo) values (1,'concept
 INSERT INTO csp.convocatoria_concepto_gasto(id, convocatoria_id, concepto_gasto_id, permitido) VALUES(1, 1, 1,true);
 
 --CONVOCATORIA CONCEPTO GASTO CÓDIGO ECONÓMICO
-INSERT INTO csp.convocatoria_concepto_gasto_codigo_ec(id, convocatoria_concepto_gasto_id, codigo_economico_ref, fecha_inicio, fecha_fin) VALUES(1, 1, 'cod-001', '2020-10-03', '2020-10-03');
+INSERT INTO csp.convocatoria_concepto_gasto_codigo_ec(id, convocatoria_concepto_gasto_id, codigo_economico_ref, fecha_inicio, fecha_fin) VALUES(1, 1, 'cod-001', '2020-10-03T00:00:00Z', '2020-10-03T23:59:59Z');

@@ -1,13 +1,12 @@
 package org.crue.hercules.sgi.csp.repository.specification;
 
-import java.time.LocalDate;
+import java.time.Instant;
 
 import org.crue.hercules.sgi.csp.model.Convocatoria;
 import org.crue.hercules.sgi.csp.model.ConvocatoriaFase;
 import org.crue.hercules.sgi.csp.model.Proyecto;
 import org.crue.hercules.sgi.csp.model.ProyectoSocio;
 import org.crue.hercules.sgi.csp.model.ProyectoSocio_;
-import org.crue.hercules.sgi.csp.model.Proyecto_;
 import org.crue.hercules.sgi.csp.model.RolSocio_;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -30,9 +29,9 @@ public class ProyectoSocioSpecifications {
    * @param proyectoId el id del {@link Proyecto}.
    * @return specification para obtener los {@link ProyectoSocio} del proyecto.
    */
-  public static Specification<ProyectoSocio> byProyecto(Long proyectoId) {
+  public static Specification<ProyectoSocio> byProyectoId(Long proyectoId) {
     return (root, query, cb) -> {
-      return cb.equal(root.get(ProyectoSocio_.proyecto).get(Proyecto_.id), proyectoId);
+      return cb.equal(root.get(ProyectoSocio_.proyectoId), proyectoId);
     };
   }
 
@@ -56,14 +55,14 @@ public class ProyectoSocioSpecifications {
    * @return specification para obtener los {@link ConvocatoriaFase} con rango de
    *         fechas solapadas
    */
-  public static Specification<ProyectoSocio> byRangoFechaSolapados(LocalDate fechaInicio, LocalDate fechaFin) {
+  public static Specification<ProyectoSocio> byRangoFechaSolapados(Instant fechaInicio, Instant fechaFin) {
     return (root, query, cb) -> {
       return cb.and(
           cb.or(cb.isNull(root.get(ProyectoSocio_.fechaInicio)),
               cb.lessThanOrEqualTo(root.get(ProyectoSocio_.fechaInicio),
-                  fechaFin != null ? fechaFin : LocalDate.of(2500, 1, 1))),
+                  fechaFin != null ? fechaFin : Instant.parse("2500-01-01T23:59:59Z"))),
           cb.or(cb.isNull(root.get(ProyectoSocio_.fechaFin)), cb.greaterThanOrEqualTo(root.get(ProyectoSocio_.fechaFin),
-              fechaInicio != null ? fechaInicio : LocalDate.of(1900, 1, 1))));
+              fechaInicio != null ? fechaInicio : Instant.parse("1900-01-01T00:00:00Z"))));
     };
   }
 

@@ -1,7 +1,7 @@
 package org.crue.hercules.sgi.csp.service;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -13,9 +13,10 @@ import org.crue.hercules.sgi.csp.model.EstadoProyecto;
 import org.crue.hercules.sgi.csp.model.Proyecto;
 import org.crue.hercules.sgi.csp.model.ProyectoSocio;
 import org.crue.hercules.sgi.csp.model.ProyectoSocioPeriodoJustificacion;
+import org.crue.hercules.sgi.csp.repository.ProyectoRepository;
 import org.crue.hercules.sgi.csp.repository.ProyectoSocioPeriodoJustificacionRepository;
 import org.crue.hercules.sgi.csp.repository.ProyectoSocioRepository;
-import org.crue.hercules.sgi.csp.repository.SocioPeriodoJustificacionDocumentoRepository;
+import org.crue.hercules.sgi.csp.repository.ProyectoSocioPeriodoJustificacionDocumentoRepository;
 import org.crue.hercules.sgi.csp.service.impl.ProyectoSocioPeriodoJustificacionServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,28 +39,31 @@ public class ProyectoSocioPeriodoJustificacionServiceTest extends BaseServiceTes
   private ProyectoSocioPeriodoJustificacionRepository repository;
   @Mock
   private ProyectoSocioRepository proyectoSocioRepository;
+  @Mock
+  private ProyectoRepository proyectoRepository;
 
   @Mock
-  private SocioPeriodoJustificacionDocumentoRepository socioPeriodoJustificacionDocumentoRepository;
+  private ProyectoSocioPeriodoJustificacionDocumentoRepository proyectoSocioPeriodoJustificacionDocumentoRepository;
 
   private ProyectoSocioPeriodoJustificacionService service;
 
   @BeforeEach
   public void setUp() throws Exception {
     service = new ProyectoSocioPeriodoJustificacionServiceImpl(repository, proyectoSocioRepository,
-        socioPeriodoJustificacionDocumentoRepository);
+        proyectoSocioPeriodoJustificacionDocumentoRepository, proyectoRepository);
   }
 
   @Test
   public void update_ReturnsProyectoSocioPeriodoJustificacion() {
     // given: un ProyectoSocioPeriodoJustificacion actualizado,
-
+    Long proyectoId = 1L;
+    Proyecto proyecto = generarMockProyecto(proyectoId);
     ProyectoSocioPeriodoJustificacion updateProyectoSocioPeriodoJustificacion1 = generarMockProyectoSocioPeriodoJustificacion(
         4L);
-    updateProyectoSocioPeriodoJustificacion1.setFechaInicio(LocalDate.of(2021, 1, 19));
-    updateProyectoSocioPeriodoJustificacion1.setFechaFin(LocalDate.of(2021, 1, 26));
+    updateProyectoSocioPeriodoJustificacion1.setFechaInicio(Instant.parse("2021-01-19T00:00:00Z"));
+    updateProyectoSocioPeriodoJustificacion1.setFechaFin(Instant.parse("2021-01-26T23:59:59Z"));
 
-    BDDMockito.given(proyectoSocioRepository.existsById(ArgumentMatchers.anyLong())).willReturn(Boolean.TRUE);
+    BDDMockito.given(proyectoRepository.findById(ArgumentMatchers.anyLong())).willReturn(Optional.of(proyecto));
 
     BDDMockito.given(repository.findById(ArgumentMatchers.anyLong()))
         .willReturn(Optional.of(generarMockProyectoSocioPeriodoJustificacion(4L)));
@@ -68,13 +72,15 @@ public class ProyectoSocioPeriodoJustificacionServiceTest extends BaseServiceTes
         .will((InvocationOnMock invocation) -> invocation.getArgument(0));
 
     // when: update
+    BDDMockito.given(proyectoSocioRepository.findById(ArgumentMatchers.anyLong()))
+        .willReturn(Optional.of(generarMockProyectoSocio(4L, proyectoId)));
     ProyectoSocioPeriodoJustificacion proyectoSocioPeriodoJustificacionActualizado = service
         .update(updateProyectoSocioPeriodoJustificacion1, 4L);
 
     // then: Se actualiza el ProyectoSocioPeriodoJustificacion
     Assertions.assertThat(proyectoSocioPeriodoJustificacionActualizado.getId()).as(".getId()").isEqualTo(4L);
-    Assertions.assertThat(proyectoSocioPeriodoJustificacionActualizado.getProyectoSocio().getId())
-        .as(".getProyectoSocio().getId()").isEqualTo(4L);
+    Assertions.assertThat(proyectoSocioPeriodoJustificacionActualizado.getProyectoSocioId()).as(".getProyectoSocioId()")
+        .isEqualTo(4L);
     Assertions.assertThat(proyectoSocioPeriodoJustificacionActualizado.getFechaInicio()).as(".getFechaInicio()")
         .isEqualTo(updateProyectoSocioPeriodoJustificacion1.getFechaInicio());
     Assertions.assertThat(proyectoSocioPeriodoJustificacionActualizado.getFechaFin()).as("getFechaFin()")
@@ -97,11 +103,10 @@ public class ProyectoSocioPeriodoJustificacionServiceTest extends BaseServiceTes
     // given: a ProyectoSocioEntidadGestora with non existing ProyectoSocio
     Long proyectoSocioPeriodoJustificacionId = 1L;
     ProyectoSocioPeriodoJustificacion proyectoSocioPeriodoJustificacion = generarMockProyectoSocioPeriodoJustificacion(
-        1L);
+        proyectoSocioPeriodoJustificacionId);
 
     BDDMockito.given(repository.findById(ArgumentMatchers.anyLong()))
         .willReturn(Optional.of(proyectoSocioPeriodoJustificacion));
-    BDDMockito.given(proyectoSocioRepository.existsById(ArgumentMatchers.anyLong())).willReturn(Boolean.FALSE);
 
     Assertions.assertThatThrownBy(
         // when: update ProyectoSocioEntidadGestora
@@ -116,7 +121,7 @@ public class ProyectoSocioPeriodoJustificacionServiceTest extends BaseServiceTes
     // existe
     Long proyectoSocioPeriodoJustificacionId = 1L;
     ProyectoSocioPeriodoJustificacion proyectoSocioPeriodoJustificacion = generarMockProyectoSocioPeriodoJustificacion(
-        1L);
+        proyectoSocioPeriodoJustificacionId);
 
     BDDMockito.given(repository.findById(ArgumentMatchers.anyLong())).willReturn(Optional.empty());
 
@@ -134,12 +139,12 @@ public class ProyectoSocioPeriodoJustificacionServiceTest extends BaseServiceTes
     // given: a ProyectoSocioPeriodoJustificacion with proyecto socio modificado
     Long proyectoSocioPeriodoJustificacionId = 1L;
     ProyectoSocioPeriodoJustificacion proyectoSocioPeriodoJustificacion = generarMockProyectoSocioPeriodoJustificacion(
-        1L);
+        proyectoSocioPeriodoJustificacionId);
 
-    proyectoSocioPeriodoJustificacion.getProyectoSocio().setId(3L);
+    proyectoSocioPeriodoJustificacion.setProyectoSocioId(3L);
 
     BDDMockito.given(repository.findById(ArgumentMatchers.anyLong()))
-        .willReturn(Optional.of(generarMockProyectoSocioPeriodoJustificacion(1L)));
+        .willReturn(Optional.of(generarMockProyectoSocioPeriodoJustificacion(proyectoSocioPeriodoJustificacionId)));
 
     Assertions.assertThatThrownBy(
         // when: update
@@ -153,13 +158,18 @@ public class ProyectoSocioPeriodoJustificacionServiceTest extends BaseServiceTes
   public void update_WithFechaFinBeforeThanFechaInicio_ThrowsIllegalArgumentException() {
     // given: a ProyectoSocioPeriodoJustificacion with fecha fin before
     // fecha inicio
+    Long proyectoId = 1L;
+    Long proyectoSocioId = 1L;
+    ProyectoSocio proyectoSocio = generarMockProyectoSocio(proyectoSocioId, proyectoId);
     Long proyectoSocioPeriodoJustificacionId = 1L;
     ProyectoSocioPeriodoJustificacion proyectoSocioPeriodoJustificacion = generarMockProyectoSocioPeriodoJustificacion(
-        1L);
+        proyectoSocioPeriodoJustificacionId);
 
-    proyectoSocioPeriodoJustificacion.setFechaInicio(proyectoSocioPeriodoJustificacion.getFechaFin().plusDays(1));
+    proyectoSocioPeriodoJustificacion
+        .setFechaInicio(proyectoSocioPeriodoJustificacion.getFechaFin().plus(Period.ofDays(1)));
 
-    BDDMockito.given(proyectoSocioRepository.existsById(ArgumentMatchers.anyLong())).willReturn(Boolean.TRUE);
+    BDDMockito.given(proyectoSocioRepository.findById(ArgumentMatchers.anyLong()))
+        .willReturn(Optional.of(proyectoSocio));
 
     BDDMockito.given(repository.findById(ArgumentMatchers.anyLong()))
         .willReturn(Optional.of(proyectoSocioPeriodoJustificacion));
@@ -176,17 +186,23 @@ public class ProyectoSocioPeriodoJustificacionServiceTest extends BaseServiceTes
   public void update_WithOutFechasPresentacionAndEstadoProyectoAbierto_ThrowsIllegalArgumentException() {
     // given: a ProyectoSocioPeriodoJustificacion without fechas presentacion and
     // estado proyecto abierto
+    Long proyectoId = 1L;
+    Proyecto proyecto = generarMockProyecto(proyectoId);
+    Long proyectoSocioId = 1L;
+    ProyectoSocio proyectoSocio = generarMockProyectoSocio(proyectoSocioId, proyectoId);
+
     Long proyectoSocioPeriodoJustificacionId = 1L;
     ProyectoSocioPeriodoJustificacion proyectoSocioPeriodoJustificacion = generarMockProyectoSocioPeriodoJustificacion(
-        1L);
+        proyectoSocioPeriodoJustificacionId);
 
     proyectoSocioPeriodoJustificacion.setFechaInicioPresentacion(null);
     proyectoSocioPeriodoJustificacion.setFechaFinPresentacion(null);
 
+    BDDMockito.given(proyectoSocioRepository.findById(ArgumentMatchers.anyLong()))
+        .willReturn(Optional.of(proyectoSocio));
+    BDDMockito.given(proyectoRepository.findById(ArgumentMatchers.anyLong())).willReturn(Optional.of(proyecto));
     BDDMockito.given(repository.findById(ArgumentMatchers.anyLong()))
         .willReturn(Optional.of(proyectoSocioPeriodoJustificacion));
-
-    BDDMockito.given(proyectoSocioRepository.existsById(ArgumentMatchers.anyLong())).willReturn(Boolean.TRUE);
 
     Assertions.assertThatThrownBy(
         // when: update
@@ -200,13 +216,19 @@ public class ProyectoSocioPeriodoJustificacionServiceTest extends BaseServiceTes
   public void update_WithFechaFinPresentacionBeforeFechaInicioPresentacion_ThrowsIllegalArgumentException() {
     // given: a ProyectoSocioPeriodoJustificacion with FechaFinPresentacion before
     // FechaInicioPresentacion
+    Long proyectoId = 1L;
+    Proyecto proyecto = generarMockProyecto(proyectoId);
+    Long proyectoSocioId = 1L;
+    ProyectoSocio proyectoSocio = generarMockProyectoSocio(proyectoSocioId, proyectoId);
     Long proyectoSocioPeriodoJustificacionId = 1L;
     ProyectoSocioPeriodoJustificacion proyectoSocioPeriodoJustificacion = generarMockProyectoSocioPeriodoJustificacion(
-        1L);
+        proyectoSocioPeriodoJustificacionId);
     proyectoSocioPeriodoJustificacion
-        .setFechaInicioPresentacion(proyectoSocioPeriodoJustificacion.getFechaFinPresentacion().plusDays(1));
+        .setFechaInicioPresentacion(proyectoSocioPeriodoJustificacion.getFechaFinPresentacion().plus(Period.ofDays(1)));
 
-    BDDMockito.given(proyectoSocioRepository.existsById(ArgumentMatchers.anyLong())).willReturn(Boolean.TRUE);
+    BDDMockito.given(proyectoRepository.findById(ArgumentMatchers.anyLong())).willReturn(Optional.of(proyecto));
+    BDDMockito.given(proyectoSocioRepository.findById(ArgumentMatchers.anyLong()))
+        .willReturn(Optional.of(proyectoSocio));
 
     BDDMockito.given(repository.findById(ArgumentMatchers.anyLong()))
         .willReturn(Optional.of(proyectoSocioPeriodoJustificacion));
@@ -223,13 +245,18 @@ public class ProyectoSocioPeriodoJustificacionServiceTest extends BaseServiceTes
   public void update_WithFechaFinAfterProyectoFechaFin_ThrowsIllegalArgumentException() {
     // given: a ProyectoSocioPeriodoJustificacion with Fecha fin after fecha fin
     // proyecto
+    Long proyectoId = 1L;
+    Proyecto proyecto = generarMockProyecto(proyectoId);
+    Long proyectoSocioId = 1L;
+    ProyectoSocio proyectoSocio = generarMockProyectoSocio(proyectoSocioId, proyectoId);
     Long proyectoSocioPeriodoJustificacionId = 1L;
     ProyectoSocioPeriodoJustificacion proyectoSocioPeriodoJustificacion = generarMockProyectoSocioPeriodoJustificacion(
-        1L);
-    proyectoSocioPeriodoJustificacion
-        .setFechaFin(proyectoSocioPeriodoJustificacion.getProyectoSocio().getFechaFin().plusDays(1));
+        proyectoSocioPeriodoJustificacionId);
+    proyectoSocioPeriodoJustificacion.setFechaFin(proyectoSocio.getFechaFin().plus(Period.ofDays(1)));
 
-    BDDMockito.given(proyectoSocioRepository.existsById(ArgumentMatchers.anyLong())).willReturn(Boolean.TRUE);
+    BDDMockito.given(proyectoRepository.findById(ArgumentMatchers.anyLong())).willReturn(Optional.of(proyecto));
+    BDDMockito.given(proyectoSocioRepository.findById(ArgumentMatchers.anyLong()))
+        .willReturn(Optional.of(proyectoSocio));
 
     BDDMockito.given(repository.findById(ArgumentMatchers.anyLong()))
         .willReturn(Optional.of(proyectoSocioPeriodoJustificacion));
@@ -245,13 +272,19 @@ public class ProyectoSocioPeriodoJustificacionServiceTest extends BaseServiceTes
   @Test
   public void create_ReturnsProyectoSocioPeriodoJustificacion() {
     // given: un nuevo ProyectoSocioPeriodoJustificacion ,
+    Long proyectoId = 1L;
+    Proyecto proyecto = generarMockProyecto(proyectoId);
+    Long proyectoSocioId = 1L;
+    ProyectoSocio proyectoSocio = generarMockProyectoSocio(proyectoSocioId, proyectoId);
 
     ProyectoSocioPeriodoJustificacion updateProyectoSocioPeriodoJustificacion1 = generarMockProyectoSocioPeriodoJustificacion(
         null);
-    updateProyectoSocioPeriodoJustificacion1.setFechaInicio(LocalDate.of(2021, 1, 19));
-    updateProyectoSocioPeriodoJustificacion1.setFechaFin(LocalDate.of(2021, 1, 26));
+    updateProyectoSocioPeriodoJustificacion1.setFechaInicio(Instant.parse("2021-01-19T00:00:00Z"));
+    updateProyectoSocioPeriodoJustificacion1.setFechaFin(Instant.parse("2021-01-26T23:59:59Z"));
 
-    BDDMockito.given(proyectoSocioRepository.existsById(ArgumentMatchers.anyLong())).willReturn(Boolean.TRUE);
+    BDDMockito.given(proyectoRepository.findById(ArgumentMatchers.anyLong())).willReturn(Optional.of(proyecto));
+    BDDMockito.given(proyectoSocioRepository.findById(ArgumentMatchers.anyLong()))
+        .willReturn(Optional.of(proyectoSocio));
 
     BDDMockito.given(repository.saveAll(ArgumentMatchers.<ProyectoSocioPeriodoJustificacion>anyList()))
         .will((InvocationOnMock invocation) -> invocation.getArgument(0));
@@ -261,8 +294,8 @@ public class ProyectoSocioPeriodoJustificacionServiceTest extends BaseServiceTes
         .create(updateProyectoSocioPeriodoJustificacion1);
 
     // then: Se crea el nuevo ProyectoSocioPeriodoJustificacion,
-    Assertions.assertThat(proyectoSocioPeriodoJustificacionActualizado.getProyectoSocio().getId())
-        .as(".getProyectoSocio().getId()").isEqualTo(1L);
+    Assertions.assertThat(proyectoSocioPeriodoJustificacionActualizado.getProyectoSocioId()).as(".getProyectoSocioId()")
+        .isEqualTo(1L);
     Assertions.assertThat(proyectoSocioPeriodoJustificacionActualizado.getFechaInicio()).as(".getFechaInicio()")
         .isEqualTo(updateProyectoSocioPeriodoJustificacion1.getFechaInicio());
     Assertions.assertThat(proyectoSocioPeriodoJustificacionActualizado.getFechaFin()).as("getFechaFin()")
@@ -285,8 +318,6 @@ public class ProyectoSocioPeriodoJustificacionServiceTest extends BaseServiceTes
     // given: a ProyectoSocioEntidadGestora with non existing ProyectoSocio
     ProyectoSocioPeriodoJustificacion proyectoSocioPeriodoJustificacion = generarMockProyectoSocioPeriodoJustificacion(
         null);
-
-    BDDMockito.given(proyectoSocioRepository.existsById(ArgumentMatchers.anyLong())).willReturn(Boolean.FALSE);
 
     Assertions.assertThatThrownBy(
         // when: create ProyectoSocioEntidadGestora
@@ -317,12 +348,17 @@ public class ProyectoSocioPeriodoJustificacionServiceTest extends BaseServiceTes
   public void create_WithFechaFinBeforeThanFechaInicio_ThrowsIllegalArgumentException() {
     // given: a ProyectoSocioPeriodoJustificacion with fecha fin before
     // fecha inicio
+    Long proyectoId = 1L;
+    Long proyectoSocioId = 1L;
+    ProyectoSocio proyectoSocio = generarMockProyectoSocio(proyectoSocioId, proyectoId);
     ProyectoSocioPeriodoJustificacion proyectoSocioPeriodoJustificacion = generarMockProyectoSocioPeriodoJustificacion(
         null);
 
-    proyectoSocioPeriodoJustificacion.setFechaInicio(proyectoSocioPeriodoJustificacion.getFechaFin().plusDays(1));
+    proyectoSocioPeriodoJustificacion
+        .setFechaInicio(proyectoSocioPeriodoJustificacion.getFechaFin().plus(Period.ofDays(1)));
 
-    BDDMockito.given(proyectoSocioRepository.existsById(ArgumentMatchers.anyLong())).willReturn(Boolean.TRUE);
+    BDDMockito.given(proyectoSocioRepository.findById(ArgumentMatchers.anyLong()))
+        .willReturn(Optional.of(proyectoSocio));
 
     Assertions.assertThatThrownBy(
         // when: create
@@ -336,13 +372,19 @@ public class ProyectoSocioPeriodoJustificacionServiceTest extends BaseServiceTes
   public void create_WithOutFechasPresentacionAndEstadoProyectoAbierto_ThrowsIllegalArgumentException() {
     // given: a ProyectoSocioPeriodoJustificacion without fechas presentacion and
     // estado proyecto abierto
+    Long proyectoId = 1L;
+    Proyecto proyecto = generarMockProyecto(proyectoId);
+    Long proyectoSocioId = 1L;
+    ProyectoSocio proyectoSocio = generarMockProyectoSocio(proyectoSocioId, proyectoId);
     ProyectoSocioPeriodoJustificacion proyectoSocioPeriodoJustificacion = generarMockProyectoSocioPeriodoJustificacion(
         null);
 
     proyectoSocioPeriodoJustificacion.setFechaInicioPresentacion(null);
     proyectoSocioPeriodoJustificacion.setFechaFinPresentacion(null);
 
-    BDDMockito.given(proyectoSocioRepository.existsById(ArgumentMatchers.anyLong())).willReturn(Boolean.TRUE);
+    BDDMockito.given(proyectoRepository.findById(ArgumentMatchers.anyLong())).willReturn(Optional.of(proyecto));
+    BDDMockito.given(proyectoSocioRepository.findById(ArgumentMatchers.anyLong()))
+        .willReturn(Optional.of(proyectoSocio));
 
     Assertions.assertThatThrownBy(
         // when: create
@@ -356,12 +398,18 @@ public class ProyectoSocioPeriodoJustificacionServiceTest extends BaseServiceTes
   public void create_WithFechaFinPresentacionBeforeFechaInicioPresentacion_ThrowsIllegalArgumentException() {
     // given: a ProyectoSocioPeriodoJustificacion with FechaFinPresentacion before
     // FechaInicioPresentacion
+    Long proyectoId = 1L;
+    Proyecto proyecto = generarMockProyecto(proyectoId);
+    Long proyectoSocioId = 1L;
+    ProyectoSocio proyectoSocio = generarMockProyectoSocio(proyectoSocioId, proyectoId);
     ProyectoSocioPeriodoJustificacion proyectoSocioPeriodoJustificacion = generarMockProyectoSocioPeriodoJustificacion(
         null);
     proyectoSocioPeriodoJustificacion
-        .setFechaInicioPresentacion(proyectoSocioPeriodoJustificacion.getFechaFinPresentacion().plusDays(1));
+        .setFechaInicioPresentacion(proyectoSocioPeriodoJustificacion.getFechaFinPresentacion().plus(Period.ofDays(1)));
 
-    BDDMockito.given(proyectoSocioRepository.existsById(ArgumentMatchers.anyLong())).willReturn(Boolean.TRUE);
+    BDDMockito.given(proyectoRepository.findById(ArgumentMatchers.anyLong())).willReturn(Optional.of(proyecto));
+    BDDMockito.given(proyectoSocioRepository.findById(ArgumentMatchers.anyLong()))
+        .willReturn(Optional.of(proyectoSocio));
 
     Assertions.assertThatThrownBy(
         // when: create
@@ -375,12 +423,17 @@ public class ProyectoSocioPeriodoJustificacionServiceTest extends BaseServiceTes
   public void create_WithFechaFinAfterProyectoFechaFin_ThrowsIllegalArgumentException() {
     // given: a ProyectoSocioPeriodoJustificacion with Fecha fin after fecha fin
     // proyecto
+    Long proyectoId = 1L;
+    Proyecto proyecto = generarMockProyecto(proyectoId);
+    Long proyectoSocioId = 1L;
+    ProyectoSocio proyectoSocio = generarMockProyectoSocio(proyectoSocioId, proyectoId);
     ProyectoSocioPeriodoJustificacion proyectoSocioPeriodoJustificacion = generarMockProyectoSocioPeriodoJustificacion(
         null);
-    proyectoSocioPeriodoJustificacion
-        .setFechaFin(proyectoSocioPeriodoJustificacion.getProyectoSocio().getFechaFin().plusDays(1));
+    proyectoSocioPeriodoJustificacion.setFechaFin(proyectoSocio.getFechaFin().plus(Period.ofDays(1)));
 
-    BDDMockito.given(proyectoSocioRepository.existsById(ArgumentMatchers.anyLong())).willReturn(Boolean.TRUE);
+    BDDMockito.given(proyectoRepository.findById(ArgumentMatchers.anyLong())).willReturn(Optional.of(proyecto));
+    BDDMockito.given(proyectoSocioRepository.findById(ArgumentMatchers.anyLong()))
+        .willReturn(Optional.of(proyectoSocio));
 
     Assertions.assertThatThrownBy(
         // when: create
@@ -394,6 +447,9 @@ public class ProyectoSocioPeriodoJustificacionServiceTest extends BaseServiceTes
   public void delete_WithExistingId_NoReturnsAnyException() {
     // given: existing SolicitudProyectoSocio
     Long id = 1L;
+    Long proyectoId = 1L;
+    Long proyectoSocioId = 1L;
+    ProyectoSocio proyectoSocio = generarMockProyectoSocio(proyectoSocioId, proyectoId);
 
     ProyectoSocioPeriodoJustificacion proyectoSocioPeriodoJustificacion = generarMockProyectoSocioPeriodoJustificacion(
         4L);
@@ -401,7 +457,7 @@ public class ProyectoSocioPeriodoJustificacionServiceTest extends BaseServiceTes
     proyectoSocioPeriodoJustificacionEliminar.add(proyectoSocioPeriodoJustificacion);
 
     BDDMockito.given(proyectoSocioRepository.findById(ArgumentMatchers.anyLong()))
-        .willReturn(Optional.of(proyectoSocioPeriodoJustificacion.getProyectoSocio()));
+        .willReturn(Optional.of(proyectoSocio));
 
     Assertions.assertThatCode(
         // when: delete by existing id
@@ -488,13 +544,13 @@ public class ProyectoSocioPeriodoJustificacionServiceTest extends BaseServiceTes
     Assertions.assertThat(proyectoSocioPeriodoJustificacion).as("isNotNull()").isNotNull();
     Assertions.assertThat(proyectoSocioPeriodoJustificacion.getId()).as("getId()").isEqualTo(idBuscado);
     Assertions.assertThat(proyectoSocioPeriodoJustificacion.getFechaInicio()).as("getFechaInicio()")
-        .isEqualTo(LocalDate.of(2020, 9, 10));
+        .isEqualTo(Instant.parse("2020-09-11T00:00:00Z"));
     Assertions.assertThat(proyectoSocioPeriodoJustificacion.getFechaFin()).as("getFechaFin()")
-        .isEqualTo(LocalDate.of(2020, 12, 20));
+        .isEqualTo(Instant.parse("2020-12-20T23:59:59Z"));
     Assertions.assertThat(proyectoSocioPeriodoJustificacion.getFechaInicioPresentacion())
-        .as("getFechaInicioPresentacion()").isEqualTo(LocalDateTime.of(2020, 10, 10, 0, 0));
+        .as("getFechaInicioPresentacion()").isEqualTo(Instant.parse("2020-10-10T00:00:00Z"));
     Assertions.assertThat(proyectoSocioPeriodoJustificacion.getFechaFinPresentacion()).as("getFechaFinPresentacion()")
-        .isEqualTo(LocalDateTime.of(2020, 11, 20, 0, 0));
+        .isEqualTo(Instant.parse("2020-11-20T23:59:59Z"));
     Assertions.assertThat(proyectoSocioPeriodoJustificacion.getNumPeriodo()).as("getNumPeriodo()").isEqualTo(1);
     Assertions.assertThat(proyectoSocioPeriodoJustificacion.getObservaciones()).as("getObservaciones()")
         .isEqualTo("observaciones-1");
@@ -512,6 +568,22 @@ public class ProyectoSocioPeriodoJustificacionServiceTest extends BaseServiceTes
         .isInstanceOf(ProyectoSocioPeriodoJustificacionNotFoundException.class);
   }
 
+  private Proyecto generarMockProyecto(Long id) {
+    Proyecto proyecto = new Proyecto();
+    proyecto.setEstado(new EstadoProyecto());
+    proyecto.getEstado().setEstado(EstadoProyecto.Estado.ABIERTO);
+    return proyecto;
+  }
+
+  private ProyectoSocio generarMockProyectoSocio(Long id, Long proyectoId) {
+    ProyectoSocio proyectoSocio = new ProyectoSocio();
+    proyectoSocio.setId(id == null ? 1 : id);
+    proyectoSocio.setProyectoId(proyectoId);
+    proyectoSocio.setFechaFin(Instant.parse("2022-12-23T23:59:59Z"));
+
+    return proyectoSocio;
+  }
+
   /**
    * Función que devuelve un objeto ProyectoSocioPeriodoJustificacion.
    * 
@@ -519,21 +591,14 @@ public class ProyectoSocioPeriodoJustificacionServiceTest extends BaseServiceTes
    * @return el objeto ProyectoSocioPeriodoJustificacion
    */
   private ProyectoSocioPeriodoJustificacion generarMockProyectoSocioPeriodoJustificacion(Long id) {
-    ProyectoSocio proyectoSocio = new ProyectoSocio();
-    proyectoSocio.setId(id == null ? 1 : id);
-    proyectoSocio.setProyecto(new Proyecto());
-    proyectoSocio.getProyecto().setEstado(new EstadoProyecto());
-    proyectoSocio.getProyecto().getEstado().setEstado(EstadoProyecto.Estado.ABIERTO);
-    proyectoSocio.setFechaFin(LocalDate.of(2022, 12, 23));
-
     ProyectoSocioPeriodoJustificacion proyectoSocioPeriodoJustificacion = new ProyectoSocioPeriodoJustificacion();
     proyectoSocioPeriodoJustificacion.setId(id);
-    proyectoSocioPeriodoJustificacion.setProyectoSocio(proyectoSocio);
+    proyectoSocioPeriodoJustificacion.setProyectoSocioId(id == null ? 1 : id);
     proyectoSocioPeriodoJustificacion.setNumPeriodo(1);
-    proyectoSocioPeriodoJustificacion.setFechaInicio(LocalDate.of(2020, 9, 10));
-    proyectoSocioPeriodoJustificacion.setFechaFin(LocalDate.of(2020, 12, 20));
-    proyectoSocioPeriodoJustificacion.setFechaInicioPresentacion(LocalDateTime.of(2020, 10, 10, 0, 0, 0));
-    proyectoSocioPeriodoJustificacion.setFechaFinPresentacion(LocalDateTime.of(2020, 11, 20, 0, 0, 0));
+    proyectoSocioPeriodoJustificacion.setFechaInicio(Instant.parse("2020-09-11T00:00:00Z"));
+    proyectoSocioPeriodoJustificacion.setFechaFin(Instant.parse("2020-12-20T23:59:59Z"));
+    proyectoSocioPeriodoJustificacion.setFechaInicioPresentacion(Instant.parse("2020-10-10T00:00:00Z"));
+    proyectoSocioPeriodoJustificacion.setFechaFinPresentacion(Instant.parse("2020-11-20T23:59:59Z"));
     proyectoSocioPeriodoJustificacion.setObservaciones("observaciones-" + id);
 
     return proyectoSocioPeriodoJustificacion;

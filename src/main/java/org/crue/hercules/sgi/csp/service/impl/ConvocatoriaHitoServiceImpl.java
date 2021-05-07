@@ -1,6 +1,6 @@
 package org.crue.hercules.sgi.csp.service.impl;
 
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.Optional;
 
 import org.crue.hercules.sgi.csp.exceptions.ConvocatoriaHitoNotFoundException;
@@ -56,24 +56,22 @@ public class ConvocatoriaHitoServiceImpl implements ConvocatoriaHitoService {
     Assert.isNull(convocatoriaHito.getId(),
         "ConvocatoriaHito id tiene que ser null para crear un nuevo ConvocatoriaHito");
 
-    Assert.isTrue(convocatoriaHito.getConvocatoria() != null && convocatoriaHito.getConvocatoria().getId() != null,
+    Assert.isTrue(convocatoriaHito.getConvocatoriaId() != null,
         "Id Convocatoria no puede ser null para crear ConvocatoriaHito");
 
     Assert.isTrue(convocatoriaHito.getTipoHito() != null && convocatoriaHito.getTipoHito().getId() != null,
         "Id Hito no puede ser null para crear ConvocatoriaHito");
 
-    if (convocatoriaHito.getFecha().isBefore(LocalDate.now())) {
+    if (convocatoriaHito.getFecha().isBefore(Instant.now())) {
       convocatoriaHito.setGeneraAviso(false);
     }
 
-    convocatoriaHito.setConvocatoria(convocatoriaRepository.findById(convocatoriaHito.getConvocatoria().getId())
-        .orElseThrow(() -> new ConvocatoriaNotFoundException(convocatoriaHito.getConvocatoria().getId())));
+    Convocatoria convocatoria = convocatoriaRepository.findById(convocatoriaHito.getConvocatoriaId())
+        .orElseThrow(() -> new ConvocatoriaNotFoundException(convocatoriaHito.getConvocatoriaId()));
 
     // Se recupera el Id de ModeloEjecucion para las siguientes validaciones
-    Long modeloEjecucionId = (convocatoriaHito.getConvocatoria().getModeloEjecucion() != null
-        && convocatoriaHito.getConvocatoria().getModeloEjecucion().getId() != null)
-            ? convocatoriaHito.getConvocatoria().getModeloEjecucion().getId()
-            : null;
+    Long modeloEjecucionId = (convocatoria.getModeloEjecucion() != null
+        && convocatoria.getModeloEjecucion().getId() != null) ? convocatoria.getModeloEjecucion().getId() : null;
 
     // TipoHito
     Optional<ModeloTipoHito> modeloTipoHito = modeloTipoHitoRepository
@@ -82,7 +80,7 @@ public class ConvocatoriaHitoServiceImpl implements ConvocatoriaHitoService {
     // Está asignado al ModeloEjecucion
     Assert.isTrue(modeloTipoHito.isPresent(),
         "TipoHito '" + convocatoriaHito.getTipoHito().getNombre() + "' no disponible para el ModeloEjecucion '"
-            + ((modeloEjecucionId != null) ? convocatoriaHito.getConvocatoria().getModeloEjecucion().getNombre()
+            + ((modeloEjecucionId != null) ? convocatoria.getModeloEjecucion().getNombre()
                 : "Convocatoria sin modelo asignado")
             + "'");
 
@@ -97,7 +95,7 @@ public class ConvocatoriaHitoServiceImpl implements ConvocatoriaHitoService {
     convocatoriaHito.setTipoHito(modeloTipoHito.get().getTipoHito());
 
     Assert.isTrue(
-        !repository.findByConvocatoriaIdAndFechaAndTipoHitoId(convocatoriaHito.getConvocatoria().getId(),
+        !repository.findByConvocatoriaIdAndFechaAndTipoHitoId(convocatoriaHito.getConvocatoriaId(),
             convocatoriaHito.getFecha(), convocatoriaHito.getTipoHito().getId()).isPresent(),
         "Ya existe un Hito con el mismo tipo en esa fecha");
 
@@ -124,9 +122,7 @@ public class ConvocatoriaHitoServiceImpl implements ConvocatoriaHitoService {
     Assert.notNull(convocatoriaHitoActualizar.getId(),
         "ConvocatoriaHito id no puede ser null para actualizar un ConvocatoriaHito");
 
-    Assert.isTrue(
-        convocatoriaHitoActualizar.getConvocatoria() != null
-            && convocatoriaHitoActualizar.getConvocatoria().getId() != null,
+    Assert.isTrue(convocatoriaHitoActualizar.getConvocatoriaId() != null,
         "Id Convocatoria no puede ser null para actualizar ConvocatoriaHito");
 
     Assert.isTrue(
@@ -136,10 +132,10 @@ public class ConvocatoriaHitoServiceImpl implements ConvocatoriaHitoService {
     return repository.findById(convocatoriaHitoActualizar.getId()).map(convocatoriaHito -> {
 
       // Se recupera el Id de ModeloEjecucion para las siguientes validaciones
-      Long modeloEjecucionId = (convocatoriaHito.getConvocatoria().getModeloEjecucion() != null
-          && convocatoriaHito.getConvocatoria().getModeloEjecucion().getId() != null)
-              ? convocatoriaHito.getConvocatoria().getModeloEjecucion().getId()
-              : null;
+      Convocatoria convocatoria = convocatoriaRepository.findById(convocatoriaHito.getConvocatoriaId())
+          .orElseThrow(() -> new ConvocatoriaNotFoundException(convocatoriaHito.getConvocatoriaId()));
+      Long modeloEjecucionId = (convocatoria.getModeloEjecucion() != null
+          && convocatoria.getModeloEjecucion().getId() != null) ? convocatoria.getModeloEjecucion().getId() : null;
 
       // TipoHito
       Optional<ModeloTipoHito> modeloTipoHito = modeloTipoHitoRepository
@@ -149,7 +145,7 @@ public class ConvocatoriaHitoServiceImpl implements ConvocatoriaHitoService {
       Assert.isTrue(modeloTipoHito.isPresent(),
           "TipoHito '" + convocatoriaHitoActualizar.getTipoHito().getNombre()
               + "' no disponible para el ModeloEjecucion '"
-              + ((modeloEjecucionId != null) ? convocatoriaHito.getConvocatoria().getModeloEjecucion().getNombre()
+              + ((modeloEjecucionId != null) ? convocatoria.getModeloEjecucion().getNombre()
                   : "Convocatoria sin modelo asignado")
               + "'");
 
@@ -169,11 +165,11 @@ public class ConvocatoriaHitoServiceImpl implements ConvocatoriaHitoService {
 
       convocatoriaHitoActualizar.setTipoHito(modeloTipoHito.get().getTipoHito());
 
-      if (convocatoriaHitoActualizar.getFecha().isBefore(LocalDate.now())) {
+      if (convocatoriaHitoActualizar.getFecha().isBefore(Instant.now())) {
         convocatoriaHitoActualizar.setGeneraAviso(false);
       }
       repository
-          .findByConvocatoriaIdAndFechaAndTipoHitoId(convocatoriaHitoActualizar.getConvocatoria().getId(),
+          .findByConvocatoriaIdAndFechaAndTipoHitoId(convocatoriaHitoActualizar.getConvocatoriaId(),
               convocatoriaHitoActualizar.getFecha(), convocatoriaHitoActualizar.getTipoHito().getId())
           .ifPresent((convocatoriaHitoExistente) -> {
             Assert.isTrue(convocatoriaHitoActualizar.getId() == convocatoriaHitoExistente.getId(),

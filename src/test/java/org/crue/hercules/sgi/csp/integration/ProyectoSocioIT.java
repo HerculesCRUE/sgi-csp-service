@@ -2,13 +2,11 @@ package org.crue.hercules.sgi.csp.integration;
 
 import java.math.BigDecimal;
 import java.net.URI;
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 
 import org.assertj.core.api.Assertions;
-import org.crue.hercules.sgi.csp.model.EstadoProyecto;
-import org.crue.hercules.sgi.csp.model.Proyecto;
 import org.crue.hercules.sgi.csp.model.ProyectoSocio;
 import org.crue.hercules.sgi.csp.model.ProyectoSocioEquipo;
 import org.crue.hercules.sgi.csp.model.ProyectoSocioPeriodoJustificacion;
@@ -48,8 +46,9 @@ public class ProyectoSocioIT extends BaseIT {
 
   @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:scripts/modelo_ejecucion.sql",
       "classpath:scripts/modelo_unidad.sql", "classpath:scripts/tipo_finalidad.sql",
-      "classpath:scripts/tipo_ambito_geografico.sql", "classpath:scripts/estado_proyecto.sql",
-      "classpath:scripts/proyecto.sql", "classpath:scripts/rol_socio.sql", "classpath:scripts/rol_proyecto.sql" })
+      "classpath:scripts/tipo_ambito_geografico.sql", "classpath:scripts/proyecto.sql",
+      "classpath:scripts/estado_proyecto.sql", "classpath:scripts/rol_socio.sql",
+      "classpath:scripts/rol_proyecto.sql" })
   @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:cleanup.sql")
   @Test
   public void create_ReturnsProyectoSocio() throws Exception {
@@ -66,9 +65,7 @@ public class ProyectoSocioIT extends BaseIT {
     Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
     ProyectoSocio responseData = response.getBody();
     Assertions.assertThat(responseData.getId()).as("getId()").isNotNull();
-    Assertions.assertThat(responseData.getProyecto()).as("getProyecto()").isNotNull();
-    Assertions.assertThat(responseData.getProyecto().getId()).as("getProyecto().getId()")
-        .isEqualTo(proyectoSocio.getProyecto().getId());
+    Assertions.assertThat(responseData.getProyectoId()).as("getProyectoId()").isEqualTo(proyectoSocio.getProyectoId());
     Assertions.assertThat(responseData.getEmpresaRef()).as("getEmpresaRef()").isEqualTo(proyectoSocio.getEmpresaRef());
     Assertions.assertThat(responseData.getRolSocio()).as("getRolSocio()").isNotNull();
     Assertions.assertThat(responseData.getRolSocio().getId()).as("getRolSocio().getId()")
@@ -84,8 +81,8 @@ public class ProyectoSocioIT extends BaseIT {
 
   @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:scripts/modelo_ejecucion.sql",
       "classpath:scripts/modelo_unidad.sql", "classpath:scripts/tipo_finalidad.sql",
-      "classpath:scripts/tipo_ambito_geografico.sql", "classpath:scripts/estado_proyecto.sql",
-      "classpath:scripts/proyecto.sql", "classpath:scripts/rol_socio.sql", "classpath:scripts/rol_proyecto.sql",
+      "classpath:scripts/tipo_ambito_geografico.sql", "classpath:scripts/proyecto.sql",
+      "classpath:scripts/estado_proyecto.sql", "classpath:scripts/rol_socio.sql", "classpath:scripts/rol_proyecto.sql",
       "classpath:scripts/proyecto_socio.sql" })
   @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:cleanup.sql")
   @Test
@@ -103,9 +100,7 @@ public class ProyectoSocioIT extends BaseIT {
     Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     ProyectoSocio responseData = response.getBody();
     Assertions.assertThat(responseData.getId()).as("getId()").isNotNull();
-    Assertions.assertThat(responseData.getProyecto()).as("getProyecto()").isNotNull();
-    Assertions.assertThat(responseData.getProyecto().getId()).as("getProyecto().getId()")
-        .isEqualTo(proyectoSocio.getProyecto().getId());
+    Assertions.assertThat(responseData.getProyectoId()).as("getProyectoId()").isEqualTo(proyectoSocio.getProyectoId());
     Assertions.assertThat(responseData.getEmpresaRef()).as("getEmpresaRef()").isEqualTo(proyectoSocio.getEmpresaRef());
     Assertions.assertThat(responseData.getRolSocio()).as("getRolSocio()").isNotNull();
     Assertions.assertThat(responseData.getRolSocio().getId()).as("getRolSocio().getId()")
@@ -122,8 +117,8 @@ public class ProyectoSocioIT extends BaseIT {
 
   @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:scripts/modelo_ejecucion.sql",
       "classpath:scripts/modelo_unidad.sql", "classpath:scripts/tipo_finalidad.sql",
-      "classpath:scripts/tipo_ambito_geografico.sql", "classpath:scripts/estado_proyecto.sql",
-      "classpath:scripts/proyecto.sql", "classpath:scripts/rol_socio.sql", "classpath:scripts/rol_proyecto.sql",
+      "classpath:scripts/tipo_ambito_geografico.sql", "classpath:scripts/proyecto.sql",
+      "classpath:scripts/estado_proyecto.sql", "classpath:scripts/rol_socio.sql", "classpath:scripts/rol_proyecto.sql",
       "classpath:scripts/proyecto_socio.sql" })
   @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:cleanup.sql")
   @Test
@@ -142,8 +137,8 @@ public class ProyectoSocioIT extends BaseIT {
 
   @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:scripts/modelo_ejecucion.sql",
       "classpath:scripts/modelo_unidad.sql", "classpath:scripts/tipo_finalidad.sql",
-      "classpath:scripts/tipo_ambito_geografico.sql", "classpath:scripts/estado_proyecto.sql",
-      "classpath:scripts/proyecto.sql", "classpath:scripts/rol_socio.sql", "classpath:scripts/rol_proyecto.sql",
+      "classpath:scripts/tipo_ambito_geografico.sql", "classpath:scripts/proyecto.sql",
+      "classpath:scripts/estado_proyecto.sql", "classpath:scripts/rol_socio.sql", "classpath:scripts/rol_proyecto.sql",
       "classpath:scripts/proyecto_socio.sql" })
   @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:cleanup.sql")
   @Test
@@ -159,8 +154,8 @@ public class ProyectoSocioIT extends BaseIT {
 
   @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:scripts/modelo_ejecucion.sql",
       "classpath:scripts/modelo_unidad.sql", "classpath:scripts/tipo_finalidad.sql",
-      "classpath:scripts/tipo_ambito_geografico.sql", "classpath:scripts/estado_proyecto.sql",
-      "classpath:scripts/proyecto.sql", "classpath:scripts/rol_socio.sql", "classpath:scripts/rol_proyecto.sql",
+      "classpath:scripts/tipo_ambito_geografico.sql", "classpath:scripts/proyecto.sql",
+      "classpath:scripts/estado_proyecto.sql", "classpath:scripts/rol_socio.sql", "classpath:scripts/rol_proyecto.sql",
       "classpath:scripts/proyecto_socio.sql" })
   @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:cleanup.sql")
   @Test
@@ -173,11 +168,13 @@ public class ProyectoSocioIT extends BaseIT {
     Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     ProyectoSocio responseData = response.getBody();
     Assertions.assertThat(responseData.getId()).as("getId()").isEqualTo(id);
-    Assertions.assertThat(responseData.getProyecto().getId()).as("getProyecto()").isEqualTo(1L);
+    Assertions.assertThat(responseData.getProyectoId()).as("getProyectoId()").isEqualTo(1L);
     Assertions.assertThat(responseData.getEmpresaRef()).as("getEmpresaRef()").isEqualTo("empresa-001");
     Assertions.assertThat(responseData.getRolSocio().getId()).as("getRolSocio().getId()").isEqualTo(1L);
-    Assertions.assertThat(responseData.getFechaInicio()).as("getFechaInicio()").isEqualTo(LocalDate.of(2021, 1, 11));
-    Assertions.assertThat(responseData.getFechaFin()).as("getFechaFin()").isEqualTo(LocalDate.of(2022, 1, 11));
+    Assertions.assertThat(responseData.getFechaInicio()).as("getFechaInicio()")
+        .isEqualTo(Instant.parse("2021-01-11T00:00:00Z"));
+    Assertions.assertThat(responseData.getFechaFin()).as("getFechaFin()")
+        .isEqualTo(Instant.parse("2022-01-11T23:59:59Z"));
     Assertions.assertThat(responseData.getNumInvestigadores()).as("getNumInvestigadores()").isEqualTo(5);
     Assertions.assertThat(responseData.getImporteConcedido()).as("getImporteConcedido()")
         .isEqualTo(new BigDecimal("1000.00"));
@@ -186,9 +183,9 @@ public class ProyectoSocioIT extends BaseIT {
 
   @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:scripts/modelo_ejecucion.sql",
       "classpath:scripts/modelo_unidad.sql", "classpath:scripts/tipo_finalidad.sql",
-      "classpath:scripts/tipo_ambito_geografico.sql", "classpath:scripts/estado_proyecto.sql",
-      "classpath:scripts/proyecto.sql", "classpath:scripts/rol_socio.sql", "classpath:scripts/proyecto_socio.sql",
-      "classpath:scripts/proyecto_socio_periodo_pago.sql" })
+      "classpath:scripts/tipo_ambito_geografico.sql", "classpath:scripts/proyecto.sql",
+      "classpath:scripts/estado_proyecto.sql", "classpath:scripts/rol_socio.sql",
+      "classpath:scripts/proyecto_socio.sql", "classpath:scripts/proyecto_socio_periodo_pago.sql" })
   @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:cleanup.sql")
   @Test
   public void findAllProyectoSocioPeriodoPago_WithPagingSortingAndFiltering_ReturnsProyectoSocioPeriodoPagoSubList()
@@ -211,8 +208,8 @@ public class ProyectoSocioIT extends BaseIT {
         });
 
     Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-    final List<ProyectoSocioPeriodoPago> solicitudProyectoPeriodoPago = response.getBody();
-    Assertions.assertThat(solicitudProyectoPeriodoPago.size()).isEqualTo(3);
+    final List<ProyectoSocioPeriodoPago> solicitudProyectoSocioPeriodoPago = response.getBody();
+    Assertions.assertThat(solicitudProyectoSocioPeriodoPago.size()).isEqualTo(3);
     HttpHeaders responseHeaders = response.getHeaders();
     Assertions.assertThat(responseHeaders.getFirst("X-Page")).as("X-Page").isEqualTo("0");
     Assertions.assertThat(responseHeaders.getFirst("X-Page-Size")).as("X-Page-Size").isEqualTo("10");
@@ -226,8 +223,8 @@ public class ProyectoSocioIT extends BaseIT {
 
   @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:scripts/modelo_ejecucion.sql",
       "classpath:scripts/modelo_unidad.sql", "classpath:scripts/tipo_finalidad.sql",
-      "classpath:scripts/tipo_ambito_geografico.sql", "classpath:scripts/estado_proyecto.sql",
-      "classpath:scripts/proyecto.sql", "classpath:scripts/rol_socio.sql", "classpath:scripts/rol_proyecto.sql",
+      "classpath:scripts/tipo_ambito_geografico.sql", "classpath:scripts/proyecto.sql",
+      "classpath:scripts/estado_proyecto.sql", "classpath:scripts/rol_socio.sql", "classpath:scripts/rol_proyecto.sql",
       "classpath:scripts/proyecto_socio.sql", "classpath:scripts/proyecto_socio_equipo.sql" })
   @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:cleanup.sql")
   @Test
@@ -273,8 +270,8 @@ public class ProyectoSocioIT extends BaseIT {
 
   @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:scripts/modelo_ejecucion.sql",
       "classpath:scripts/modelo_unidad.sql", "classpath:scripts/tipo_finalidad.sql",
-      "classpath:scripts/tipo_ambito_geografico.sql", "classpath:scripts/estado_proyecto.sql",
-      "classpath:scripts/proyecto.sql", "classpath:scripts/rol_socio.sql", "classpath:scripts/rol_proyecto.sql",
+      "classpath:scripts/tipo_ambito_geografico.sql", "classpath:scripts/proyecto.sql",
+      "classpath:scripts/estado_proyecto.sql", "classpath:scripts/rol_socio.sql", "classpath:scripts/rol_proyecto.sql",
       "classpath:scripts/proyecto_socio.sql", "classpath:scripts/proyecto_socio_periodo_justificacion.sql" })
   @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:cleanup.sql")
   @Test
@@ -323,23 +320,18 @@ public class ProyectoSocioIT extends BaseIT {
 
     String suffix = String.format("%03d", proyectoSocioId);
 
-    ProyectoSocio proyectoSocio = ProyectoSocio.builder()//
-        .id(proyectoSocioId)//
-        .proyecto(Proyecto.builder()//
-            .id(1L)//
-            .estado(//
-                EstadoProyecto.builder()//
-                    .id(1L)//
-                    .estado(EstadoProyecto.Estado.BORRADOR)//
-                    .build())
-            .build())//
-        .empresaRef("empresa-" + suffix)//
-        .rolSocio(RolSocio.builder().id(1L).coordinador(true).build())//
-        .fechaInicio(LocalDate.of(2021, 1, 11))//
-        .fechaFin(LocalDate.of(2022, 1, 11))//
-        .numInvestigadores(5)//
-        .importeConcedido(BigDecimal.valueOf(1000))//
+    // @formatter:off
+    ProyectoSocio proyectoSocio = ProyectoSocio.builder()
+        .id(proyectoSocioId)
+        .proyectoId(1L)
+        .empresaRef("empresa-" + suffix)
+        .rolSocio(RolSocio.builder().id(1L).coordinador(true).build())
+        .fechaInicio(Instant.parse("2021-01-11T00:00:00Z"))
+        .fechaFin(Instant.parse("2022-01-11T23:59:59Z"))
+        .numInvestigadores(5)
+        .importeConcedido(BigDecimal.valueOf(1000))
         .build();
+    // @formatter:on
 
     return proyectoSocio;
   }

@@ -1,5 +1,6 @@
 package org.crue.hercules.sgi.csp.model;
 
+import java.time.Instant;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -17,15 +18,12 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import org.crue.hercules.sgi.csp.enums.ClasificacionCVN;
 
@@ -39,8 +37,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "convocatoria", uniqueConstraints = {
-    @UniqueConstraint(columnNames = { "codigo" }, name = "UK_CONVOCATORIA_CODIGO") })
+@Table(name = "convocatoria")
 @Data
 @EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
@@ -52,16 +49,6 @@ public class Convocatoria extends BaseEntity {
    * Serial version
    */
   private static final long serialVersionUID = 1L;
-
-  /** Destinatarios de la convocatoria */
-  public enum Destinatarios {
-    /** Individual */
-    INDIVIDUAL,
-    /** Equipo de proyecto */
-    EQUIPO_PROYECTO,
-    /** Grupo de investigación */
-    GRUPO_INVESTIGACION;
-  }
 
   /** Estados de la convocatoria */
   public enum Estado {
@@ -89,18 +76,22 @@ public class Convocatoria extends BaseEntity {
   private ModeloEjecucion modeloEjecucion;
 
   /** Codigo */
-  @Column(name = "codigo", length = 50, nullable = false)
-  @NotBlank
+  @Column(name = "codigo", length = 50, nullable = true)
   @Size(max = 50)
   private String codigo;
 
-  /** Anio */
-  @Column(name = "anio", nullable = false)
+  /** Fecha Publicación */
+  @Column(name = "fecha_publicacion", nullable = false)
   @NotNull
-  @Min(1000)
-  @Max(9999)
-  @Digits(fraction = 0, integer = 4)
-  private Integer anio;
+  private Instant fechaPublicacion;
+
+  /** Fecha Provisional */
+  @Column(name = "fecha_provisional", nullable = true)
+  private Instant fechaProvisional;
+
+  /** Fecha Concesión */
+  @Column(name = "fecha_concesion", nullable = true)
+  private Instant fechaConcesion;
 
   /** Titulo */
   @Column(name = "titulo", length = 250, nullable = false)
@@ -127,11 +118,6 @@ public class Convocatoria extends BaseEntity {
   @ManyToOne
   @JoinColumn(name = "tipo_regimen_concurrencia_id", nullable = true, foreignKey = @ForeignKey(name = "FK_CONVOCATORIA_REGIMENCONCURRENCIA"))
   private TipoRegimenConcurrencia regimenConcurrencia;
-
-  /** Destinatarios */
-  @Column(name = "destinatarios", length = 50, nullable = true)
-  @Enumerated(EnumType.STRING)
-  private Destinatarios destinatarios;
 
   /** Colaborativos */
   @Column(name = "colaborativos", nullable = true)
@@ -168,24 +154,80 @@ public class Convocatoria extends BaseEntity {
   @OneToOne(mappedBy = "convocatoria")
   @Getter(AccessLevel.NONE)
   @Setter(AccessLevel.NONE)
-  @JsonIgnore
   private final ConfiguracionSolicitud configuracionSolicitud = null;
+
+  @OneToOne(mappedBy = "convocatoria")
+  @Getter(AccessLevel.NONE)
+  @Setter(AccessLevel.NONE)
+  private final RequisitoEquipo requisitoEquipo = null;
+
+  @OneToOne(mappedBy = "convocatoria")
+  @Getter(AccessLevel.NONE)
+  @Setter(AccessLevel.NONE)
+  private final RequisitoIP requisitoIP = null;
 
   @OneToMany(fetch = FetchType.LAZY, mappedBy = "convocatoria")
   @Getter(AccessLevel.NONE)
   @Setter(AccessLevel.NONE)
-  @JsonIgnore
   private final List<ConvocatoriaAreaTematica> areasTematicas = null;
 
   @OneToMany(fetch = FetchType.LAZY, mappedBy = "convocatoria")
   @Getter(AccessLevel.NONE)
   @Setter(AccessLevel.NONE)
-  @JsonIgnore
+  private final List<ConvocatoriaConceptoGasto> conceptosGasto = null;
+
+  @OneToMany(fetch = FetchType.LAZY, mappedBy = "convocatoria")
+  @Getter(AccessLevel.NONE)
+  @Setter(AccessLevel.NONE)
+  private final List<ConvocatoriaDocumento> documentos = null;
+
+  @OneToMany(fetch = FetchType.LAZY, mappedBy = "convocatoria")
+  @Getter(AccessLevel.NONE)
+  @Setter(AccessLevel.NONE)
+  private final List<ConvocatoriaEnlace> enlaces = null;
+
+  @OneToMany(fetch = FetchType.LAZY, mappedBy = "convocatoria")
+  @Getter(AccessLevel.NONE)
+  @Setter(AccessLevel.NONE)
   private final List<ConvocatoriaEntidadConvocante> entidadesConvocantes = null;
 
   @OneToMany(fetch = FetchType.LAZY, mappedBy = "convocatoria")
   @Getter(AccessLevel.NONE)
   @Setter(AccessLevel.NONE)
-  @JsonIgnore
   private final List<ConvocatoriaEntidadFinanciadora> entidadesFinanciadoras = null;
+
+  @OneToMany(fetch = FetchType.LAZY, mappedBy = "convocatoria")
+  @Getter(AccessLevel.NONE)
+  @Setter(AccessLevel.NONE)
+  private final List<ConvocatoriaEntidadGestora> entidadesGestoras = null;
+
+  @OneToMany(fetch = FetchType.LAZY, mappedBy = "convocatoria")
+  @Getter(AccessLevel.NONE)
+  @Setter(AccessLevel.NONE)
+  private final List<ConvocatoriaFase> fases = null;
+
+  @OneToMany(fetch = FetchType.LAZY, mappedBy = "convocatoria")
+  @Getter(AccessLevel.NONE)
+  @Setter(AccessLevel.NONE)
+  private final List<ConvocatoriaHito> hitos = null;
+
+  @OneToMany(fetch = FetchType.LAZY, mappedBy = "convocatoria")
+  @Getter(AccessLevel.NONE)
+  @Setter(AccessLevel.NONE)
+  private final List<ConvocatoriaPeriodoJustificacion> periodosJustificacion = null;
+
+  @OneToMany(fetch = FetchType.LAZY, mappedBy = "convocatoria")
+  @Getter(AccessLevel.NONE)
+  @Setter(AccessLevel.NONE)
+  private final List<ConvocatoriaPeriodoSeguimientoCientifico> periodosSeguimiento = null;
+
+  @OneToMany(fetch = FetchType.LAZY, mappedBy = "convocatoria")
+  @Getter(AccessLevel.NONE)
+  @Setter(AccessLevel.NONE)
+  private final List<Proyecto> proyectos = null;
+
+  @OneToMany(fetch = FetchType.LAZY, mappedBy = "convocatoria")
+  @Getter(AccessLevel.NONE)
+  @Setter(AccessLevel.NONE)
+  private final List<Solicitud> solicitudes = null;
 }

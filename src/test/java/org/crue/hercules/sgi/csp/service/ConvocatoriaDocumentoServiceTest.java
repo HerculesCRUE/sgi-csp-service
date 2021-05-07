@@ -1,5 +1,6 @@
 package org.crue.hercules.sgi.csp.service;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -61,13 +62,15 @@ public class ConvocatoriaDocumentoServiceTest extends BaseServiceTest {
   @Test
   public void create_ReturnsConvocatoriaDocumento() {
     // given: new ConvocatoriaDocumento
-    ConvocatoriaDocumento newConvocatoriaDocumento = generarMockConvocatoriaDocumento(1L, 1L, 1L, 1L);
+    Long convocatoriaId = 1L;
+    Convocatoria convocatoria = generarMockConvocatoria(convocatoriaId);
+    ConvocatoriaDocumento newConvocatoriaDocumento = generarMockConvocatoriaDocumento(1L, convocatoriaId, 1L, 1L);
     newConvocatoriaDocumento.setId(null);
-    ModeloTipoFase modeloTipoFase = generarMockModeloTipoFase(newConvocatoriaDocumento);
-    ModeloTipoDocumento modeloTipoDocumento = generarMockModeloTipoDocumento(newConvocatoriaDocumento);
+    ModeloTipoFase modeloTipoFase = generarMockModeloTipoFase(newConvocatoriaDocumento, convocatoria);
+    ModeloTipoDocumento modeloTipoDocumento = generarMockModeloTipoDocumento(newConvocatoriaDocumento, convocatoria);
 
     BDDMockito.given(convocatoriaRepository.findById(ArgumentMatchers.<Long>any()))
-        .willReturn(Optional.of(newConvocatoriaDocumento.getConvocatoria()));
+        .willReturn(Optional.of(convocatoria));
 
     BDDMockito.given(modeloTipoFaseRepository.findByModeloEjecucionIdAndTipoFaseId(ArgumentMatchers.<Long>any(),
         ArgumentMatchers.<Long>any())).willReturn(Optional.of(modeloTipoFase));
@@ -89,8 +92,8 @@ public class ConvocatoriaDocumentoServiceTest extends BaseServiceTest {
     // then: new ConvocatoriaDocumento is created
     Assertions.assertThat(created).as("isNotNull()").isNotNull();
     Assertions.assertThat(created.getId()).as("getId()").isEqualTo(1L);
-    Assertions.assertThat(created.getConvocatoria().getId()).as("getConvocatoria().getId()")
-        .isEqualTo(newConvocatoriaDocumento.getConvocatoria().getId());
+    Assertions.assertThat(created.getConvocatoriaId()).as("getConvocatoriaId()")
+        .isEqualTo(newConvocatoriaDocumento.getConvocatoriaId());
     Assertions.assertThat(created.getTipoFase().getId()).as("getTipoFase().getId()")
         .isEqualTo(newConvocatoriaDocumento.getTipoFase().getId());
     Assertions.assertThat(newConvocatoriaDocumento.getTipoDocumento().getId()).as("getTipoDocumento()")
@@ -121,7 +124,7 @@ public class ConvocatoriaDocumentoServiceTest extends BaseServiceTest {
     // given: new ConvocatoriaDocumento without Convocatoria
     ConvocatoriaDocumento newConvocatoriaDocumento = generarMockConvocatoriaDocumento(1L, 1L, 1L, 1L);
     newConvocatoriaDocumento.setId(null);
-    newConvocatoriaDocumento.setConvocatoria(null);
+    newConvocatoriaDocumento.setConvocatoriaId(null);
 
     Assertions.assertThatThrownBy(
         // when: Create ConvocatoriaDocumento
@@ -189,13 +192,15 @@ public class ConvocatoriaDocumentoServiceTest extends BaseServiceTest {
   @Test
   public void create_WithoutTipoFase_DoesNotThrowAnyException() {
     // given: a ConvocatoriaDocumento without TipoFase
-    ConvocatoriaDocumento newConvocatoriaDocumento = generarMockConvocatoriaDocumento(1L, 1L, 1L, 1L);
+    Long convocatoriaId = 1L;
+    Convocatoria convocatoria = generarMockConvocatoria(convocatoriaId);
+    ConvocatoriaDocumento newConvocatoriaDocumento = generarMockConvocatoriaDocumento(1L, convocatoriaId, 1L, 1L);
     newConvocatoriaDocumento.setId(null);
     newConvocatoriaDocumento.setTipoFase(null);
-    ModeloTipoDocumento modeloTipoDocumento = generarMockModeloTipoDocumento(newConvocatoriaDocumento);
+    ModeloTipoDocumento modeloTipoDocumento = generarMockModeloTipoDocumento(newConvocatoriaDocumento, convocatoria);
 
     BDDMockito.given(convocatoriaRepository.findById(ArgumentMatchers.<Long>any()))
-        .willReturn(Optional.of(newConvocatoriaDocumento.getConvocatoria()));
+        .willReturn(Optional.of(convocatoria));
 
     BDDMockito
         .given(modeloTipoDocumentoRepository.findByModeloEjecucionIdAndModeloTipoFaseIdAndTipoDocumentoId(
@@ -219,11 +224,13 @@ public class ConvocatoriaDocumentoServiceTest extends BaseServiceTest {
   public void create_WithNoExistingModeloTipoFase_ThrowsIllegalArgumentException() {
     // given: a ConvocatoriaDocumento with TipoFase not assigned to ModeloEjecucion
     // Convocatoria
-    ConvocatoriaDocumento newConvocatoriaDocumento = generarMockConvocatoriaDocumento(1L, 1L, 1L, 1L);
+    Long convocatoriaId = 1L;
+    Convocatoria convocatoria = generarMockConvocatoria(convocatoriaId);
+    ConvocatoriaDocumento newConvocatoriaDocumento = generarMockConvocatoriaDocumento(1L, convocatoriaId, 1L, 1L);
     newConvocatoriaDocumento.setId(null);
 
     BDDMockito.given(convocatoriaRepository.findById(ArgumentMatchers.<Long>any()))
-        .willReturn(Optional.of(newConvocatoriaDocumento.getConvocatoria()));
+        .willReturn(Optional.of(convocatoria));
 
     BDDMockito.given(modeloTipoFaseRepository.findByModeloEjecucionIdAndTipoFaseId(ArgumentMatchers.<Long>any(),
         ArgumentMatchers.<Long>any())).willReturn(Optional.empty());
@@ -234,21 +241,22 @@ public class ConvocatoriaDocumentoServiceTest extends BaseServiceTest {
         // then: throw exception as ModeloTipoFase not found
         .isInstanceOf(IllegalArgumentException.class)
         .hasMessage("TipoFase '%s' no disponible para el ModeloEjecucion '%s'",
-            newConvocatoriaDocumento.getTipoFase().getNombre(),
-            newConvocatoriaDocumento.getConvocatoria().getModeloEjecucion().getNombre());
+            newConvocatoriaDocumento.getTipoFase().getNombre(), convocatoria.getModeloEjecucion().getNombre());
   }
 
   @Test
   public void create_WithModeloTipoFaseDisabled_ThrowsIllegalArgumentException() {
     // given: a ConvocatoriaDocumento with TipoFase assigned to disabled
     // ModeloEjecucion
-    ConvocatoriaDocumento newConvocatoriaDocumento = generarMockConvocatoriaDocumento(1L, 1L, 1L, 1L);
+    Long convocatoriaId = 1L;
+    Convocatoria convocatoria = generarMockConvocatoria(convocatoriaId);
+    ConvocatoriaDocumento newConvocatoriaDocumento = generarMockConvocatoriaDocumento(1L, convocatoriaId, 1L, 1L);
     newConvocatoriaDocumento.setId(null);
-    ModeloTipoFase modeloTipoFase = generarMockModeloTipoFase(newConvocatoriaDocumento);
+    ModeloTipoFase modeloTipoFase = generarMockModeloTipoFase(newConvocatoriaDocumento, convocatoria);
     modeloTipoFase.setActivo(Boolean.FALSE);
 
     BDDMockito.given(convocatoriaRepository.findById(ArgumentMatchers.<Long>any()))
-        .willReturn(Optional.of(newConvocatoriaDocumento.getConvocatoria()));
+        .willReturn(Optional.of(convocatoria));
 
     BDDMockito.given(modeloTipoFaseRepository.findByModeloEjecucionIdAndTipoFaseId(ArgumentMatchers.<Long>any(),
         ArgumentMatchers.<Long>any())).willReturn(Optional.of(modeloTipoFase));
@@ -257,22 +265,24 @@ public class ConvocatoriaDocumentoServiceTest extends BaseServiceTest {
         // when: create ConvocatoriaDocumento
         () -> service.create(newConvocatoriaDocumento))
         // then: throw exception as ModeloTipoFase is disabled
-        .isInstanceOf(IllegalArgumentException.class).hasMessage(
-            "ModeloTipoFase '%s' no está activo para el ModeloEjecucion '%s'", modeloTipoFase.getTipoFase().getNombre(),
-            newConvocatoriaDocumento.getConvocatoria().getModeloEjecucion().getNombre());
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessage("ModeloTipoFase '%s' no está activo para el ModeloEjecucion '%s'",
+            modeloTipoFase.getTipoFase().getNombre(), convocatoria.getModeloEjecucion().getNombre());
   }
 
   @Test
   public void create_WithTipoFaseDisabled_ThrowsIllegalArgumentException() {
     // given: a ConvocatoriaDocumento with TipoFase disabled assigned to
     // ModeloEjecucion Convocatoria
-    ConvocatoriaDocumento newConvocatoriaDocumento = generarMockConvocatoriaDocumento(1L, 1L, 1L, 1L);
+    Long convocatoriaId = 1L;
+    Convocatoria convocatoria = generarMockConvocatoria(convocatoriaId);
+    ConvocatoriaDocumento newConvocatoriaDocumento = generarMockConvocatoriaDocumento(1L, convocatoriaId, 1L, 1L);
     newConvocatoriaDocumento.setId(null);
-    ModeloTipoFase modeloTipoFase = generarMockModeloTipoFase(newConvocatoriaDocumento);
+    ModeloTipoFase modeloTipoFase = generarMockModeloTipoFase(newConvocatoriaDocumento, convocatoria);
     modeloTipoFase.getTipoFase().setActivo(Boolean.FALSE);
 
     BDDMockito.given(convocatoriaRepository.findById(ArgumentMatchers.<Long>any()))
-        .willReturn(Optional.of(newConvocatoriaDocumento.getConvocatoria()));
+        .willReturn(Optional.of(convocatoria));
 
     BDDMockito.given(modeloTipoFaseRepository.findByModeloEjecucionIdAndTipoFaseId(ArgumentMatchers.<Long>any(),
         ArgumentMatchers.<Long>any())).willReturn(Optional.of(modeloTipoFase));
@@ -289,12 +299,14 @@ public class ConvocatoriaDocumentoServiceTest extends BaseServiceTest {
   public void create_WithNoExistingModeloTipoDocumento_ThrowsIllegalArgumentException() {
     // given: a ConvocatoriaDocumento with TipoDocumento not assigned to
     // ModeloEjecucion Convocatoria
-    ConvocatoriaDocumento newConvocatoriaDocumento = generarMockConvocatoriaDocumento(1L, 1L, 1L, 1L);
+    Long convocatoriaId = 1L;
+    Convocatoria convocatoria = generarMockConvocatoria(convocatoriaId);
+    ConvocatoriaDocumento newConvocatoriaDocumento = generarMockConvocatoriaDocumento(1L, convocatoriaId, 1L, 1L);
     newConvocatoriaDocumento.setId(null);
-    ModeloTipoFase modeloTipoFase = generarMockModeloTipoFase(newConvocatoriaDocumento);
+    ModeloTipoFase modeloTipoFase = generarMockModeloTipoFase(newConvocatoriaDocumento, convocatoria);
 
     BDDMockito.given(convocatoriaRepository.findById(ArgumentMatchers.<Long>any()))
-        .willReturn(Optional.of(newConvocatoriaDocumento.getConvocatoria()));
+        .willReturn(Optional.of(convocatoria));
 
     BDDMockito.given(modeloTipoFaseRepository.findByModeloEjecucionIdAndTipoFaseId(ArgumentMatchers.<Long>any(),
         ArgumentMatchers.<Long>any())).willReturn(Optional.of(modeloTipoFase));
@@ -310,8 +322,7 @@ public class ConvocatoriaDocumentoServiceTest extends BaseServiceTest {
         // then: throw exception as TipoDocumento not found
         .isInstanceOf(IllegalArgumentException.class)
         .hasMessage("TipoDocumento '%s' no disponible para el ModeloEjecucion '%s' y TipoFase '%s'",
-            newConvocatoriaDocumento.getTipoDocumento().getNombre(),
-            newConvocatoriaDocumento.getConvocatoria().getModeloEjecucion().getNombre(),
+            newConvocatoriaDocumento.getTipoDocumento().getNombre(), convocatoria.getModeloEjecucion().getNombre(),
             modeloTipoFase.getTipoFase().getNombre());
   }
 
@@ -319,14 +330,16 @@ public class ConvocatoriaDocumentoServiceTest extends BaseServiceTest {
   public void create_WithModeloTipoDocumentoDisabled_ThrowsIllegalArgumentException() {
     // given: a ConvocatoriaDocumento with TipoDocumento assigned to disabled
     // ModeloEjecucion
-    ConvocatoriaDocumento newConvocatoriaDocumento = generarMockConvocatoriaDocumento(1L, 1L, 1L, 1L);
+    Long convocatoriaId = 1L;
+    Convocatoria convocatoria = generarMockConvocatoria(convocatoriaId);
+    ConvocatoriaDocumento newConvocatoriaDocumento = generarMockConvocatoriaDocumento(1L, convocatoriaId, 1L, 1L);
     newConvocatoriaDocumento.setId(null);
-    ModeloTipoFase modeloTipoFase = generarMockModeloTipoFase(newConvocatoriaDocumento);
-    ModeloTipoDocumento modeloTipoDocumento = generarMockModeloTipoDocumento(newConvocatoriaDocumento);
+    ModeloTipoFase modeloTipoFase = generarMockModeloTipoFase(newConvocatoriaDocumento, convocatoria);
+    ModeloTipoDocumento modeloTipoDocumento = generarMockModeloTipoDocumento(newConvocatoriaDocumento, convocatoria);
     modeloTipoDocumento.setActivo(Boolean.FALSE);
 
     BDDMockito.given(convocatoriaRepository.findById(ArgumentMatchers.<Long>any()))
-        .willReturn(Optional.of(newConvocatoriaDocumento.getConvocatoria()));
+        .willReturn(Optional.of(convocatoria));
 
     BDDMockito.given(modeloTipoFaseRepository.findByModeloEjecucionIdAndTipoFaseId(ArgumentMatchers.<Long>any(),
         ArgumentMatchers.<Long>any())).willReturn(Optional.of(modeloTipoFase));
@@ -342,22 +355,23 @@ public class ConvocatoriaDocumentoServiceTest extends BaseServiceTest {
         // then: throw exception as ModeloTipoDocumento is disabled
         .isInstanceOf(IllegalArgumentException.class)
         .hasMessage("ModeloTipoDocumento '%s' no está activo para el ModeloEjecucion '%s'",
-            modeloTipoDocumento.getTipoDocumento().getNombre(),
-            newConvocatoriaDocumento.getConvocatoria().getModeloEjecucion().getNombre());
+            modeloTipoDocumento.getTipoDocumento().getNombre(), convocatoria.getModeloEjecucion().getNombre());
   }
 
   @Test
   public void create_WithTipoDocumentoDisabled_ThrowsIllegalArgumentException() {
     // given: a ConvocatoriaDocumento with TipoDocumento disabled assigned to
     // ModeloEjecucion Convocatoria
-    ConvocatoriaDocumento newConvocatoriaDocumento = generarMockConvocatoriaDocumento(1L, 1L, 1L, 1L);
+    Long convocatoriaId = 1L;
+    Convocatoria convocatoria = generarMockConvocatoria(convocatoriaId);
+    ConvocatoriaDocumento newConvocatoriaDocumento = generarMockConvocatoriaDocumento(1L, convocatoriaId, 1L, 1L);
     newConvocatoriaDocumento.setId(null);
-    ModeloTipoFase modeloTipoFase = generarMockModeloTipoFase(newConvocatoriaDocumento);
-    ModeloTipoDocumento modeloTipoDocumento = generarMockModeloTipoDocumento(newConvocatoriaDocumento);
+    ModeloTipoFase modeloTipoFase = generarMockModeloTipoFase(newConvocatoriaDocumento, convocatoria);
+    ModeloTipoDocumento modeloTipoDocumento = generarMockModeloTipoDocumento(newConvocatoriaDocumento, convocatoria);
     modeloTipoDocumento.getTipoDocumento().setActivo(Boolean.FALSE);
 
     BDDMockito.given(convocatoriaRepository.findById(ArgumentMatchers.<Long>any()))
-        .willReturn(Optional.of(newConvocatoriaDocumento.getConvocatoria()));
+        .willReturn(Optional.of(convocatoria));
 
     BDDMockito.given(modeloTipoFaseRepository.findByModeloEjecucionIdAndTipoFaseId(ArgumentMatchers.<Long>any(),
         ArgumentMatchers.<Long>any())).willReturn(Optional.of(modeloTipoFase));
@@ -378,19 +392,22 @@ public class ConvocatoriaDocumentoServiceTest extends BaseServiceTest {
   @Test
   public void update_ReturnsConvocatoriaDocumento() {
     // given: updated ConvocatoriaDocumento
-    ConvocatoriaDocumento originalConvocatoriaDocumento = generarMockConvocatoriaDocumento(1L, 1L, 1L, 1L);
-    ConvocatoriaDocumento updatedConvocatoriaDocumento = generarMockConvocatoriaDocumento(1L, 1L, 1L, 1L);
+    Long convocatoriaId = 1L;
+    Convocatoria convocatoria = generarMockConvocatoria(convocatoriaId);
+    ConvocatoriaDocumento originalConvocatoriaDocumento = generarMockConvocatoriaDocumento(1L, convocatoriaId, 1L, 1L);
+    ConvocatoriaDocumento updatedConvocatoriaDocumento = generarMockConvocatoriaDocumento(1L, convocatoriaId, 1L, 1L);
     updatedConvocatoriaDocumento.setNombre("nombre-modificado");
     updatedConvocatoriaDocumento.setObservaciones("observaciones-modificadas");
     updatedConvocatoriaDocumento.setDocumentoRef("documentoRef-modificado");
-    ModeloTipoFase modeloTipoFase = generarMockModeloTipoFase(updatedConvocatoriaDocumento);
-    ModeloTipoDocumento modeloTipoDocumento = generarMockModeloTipoDocumento(updatedConvocatoriaDocumento);
+    ModeloTipoFase modeloTipoFase = generarMockModeloTipoFase(updatedConvocatoriaDocumento, convocatoria);
+    ModeloTipoDocumento modeloTipoDocumento = generarMockModeloTipoDocumento(updatedConvocatoriaDocumento,
+        convocatoria);
 
     BDDMockito.given(repository.findById(ArgumentMatchers.<Long>any()))
         .willReturn(Optional.of(originalConvocatoriaDocumento));
 
     BDDMockito.given(convocatoriaRepository.findById(ArgumentMatchers.<Long>any()))
-        .willReturn(Optional.of(originalConvocatoriaDocumento.getConvocatoria()));
+        .willReturn(Optional.of(convocatoria));
 
     BDDMockito.given(modeloTipoFaseRepository.findByModeloEjecucionIdAndTipoFaseId(ArgumentMatchers.<Long>any(),
         ArgumentMatchers.<Long>any())).willReturn(Optional.of(modeloTipoFase));
@@ -409,8 +426,8 @@ public class ConvocatoriaDocumentoServiceTest extends BaseServiceTest {
     // then: ConvocatoriaDocumento is updated
     Assertions.assertThat(updated).as("isNotNull()").isNotNull();
     Assertions.assertThat(updated.getId()).as("getId()").isEqualTo(originalConvocatoriaDocumento.getId());
-    Assertions.assertThat(updated.getConvocatoria().getId()).as("getConvocatoria().getId()")
-        .isEqualTo(originalConvocatoriaDocumento.getConvocatoria().getId());
+    Assertions.assertThat(updated.getConvocatoriaId()).as("getConvocatoriaId()")
+        .isEqualTo(originalConvocatoriaDocumento.getConvocatoriaId());
     Assertions.assertThat(updated.getTipoFase().getId()).as("getTipoFase().getId()")
         .isEqualTo(originalConvocatoriaDocumento.getTipoFase().getId());
     Assertions.assertThat(originalConvocatoriaDocumento.getTipoDocumento().getId()).as("getTipoDocumento()")
@@ -442,7 +459,7 @@ public class ConvocatoriaDocumentoServiceTest extends BaseServiceTest {
   public void update_WithoutConvocatoria_ThrowsIllegalArgumentException() {
     // given: a updated ConvocatoriaDocumento without Convocatoria
     ConvocatoriaDocumento updatedConvocatoriaDocumento = generarMockConvocatoriaDocumento(1L, 1L, 1L, 1L);
-    updatedConvocatoriaDocumento.setConvocatoria(null);
+    updatedConvocatoriaDocumento.setConvocatoriaId(null);
 
     Assertions.assertThatThrownBy(
         // when: update ConvocatoriaDocumento
@@ -522,18 +539,21 @@ public class ConvocatoriaDocumentoServiceTest extends BaseServiceTest {
   @Test
   public void update_WithoutTipoFase_DoesNotThrowAnyException() {
     // given: a ConvocatoriaDocumento without TipoFase
-    ConvocatoriaDocumento originalConvocatoriaDocumento = generarMockConvocatoriaDocumento(1L, 1L, 1L, 1L);
-    ConvocatoriaDocumento updatedConvocatoriaDocumento = generarMockConvocatoriaDocumento(1L, 1L, 1L, 1L);
+    Long convocatoriaId = 1L;
+    Convocatoria convocatoria = generarMockConvocatoria(convocatoriaId);
+    ConvocatoriaDocumento originalConvocatoriaDocumento = generarMockConvocatoriaDocumento(1L, convocatoriaId, 1L, 1L);
+    ConvocatoriaDocumento updatedConvocatoriaDocumento = generarMockConvocatoriaDocumento(1L, convocatoriaId, 1L, 1L);
     updatedConvocatoriaDocumento.setObservaciones("observaciones-modificadas");
     updatedConvocatoriaDocumento.setDocumentoRef("documentoRef-modificado");
     updatedConvocatoriaDocumento.setTipoFase(null);
-    ModeloTipoDocumento modeloTipoDocumento = generarMockModeloTipoDocumento(updatedConvocatoriaDocumento);
+    ModeloTipoDocumento modeloTipoDocumento = generarMockModeloTipoDocumento(updatedConvocatoriaDocumento,
+        convocatoria);
 
     BDDMockito.given(repository.findById(ArgumentMatchers.<Long>any()))
         .willReturn(Optional.of(originalConvocatoriaDocumento));
 
     BDDMockito.given(convocatoriaRepository.findById(ArgumentMatchers.<Long>any()))
-        .willReturn(Optional.of(originalConvocatoriaDocumento.getConvocatoria()));
+        .willReturn(Optional.of(convocatoria));
 
     BDDMockito
         .given(modeloTipoDocumentoRepository.findByModeloEjecucionIdAndModeloTipoFaseIdAndTipoDocumentoId(
@@ -554,8 +574,10 @@ public class ConvocatoriaDocumentoServiceTest extends BaseServiceTest {
   public void update_WithNoExistingModeloTipoFase_ThrowsIllegalArgumentException() {
     // given: a ConvocatoriaDocumento with TipoFase not assigned to ModeloEjecucion
     // Convocatoria
-    ConvocatoriaDocumento originalConvocatoriaDocumento = generarMockConvocatoriaDocumento(1L, 1L, 1L, 1L);
-    ConvocatoriaDocumento updatedConvocatoriaDocumento = generarMockConvocatoriaDocumento(1L, 1L, 1L, 1L);
+    Long convocatoriaId = 1L;
+    Convocatoria convocatoria = generarMockConvocatoria(convocatoriaId);
+    ConvocatoriaDocumento originalConvocatoriaDocumento = generarMockConvocatoriaDocumento(1L, convocatoriaId, 1L, 1L);
+    ConvocatoriaDocumento updatedConvocatoriaDocumento = generarMockConvocatoriaDocumento(1L, convocatoriaId, 1L, 1L);
     updatedConvocatoriaDocumento.setObservaciones("observaciones-modificadas");
     updatedConvocatoriaDocumento.setDocumentoRef("documentoRef-modificado");
 
@@ -563,7 +585,7 @@ public class ConvocatoriaDocumentoServiceTest extends BaseServiceTest {
         .willReturn(Optional.of(originalConvocatoriaDocumento));
 
     BDDMockito.given(convocatoriaRepository.findById(ArgumentMatchers.<Long>any()))
-        .willReturn(Optional.of(originalConvocatoriaDocumento.getConvocatoria()));
+        .willReturn(Optional.of(convocatoria));
 
     BDDMockito.given(modeloTipoFaseRepository.findByModeloEjecucionIdAndTipoFaseId(ArgumentMatchers.<Long>any(),
         ArgumentMatchers.<Long>any())).willReturn(Optional.empty());
@@ -574,27 +596,29 @@ public class ConvocatoriaDocumentoServiceTest extends BaseServiceTest {
         // then: throw exception as ModeloTipoFase not found
         .isInstanceOf(IllegalArgumentException.class)
         .hasMessage("TipoFase '%s' no disponible para el ModeloEjecucion '%s'",
-            updatedConvocatoriaDocumento.getTipoFase().getNombre(),
-            updatedConvocatoriaDocumento.getConvocatoria().getModeloEjecucion().getNombre());
+            updatedConvocatoriaDocumento.getTipoFase().getNombre(), convocatoria.getModeloEjecucion().getNombre());
   }
 
   @Test
   public void update_TipoFaseWithSameTipoFaseAndModeloTipoFaseDisabled_DoesNotThrowAnyException() {
     // given: a ConvocatoriaDocumento with the same TipoFase assigned to disabled
     // ModeloEjecucion
-    ConvocatoriaDocumento originalConvocatoriaDocumento = generarMockConvocatoriaDocumento(1L, 1L, 1L, 1L);
-    ConvocatoriaDocumento updatedConvocatoriaDocumento = generarMockConvocatoriaDocumento(1L, 1L, 1L, 1L);
+    Long convocatoriaId = 1L;
+    Convocatoria convocatoria = generarMockConvocatoria(convocatoriaId);
+    ConvocatoriaDocumento originalConvocatoriaDocumento = generarMockConvocatoriaDocumento(1L, convocatoriaId, 1L, 1L);
+    ConvocatoriaDocumento updatedConvocatoriaDocumento = generarMockConvocatoriaDocumento(1L, convocatoriaId, 1L, 1L);
     updatedConvocatoriaDocumento.setObservaciones("observaciones-modificadas");
     updatedConvocatoriaDocumento.setDocumentoRef("documentoRef-modificado");
-    ModeloTipoFase modeloTipoFase = generarMockModeloTipoFase(updatedConvocatoriaDocumento);
+    ModeloTipoFase modeloTipoFase = generarMockModeloTipoFase(updatedConvocatoriaDocumento, convocatoria);
     modeloTipoFase.setActivo(Boolean.FALSE);
-    ModeloTipoDocumento modeloTipoDocumento = generarMockModeloTipoDocumento(updatedConvocatoriaDocumento);
+    ModeloTipoDocumento modeloTipoDocumento = generarMockModeloTipoDocumento(updatedConvocatoriaDocumento,
+        convocatoria);
 
     BDDMockito.given(repository.findById(ArgumentMatchers.<Long>any()))
         .willReturn(Optional.of(originalConvocatoriaDocumento));
 
     BDDMockito.given(convocatoriaRepository.findById(ArgumentMatchers.<Long>any()))
-        .willReturn(Optional.of(originalConvocatoriaDocumento.getConvocatoria()));
+        .willReturn(Optional.of(convocatoria));
 
     BDDMockito.given(modeloTipoFaseRepository.findByModeloEjecucionIdAndTipoFaseId(ArgumentMatchers.<Long>any(),
         ArgumentMatchers.<Long>any())).willReturn(Optional.of(modeloTipoFase));
@@ -618,19 +642,22 @@ public class ConvocatoriaDocumentoServiceTest extends BaseServiceTest {
   public void update_TipoFaseWithSameTipoFaseDisabled_DoesNotThrowAnyException() {
     // given: a ConvocatoriaDocumento with the same TipoFase disabled assigned to
     // ModeloEjecucion Convocatoria
-    ConvocatoriaDocumento originalConvocatoriaDocumento = generarMockConvocatoriaDocumento(1L, 1L, 1L, 1L);
-    ConvocatoriaDocumento updatedConvocatoriaDocumento = generarMockConvocatoriaDocumento(1L, 1L, 1L, 1L);
+    Long convocatoriaId = 1L;
+    Convocatoria convocatoria = generarMockConvocatoria(convocatoriaId);
+    ConvocatoriaDocumento originalConvocatoriaDocumento = generarMockConvocatoriaDocumento(1L, convocatoriaId, 1L, 1L);
+    ConvocatoriaDocumento updatedConvocatoriaDocumento = generarMockConvocatoriaDocumento(1L, convocatoriaId, 1L, 1L);
     updatedConvocatoriaDocumento.setObservaciones("observaciones-modificadas");
     updatedConvocatoriaDocumento.setDocumentoRef("documentoRef-modificado");
-    ModeloTipoFase modeloTipoFase = generarMockModeloTipoFase(updatedConvocatoriaDocumento);
+    ModeloTipoFase modeloTipoFase = generarMockModeloTipoFase(updatedConvocatoriaDocumento, convocatoria);
     modeloTipoFase.getTipoFase().setActivo(Boolean.FALSE);
-    ModeloTipoDocumento modeloTipoDocumento = generarMockModeloTipoDocumento(updatedConvocatoriaDocumento);
+    ModeloTipoDocumento modeloTipoDocumento = generarMockModeloTipoDocumento(updatedConvocatoriaDocumento,
+        convocatoria);
 
     BDDMockito.given(repository.findById(ArgumentMatchers.<Long>any()))
         .willReturn(Optional.of(originalConvocatoriaDocumento));
 
     BDDMockito.given(convocatoriaRepository.findById(ArgumentMatchers.<Long>any()))
-        .willReturn(Optional.of(originalConvocatoriaDocumento.getConvocatoria()));
+        .willReturn(Optional.of(convocatoria));
 
     BDDMockito.given(modeloTipoFaseRepository.findByModeloEjecucionIdAndTipoFaseId(ArgumentMatchers.<Long>any(),
         ArgumentMatchers.<Long>any())).willReturn(Optional.of(modeloTipoFase));
@@ -654,19 +681,21 @@ public class ConvocatoriaDocumentoServiceTest extends BaseServiceTest {
   public void update_TipoFaseWithModeloTipoFaseDisabled_ThrowsIllegalArgumentException() {
     // given: a ConvocatoriaDocumento with updated TipoFase assigned to disabled
     // ModeloEjecucion
-    ConvocatoriaDocumento originalConvocatoriaDocumento = generarMockConvocatoriaDocumento(1L, 1L, 1L, 1L);
-    ConvocatoriaDocumento updatedConvocatoriaDocumento = generarMockConvocatoriaDocumento(1L, 1L, 1L, 1L);
+    Long convocatoriaId = 1L;
+    Convocatoria convocatoria = generarMockConvocatoria(convocatoriaId);
+    ConvocatoriaDocumento originalConvocatoriaDocumento = generarMockConvocatoriaDocumento(1L, convocatoriaId, 1L, 1L);
+    ConvocatoriaDocumento updatedConvocatoriaDocumento = generarMockConvocatoriaDocumento(1L, convocatoriaId, 1L, 1L);
     updatedConvocatoriaDocumento.setTipoFase(generarMockTipoFase(2L));
     updatedConvocatoriaDocumento.setObservaciones("observaciones-modificadas");
     updatedConvocatoriaDocumento.setDocumentoRef("documentoRef-modificado");
-    ModeloTipoFase modeloTipoFase = generarMockModeloTipoFase(updatedConvocatoriaDocumento);
+    ModeloTipoFase modeloTipoFase = generarMockModeloTipoFase(updatedConvocatoriaDocumento, convocatoria);
     modeloTipoFase.setActivo(Boolean.FALSE);
 
     BDDMockito.given(repository.findById(ArgumentMatchers.<Long>any()))
         .willReturn(Optional.of(originalConvocatoriaDocumento));
 
     BDDMockito.given(convocatoriaRepository.findById(ArgumentMatchers.<Long>any()))
-        .willReturn(Optional.of(originalConvocatoriaDocumento.getConvocatoria()));
+        .willReturn(Optional.of(convocatoria));
 
     BDDMockito.given(modeloTipoFaseRepository.findByModeloEjecucionIdAndTipoFaseId(ArgumentMatchers.<Long>any(),
         ArgumentMatchers.<Long>any())).willReturn(Optional.of(modeloTipoFase));
@@ -675,28 +704,30 @@ public class ConvocatoriaDocumentoServiceTest extends BaseServiceTest {
         // when: update ConvocatoriaDocumento
         () -> service.update(updatedConvocatoriaDocumento))
         // then: throw exception as ModeloTipoFase is disabled
-        .isInstanceOf(IllegalArgumentException.class).hasMessage(
-            "ModeloTipoFase '%s' no está activo para el ModeloEjecucion '%s'", modeloTipoFase.getTipoFase().getNombre(),
-            originalConvocatoriaDocumento.getConvocatoria().getModeloEjecucion().getNombre());
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessage("ModeloTipoFase '%s' no está activo para el ModeloEjecucion '%s'",
+            modeloTipoFase.getTipoFase().getNombre(), convocatoria.getModeloEjecucion().getNombre());
   }
 
   @Test
   public void update_TipoFaseWithTipoFaseDisabled_ThrowsIllegalArgumentException() {
     // given: a ConvocatoriaDocumento with updated TipoFase disabled assigned to
     // ModeloEjecucion Convocatoria
-    ConvocatoriaDocumento originalConvocatoriaDocumento = generarMockConvocatoriaDocumento(1L, 1L, 1L, 1L);
-    ConvocatoriaDocumento updatedConvocatoriaDocumento = generarMockConvocatoriaDocumento(1L, 1L, 1L, 1L);
+    Long convocatoriaId = 1L;
+    Convocatoria convocatoria = generarMockConvocatoria(convocatoriaId);
+    ConvocatoriaDocumento originalConvocatoriaDocumento = generarMockConvocatoriaDocumento(1L, convocatoriaId, 1L, 1L);
+    ConvocatoriaDocumento updatedConvocatoriaDocumento = generarMockConvocatoriaDocumento(1L, convocatoriaId, 1L, 1L);
     updatedConvocatoriaDocumento.setTipoFase(generarMockTipoFase(2L));
     updatedConvocatoriaDocumento.setObservaciones("observaciones-modificadas");
     updatedConvocatoriaDocumento.setDocumentoRef("documentoRef-modificado");
-    ModeloTipoFase modeloTipoFase = generarMockModeloTipoFase(updatedConvocatoriaDocumento);
+    ModeloTipoFase modeloTipoFase = generarMockModeloTipoFase(updatedConvocatoriaDocumento, convocatoria);
     modeloTipoFase.getTipoFase().setActivo(Boolean.FALSE);
 
     BDDMockito.given(repository.findById(ArgumentMatchers.<Long>any()))
         .willReturn(Optional.of(originalConvocatoriaDocumento));
 
     BDDMockito.given(convocatoriaRepository.findById(ArgumentMatchers.<Long>any()))
-        .willReturn(Optional.of(originalConvocatoriaDocumento.getConvocatoria()));
+        .willReturn(Optional.of(convocatoria));
 
     BDDMockito.given(modeloTipoFaseRepository.findByModeloEjecucionIdAndTipoFaseId(ArgumentMatchers.<Long>any(),
         ArgumentMatchers.<Long>any())).willReturn(Optional.of(modeloTipoFase));
@@ -713,17 +744,19 @@ public class ConvocatoriaDocumentoServiceTest extends BaseServiceTest {
   public void update_WithNoExistingModeloTipoDocumento_ThrowsIllegalArgumentException() {
     // given: a ConvocatoriaDocumento with Documento not assigned to ModeloEjecucion
     // Convocatoria
-    ConvocatoriaDocumento originalConvocatoriaDocumento = generarMockConvocatoriaDocumento(1L, 1L, 1L, 1L);
-    ConvocatoriaDocumento updatedConvocatoriaDocumento = generarMockConvocatoriaDocumento(1L, 1L, 1L, 1L);
+    Long convocatoriaId = 1L;
+    Convocatoria convocatoria = generarMockConvocatoria(convocatoriaId);
+    ConvocatoriaDocumento originalConvocatoriaDocumento = generarMockConvocatoriaDocumento(1L, convocatoriaId, 1L, 1L);
+    ConvocatoriaDocumento updatedConvocatoriaDocumento = generarMockConvocatoriaDocumento(1L, convocatoriaId, 1L, 1L);
     updatedConvocatoriaDocumento.setObservaciones("observaciones-modificadas");
     updatedConvocatoriaDocumento.setDocumentoRef("documentoRef-modificado");
-    ModeloTipoFase modeloTipoFase = generarMockModeloTipoFase(updatedConvocatoriaDocumento);
+    ModeloTipoFase modeloTipoFase = generarMockModeloTipoFase(updatedConvocatoriaDocumento, convocatoria);
 
     BDDMockito.given(repository.findById(ArgumentMatchers.<Long>any()))
         .willReturn(Optional.of(originalConvocatoriaDocumento));
 
     BDDMockito.given(convocatoriaRepository.findById(ArgumentMatchers.<Long>any()))
-        .willReturn(Optional.of(originalConvocatoriaDocumento.getConvocatoria()));
+        .willReturn(Optional.of(convocatoria));
 
     BDDMockito.given(modeloTipoFaseRepository.findByModeloEjecucionIdAndTipoFaseId(ArgumentMatchers.<Long>any(),
         ArgumentMatchers.<Long>any())).willReturn(Optional.of(modeloTipoFase));
@@ -739,8 +772,7 @@ public class ConvocatoriaDocumentoServiceTest extends BaseServiceTest {
         // then: throw exception as ModeloTipoDocumento not found
         .isInstanceOf(IllegalArgumentException.class)
         .hasMessage("TipoDocumento '%s' no disponible para el ModeloEjecucion '%s' y TipoFase '%s'",
-            updatedConvocatoriaDocumento.getTipoDocumento().getNombre(),
-            updatedConvocatoriaDocumento.getConvocatoria().getModeloEjecucion().getNombre(),
+            updatedConvocatoriaDocumento.getTipoDocumento().getNombre(), convocatoria.getModeloEjecucion().getNombre(),
             modeloTipoFase.getTipoFase().getNombre());
   }
 
@@ -749,19 +781,22 @@ public class ConvocatoriaDocumentoServiceTest extends BaseServiceTest {
     // given: a ConvocatoriaDocumento with the same TipoDocumento assigned to
     // disabled
     // ModeloEjecucion
-    ConvocatoriaDocumento originalConvocatoriaDocumento = generarMockConvocatoriaDocumento(1L, 1L, 1L, 1L);
-    ConvocatoriaDocumento updatedConvocatoriaDocumento = generarMockConvocatoriaDocumento(1L, 1L, 1L, 1L);
+    Long convocatoriaId = 1L;
+    Convocatoria convocatoria = generarMockConvocatoria(convocatoriaId);
+    ConvocatoriaDocumento originalConvocatoriaDocumento = generarMockConvocatoriaDocumento(1L, convocatoriaId, 1L, 1L);
+    ConvocatoriaDocumento updatedConvocatoriaDocumento = generarMockConvocatoriaDocumento(1L, convocatoriaId, 1L, 1L);
     updatedConvocatoriaDocumento.setObservaciones("observaciones-modificadas");
     updatedConvocatoriaDocumento.setDocumentoRef("documentoRef-modificado");
-    ModeloTipoFase modeloTipoFase = generarMockModeloTipoFase(updatedConvocatoriaDocumento);
-    ModeloTipoDocumento modeloTipoDocumento = generarMockModeloTipoDocumento(updatedConvocatoriaDocumento);
+    ModeloTipoFase modeloTipoFase = generarMockModeloTipoFase(updatedConvocatoriaDocumento, convocatoria);
+    ModeloTipoDocumento modeloTipoDocumento = generarMockModeloTipoDocumento(updatedConvocatoriaDocumento,
+        convocatoria);
     modeloTipoDocumento.setActivo(Boolean.FALSE);
 
     BDDMockito.given(repository.findById(ArgumentMatchers.<Long>any()))
         .willReturn(Optional.of(originalConvocatoriaDocumento));
 
     BDDMockito.given(convocatoriaRepository.findById(ArgumentMatchers.<Long>any()))
-        .willReturn(Optional.of(originalConvocatoriaDocumento.getConvocatoria()));
+        .willReturn(Optional.of(convocatoria));
 
     BDDMockito.given(modeloTipoFaseRepository.findByModeloEjecucionIdAndTipoFaseId(ArgumentMatchers.<Long>any(),
         ArgumentMatchers.<Long>any())).willReturn(Optional.of(modeloTipoFase));
@@ -785,19 +820,22 @@ public class ConvocatoriaDocumentoServiceTest extends BaseServiceTest {
   public void update_TipoDocumentoWithSameTipoDocumentoDisabled_DoesNotThrowAnyException() {
     // given: a ConvocatoriaDocumento with the same Documento disabled assigned to
     // ModeloEjecucion Convocatoria
-    ConvocatoriaDocumento originalConvocatoriaDocumento = generarMockConvocatoriaDocumento(1L, 1L, 1L, 1L);
-    ConvocatoriaDocumento updatedConvocatoriaDocumento = generarMockConvocatoriaDocumento(1L, 1L, 1L, 1L);
+    Long convocatoriaId = 1L;
+    Convocatoria convocatoria = generarMockConvocatoria(convocatoriaId);
+    ConvocatoriaDocumento originalConvocatoriaDocumento = generarMockConvocatoriaDocumento(1L, convocatoriaId, 1L, 1L);
+    ConvocatoriaDocumento updatedConvocatoriaDocumento = generarMockConvocatoriaDocumento(1L, convocatoriaId, 1L, 1L);
     updatedConvocatoriaDocumento.setObservaciones("observaciones-modificadas");
     updatedConvocatoriaDocumento.setDocumentoRef("documentoRef-modificado");
-    ModeloTipoFase modeloTipoFase = generarMockModeloTipoFase(updatedConvocatoriaDocumento);
-    ModeloTipoDocumento modeloTipoDocumento = generarMockModeloTipoDocumento(updatedConvocatoriaDocumento);
+    ModeloTipoFase modeloTipoFase = generarMockModeloTipoFase(updatedConvocatoriaDocumento, convocatoria);
+    ModeloTipoDocumento modeloTipoDocumento = generarMockModeloTipoDocumento(updatedConvocatoriaDocumento,
+        convocatoria);
     modeloTipoDocumento.getTipoDocumento().setActivo(Boolean.FALSE);
 
     BDDMockito.given(repository.findById(ArgumentMatchers.<Long>any()))
         .willReturn(Optional.of(originalConvocatoriaDocumento));
 
     BDDMockito.given(convocatoriaRepository.findById(ArgumentMatchers.<Long>any()))
-        .willReturn(Optional.of(originalConvocatoriaDocumento.getConvocatoria()));
+        .willReturn(Optional.of(convocatoria));
 
     BDDMockito.given(modeloTipoFaseRepository.findByModeloEjecucionIdAndTipoFaseId(ArgumentMatchers.<Long>any(),
         ArgumentMatchers.<Long>any())).willReturn(Optional.of(modeloTipoFase));
@@ -821,20 +859,23 @@ public class ConvocatoriaDocumentoServiceTest extends BaseServiceTest {
   public void update_TipoDocumentoWithModeloTipoDocumentoDisabled_ThrowsIllegalArgumentException() {
     // given: a ConvocatoriaDocumento with updated TipoDocumento assigned to
     // disabled ModeloEjecucion
-    ConvocatoriaDocumento originalConvocatoriaDocumento = generarMockConvocatoriaDocumento(1L, 1L, 1L, 1L);
-    ConvocatoriaDocumento updatedConvocatoriaDocumento = generarMockConvocatoriaDocumento(1L, 1L, 1L, 1L);
+    Long convocatoriaId = 1L;
+    Convocatoria convocatoria = generarMockConvocatoria(convocatoriaId);
+    ConvocatoriaDocumento originalConvocatoriaDocumento = generarMockConvocatoriaDocumento(1L, convocatoriaId, 1L, 1L);
+    ConvocatoriaDocumento updatedConvocatoriaDocumento = generarMockConvocatoriaDocumento(1L, convocatoriaId, 1L, 1L);
     updatedConvocatoriaDocumento.setTipoDocumento(generarMockTipoDocumento(2L));
     updatedConvocatoriaDocumento.setObservaciones("observaciones-modificadas");
     updatedConvocatoriaDocumento.setDocumentoRef("documentoRef-modificado");
-    ModeloTipoFase modeloTipoFase = generarMockModeloTipoFase(updatedConvocatoriaDocumento);
-    ModeloTipoDocumento modeloTipoDocumento = generarMockModeloTipoDocumento(updatedConvocatoriaDocumento);
+    ModeloTipoFase modeloTipoFase = generarMockModeloTipoFase(updatedConvocatoriaDocumento, convocatoria);
+    ModeloTipoDocumento modeloTipoDocumento = generarMockModeloTipoDocumento(updatedConvocatoriaDocumento,
+        convocatoria);
     modeloTipoDocumento.setActivo(Boolean.FALSE);
 
     BDDMockito.given(repository.findById(ArgumentMatchers.<Long>any()))
         .willReturn(Optional.of(originalConvocatoriaDocumento));
 
     BDDMockito.given(convocatoriaRepository.findById(ArgumentMatchers.<Long>any()))
-        .willReturn(Optional.of(originalConvocatoriaDocumento.getConvocatoria()));
+        .willReturn(Optional.of(convocatoria));
 
     BDDMockito.given(modeloTipoFaseRepository.findByModeloEjecucionIdAndTipoFaseId(ArgumentMatchers.<Long>any(),
         ArgumentMatchers.<Long>any())).willReturn(Optional.of(modeloTipoFase));
@@ -850,28 +891,30 @@ public class ConvocatoriaDocumentoServiceTest extends BaseServiceTest {
         // then: throw exception as ModeloTipoDocumento is disabled
         .isInstanceOf(IllegalArgumentException.class)
         .hasMessage("ModeloTipoDocumento '%s' no está activo para el ModeloEjecucion '%s'",
-            modeloTipoDocumento.getTipoDocumento().getNombre(),
-            originalConvocatoriaDocumento.getConvocatoria().getModeloEjecucion().getNombre());
+            modeloTipoDocumento.getTipoDocumento().getNombre(), convocatoria.getModeloEjecucion().getNombre());
   }
 
   @Test
   public void update_TipoDocumentoWithTipoDocumentoDisabled_ThrowsIllegalArgumentException() {
     // given: a ConvocatoriaDocumento with updated TipoDocumento disabled assigned
     // to ModeloEjecucion Convocatoria
-    ConvocatoriaDocumento originalConvocatoriaDocumento = generarMockConvocatoriaDocumento(1L, 1L, 1L, 1L);
-    ConvocatoriaDocumento updatedConvocatoriaDocumento = generarMockConvocatoriaDocumento(1L, 1L, 1L, 1L);
+    Long convocatoriaId = 1L;
+    Convocatoria convocatoria = generarMockConvocatoria(convocatoriaId);
+    ConvocatoriaDocumento originalConvocatoriaDocumento = generarMockConvocatoriaDocumento(1L, convocatoriaId, 1L, 1L);
+    ConvocatoriaDocumento updatedConvocatoriaDocumento = generarMockConvocatoriaDocumento(1L, convocatoriaId, 1L, 1L);
     updatedConvocatoriaDocumento.setTipoDocumento(generarMockTipoDocumento(2L));
     updatedConvocatoriaDocumento.setObservaciones("observaciones-modificadas");
     updatedConvocatoriaDocumento.setDocumentoRef("documentoRef-modificado");
-    ModeloTipoFase modeloTipoFase = generarMockModeloTipoFase(updatedConvocatoriaDocumento);
-    ModeloTipoDocumento modeloTipoDocumento = generarMockModeloTipoDocumento(updatedConvocatoriaDocumento);
+    ModeloTipoFase modeloTipoFase = generarMockModeloTipoFase(updatedConvocatoriaDocumento, convocatoria);
+    ModeloTipoDocumento modeloTipoDocumento = generarMockModeloTipoDocumento(updatedConvocatoriaDocumento,
+        convocatoria);
     modeloTipoDocumento.getTipoDocumento().setActivo(Boolean.FALSE);
 
     BDDMockito.given(repository.findById(ArgumentMatchers.<Long>any()))
         .willReturn(Optional.of(originalConvocatoriaDocumento));
 
     BDDMockito.given(convocatoriaRepository.findById(ArgumentMatchers.<Long>any()))
-        .willReturn(Optional.of(originalConvocatoriaDocumento.getConvocatoria()));
+        .willReturn(Optional.of(convocatoria));
 
     BDDMockito.given(modeloTipoFaseRepository.findByModeloEjecucionIdAndTipoFaseId(ArgumentMatchers.<Long>any(),
         ArgumentMatchers.<Long>any())).willReturn(Optional.of(modeloTipoFase));
@@ -943,8 +986,7 @@ public class ConvocatoriaDocumentoServiceTest extends BaseServiceTest {
     // then: ConvocatoriaDocumento is found
     Assertions.assertThat(convocatoriaDocumento).as("isNotNull()").isNotNull();
     Assertions.assertThat(convocatoriaDocumento.getId()).as("getId()").isEqualTo(idBuscado);
-    Assertions.assertThat(convocatoriaDocumento.getConvocatoria().getId()).as("getConvocatoria().getId()")
-        .isEqualTo(1L);
+    Assertions.assertThat(convocatoriaDocumento.getConvocatoriaId()).as("getConvocatoriaId()").isEqualTo(1L);
     Assertions.assertThat(convocatoriaDocumento.getTipoFase().getId()).as("getTipoFase().getId()").isEqualTo(1L);
     Assertions.assertThat(convocatoriaDocumento.getTipoDocumento().getId()).as("getTipoDocumento()").isEqualTo(1L);
     Assertions.assertThat(convocatoriaDocumento.getNombre()).as("getNombre()").isEqualTo("nombre doc-" + idBuscado);
@@ -1024,61 +1066,64 @@ public class ConvocatoriaDocumentoServiceTest extends BaseServiceTest {
   private Convocatoria generarMockConvocatoria(Long convocatoriaId, Long unidadGestionId, Long modeloEjecucionId,
       Long modeloTipoFinalidadId, Long tipoRegimenConcurrenciaId, Long tipoAmbitoGeogragicoId, Boolean activo) {
 
+    // @formatter:off
     ModeloEjecucion modeloEjecucion = (modeloEjecucionId == null) ? null
-        : ModeloEjecucion.builder()//
-            .id(modeloEjecucionId)//
-            .nombre("nombreModeloEjecucion-" + String.format("%03d", modeloEjecucionId))//
-            .activo(Boolean.TRUE)//
+        : ModeloEjecucion.builder()
+            .id(modeloEjecucionId)
+            .nombre("nombreModeloEjecucion-" + String.format("%03d", modeloEjecucionId))
+            .activo(Boolean.TRUE)
             .build();
 
     TipoFinalidad tipoFinalidad = (modeloTipoFinalidadId == null) ? null
-        : TipoFinalidad.builder()//
-            .id(modeloTipoFinalidadId)//
-            .nombre("nombreTipoFinalidad-" + String.format("%03d", modeloTipoFinalidadId))//
-            .activo(Boolean.TRUE)//
+        : TipoFinalidad.builder()
+            .id(modeloTipoFinalidadId)
+            .nombre("nombreTipoFinalidad-" + String.format("%03d", modeloTipoFinalidadId))
+            .activo(Boolean.TRUE)
             .build();
 
     ModeloTipoFinalidad modeloTipoFinalidad = (modeloTipoFinalidadId == null) ? null
-        : ModeloTipoFinalidad.builder()//
-            .id(modeloTipoFinalidadId)//
-            .modeloEjecucion(modeloEjecucion)//
-            .tipoFinalidad(tipoFinalidad)//
-            .activo(Boolean.TRUE)//
+        : ModeloTipoFinalidad.builder()
+            .id(modeloTipoFinalidadId)
+            .modeloEjecucion(modeloEjecucion)
+            .tipoFinalidad(tipoFinalidad)
+            .activo(Boolean.TRUE)
             .build();
 
     TipoRegimenConcurrencia tipoRegimenConcurrencia = (tipoRegimenConcurrenciaId == null) ? null
-        : TipoRegimenConcurrencia.builder()//
-            .id(tipoRegimenConcurrenciaId)//
-            .nombre("nombreTipoRegimenConcurrencia-" + String.format("%03d", tipoRegimenConcurrenciaId))//
-            .activo(Boolean.TRUE)//
+        : TipoRegimenConcurrencia.builder()
+            .id(tipoRegimenConcurrenciaId)
+            .nombre("nombreTipoRegimenConcurrencia-" + String.format("%03d", tipoRegimenConcurrenciaId))
+            .activo(Boolean.TRUE)
             .build();
 
     TipoAmbitoGeografico tipoAmbitoGeografico = (tipoAmbitoGeogragicoId == null) ? null
-        : TipoAmbitoGeografico.builder()//
-            .id(tipoAmbitoGeogragicoId)//
-            .nombre("nombreTipoAmbitoGeografico-" + String.format("%03d", tipoAmbitoGeogragicoId))//
-            .activo(Boolean.TRUE)//
+        : TipoAmbitoGeografico.builder()
+            .id(tipoAmbitoGeogragicoId)
+            .nombre("nombreTipoAmbitoGeografico-" + String.format("%03d", tipoAmbitoGeogragicoId))
+            .activo(Boolean.TRUE)
             .build();
 
-    Convocatoria convocatoria = Convocatoria.builder()//
-        .id(convocatoriaId)//
-        .unidadGestionRef((unidadGestionId == null) ? null : "unidad-" + String.format("%03d", unidadGestionId))//
-        .modeloEjecucion(modeloEjecucion)//
-        .codigo("codigo-" + String.format("%03d", convocatoriaId))//
-        .anio(2020)//
-        .titulo("titulo-" + String.format("%03d", convocatoriaId))//
-        .objeto("objeto-" + String.format("%03d", convocatoriaId))//
-        .observaciones("observaciones-" + String.format("%03d", convocatoriaId))//
-        .finalidad((modeloTipoFinalidad == null) ? null : modeloTipoFinalidad.getTipoFinalidad())//
-        .regimenConcurrencia(tipoRegimenConcurrencia)//
-        .destinatarios(Convocatoria.Destinatarios.INDIVIDUAL)//
-        .colaborativos(Boolean.TRUE)//
-        .estado(Convocatoria.Estado.REGISTRADA)//
-        .duracion(12)//
-        .ambitoGeografico(tipoAmbitoGeografico)//
-        .clasificacionCVN(ClasificacionCVN.AYUDAS)//
-        .activo(activo)//
+    Convocatoria convocatoria = Convocatoria.builder()
+        .id(convocatoriaId)
+        .unidadGestionRef((unidadGestionId == null) ? null : "unidad-" + String.format("%03d", unidadGestionId))
+        .modeloEjecucion(modeloEjecucion)
+        .codigo("codigo-" + String.format("%03d", convocatoriaId))
+        .fechaPublicacion(Instant.parse("2021-08-01T00:00:00Z"))
+        .fechaProvisional(Instant.parse("2021-08-01T00:00:00Z"))
+        .fechaConcesion(Instant.parse("2021-08-01T00:00:00Z"))
+        .titulo("titulo-" + String.format("%03d", convocatoriaId))
+        .objeto("objeto-" + String.format("%03d", convocatoriaId))
+        .observaciones("observaciones-" + String.format("%03d", convocatoriaId))
+        .finalidad((modeloTipoFinalidad == null) ? null : modeloTipoFinalidad.getTipoFinalidad())
+        .regimenConcurrencia(tipoRegimenConcurrencia)
+        .colaborativos(Boolean.TRUE)
+        .estado(Convocatoria.Estado.REGISTRADA)
+        .duracion(12)
+        .ambitoGeografico(tipoAmbitoGeografico)
+        .clasificacionCVN(ClasificacionCVN.AYUDAS)
+        .activo(activo)
         .build();
+    // @formatter:on
 
     return convocatoria;
   }
@@ -1090,17 +1135,20 @@ public class ConvocatoriaDocumentoServiceTest extends BaseServiceTest {
    * @param convocatoriaDocumento
    * @return el objeto ModeloTipoFase
    */
-  private ModeloTipoFase generarMockModeloTipoFase(ConvocatoriaDocumento convocatoriaDocumento) {
+  private ModeloTipoFase generarMockModeloTipoFase(ConvocatoriaDocumento convocatoriaDocumento,
+      Convocatoria convocatoria) {
 
-    return ModeloTipoFase.builder()//
-        .id(convocatoriaDocumento.getId() == null ? 1L : convocatoriaDocumento.getId())//
-        .modeloEjecucion(convocatoriaDocumento.getConvocatoria().getModeloEjecucion())//
-        .tipoFase(convocatoriaDocumento.getTipoFase())//
-        .solicitud(Boolean.TRUE)//
-        .convocatoria(Boolean.TRUE)//
-        .proyecto(Boolean.TRUE)//
-        .activo(Boolean.TRUE)//
+    // @formatter:off
+    return ModeloTipoFase.builder()
+        .id(convocatoriaDocumento.getId() == null ? 1L : convocatoriaDocumento.getId())
+        .modeloEjecucion(convocatoria.getModeloEjecucion())
+        .tipoFase(convocatoriaDocumento.getTipoFase())
+        .solicitud(Boolean.TRUE)
+        .convocatoria(Boolean.TRUE)
+        .proyecto(Boolean.TRUE)
+        .activo(Boolean.TRUE)
         .build();
+    // @formatter:on
   }
 
   /**
@@ -1110,15 +1158,18 @@ public class ConvocatoriaDocumentoServiceTest extends BaseServiceTest {
    * @param convocatoriaDocumento
    * @return el objeto ModeloTipoFase
    */
-  private ModeloTipoDocumento generarMockModeloTipoDocumento(ConvocatoriaDocumento convocatoriaDocumento) {
+  private ModeloTipoDocumento generarMockModeloTipoDocumento(ConvocatoriaDocumento convocatoriaDocumento,
+      Convocatoria convocatoria) {
 
-    return ModeloTipoDocumento.builder()//
-        .id(convocatoriaDocumento.getId() == null ? 1L : convocatoriaDocumento.getId())//
-        .modeloEjecucion(convocatoriaDocumento.getConvocatoria().getModeloEjecucion())//
-        .modeloTipoFase(generarMockModeloTipoFase(convocatoriaDocumento))//
-        .tipoDocumento(convocatoriaDocumento.getTipoDocumento())//
-        .activo(Boolean.TRUE)//
+    // @formatter:off
+    return ModeloTipoDocumento.builder()
+        .id(convocatoriaDocumento.getId() == null ? 1L : convocatoriaDocumento.getId())
+        .modeloEjecucion(convocatoria.getModeloEjecucion())
+        .modeloTipoFase(generarMockModeloTipoFase(convocatoriaDocumento, convocatoria))
+        .tipoDocumento(convocatoriaDocumento.getTipoDocumento())
+        .activo(Boolean.TRUE)
         .build();
+    // @formatter:on
   }
 
   /**
@@ -1129,12 +1180,14 @@ public class ConvocatoriaDocumentoServiceTest extends BaseServiceTest {
    */
   private TipoDocumento generarMockTipoDocumento(Long id) {
 
-    return TipoDocumento.builder()//
-        .id(id)//
-        .nombre("nombreTipoDocumento-" + id)//
-        .descripcion("descripcionTipoDocumento-" + id)//
-        .activo(Boolean.TRUE)//
+    // @formatter:off
+    return TipoDocumento.builder()
+        .id(id)
+        .nombre("nombreTipoDocumento-" + id)
+        .descripcion("descripcionTipoDocumento-" + id)
+        .activo(Boolean.TRUE)
         .build();
+    // @formatter:on
   }
 
   /**
@@ -1145,12 +1198,18 @@ public class ConvocatoriaDocumentoServiceTest extends BaseServiceTest {
    */
   private TipoFase generarMockTipoFase(Long id) {
 
-    return TipoFase.builder()//
-        .id(id)//
-        .nombre("nombreTipoFase-" + id)//
-        .descripcion("descripcionTipoFase-" + id)//
-        .activo(Boolean.TRUE)//
+    // @formatter:off
+    return TipoFase.builder()
+        .id(id)
+        .nombre("nombreTipoFase-" + id)
+        .descripcion("descripcionTipoFase-" + id)
+        .activo(Boolean.TRUE)
         .build();
+    // @formatter:on
+  }
+
+  private Convocatoria generarMockConvocatoria(Long convocatoriaId) {
+    return generarMockConvocatoria(convocatoriaId, 1L, 1L, 1L, 1L, 1L, Boolean.TRUE);
   }
 
   /**
@@ -1165,20 +1224,21 @@ public class ConvocatoriaDocumentoServiceTest extends BaseServiceTest {
   private ConvocatoriaDocumento generarMockConvocatoriaDocumento(Long id, Long convocatoriaId, Long tipoFaseId,
       Long tipoDocumentoId) {
 
-    Convocatoria convocatoria = generarMockConvocatoria(convocatoriaId, 1L, 1L, 1L, 1L, 1L, Boolean.TRUE);
     TipoFase tipoFase = generarMockTipoFase(tipoFaseId);
     TipoDocumento tipoDocumento = generarMockTipoDocumento(tipoDocumentoId);
 
-    return ConvocatoriaDocumento.builder()//
-        .id(id)//
-        .convocatoria(convocatoria)//
-        .tipoFase(tipoFase)//
-        .tipoDocumento(tipoDocumento)//
-        .nombre("nombre doc-" + id)//
-        .publico(Boolean.TRUE)//
-        .observaciones("observaciones-" + id)//
-        .documentoRef("documentoRef-" + id)//
+    // @formatter:off
+    return ConvocatoriaDocumento.builder()
+        .id(id)
+        .convocatoriaId(convocatoriaId)
+        .tipoFase(tipoFase)
+        .tipoDocumento(tipoDocumento)
+        .nombre("nombre doc-" + id)
+        .publico(Boolean.TRUE)
+        .observaciones("observaciones-" + id)
+        .documentoRef("documentoRef-" + id)
         .build();
+    // @formatter:on
   }
 
 }

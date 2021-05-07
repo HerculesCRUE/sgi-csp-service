@@ -1,7 +1,6 @@
 package org.crue.hercules.sgi.csp.controller;
 
 import org.crue.hercules.sgi.csp.exceptions.ProyectoEntidadGestoraNotFoundException;
-import org.crue.hercules.sgi.csp.model.Proyecto;
 import org.crue.hercules.sgi.csp.model.ProyectoEntidadGestora;
 import org.crue.hercules.sgi.csp.service.ProyectoEntidadGestoraService;
 import org.junit.jupiter.api.Test;
@@ -55,7 +54,7 @@ public class ProyectoEntidadGestoraControllerTest extends BaseControllerTest {
         // then: new ProyectoEntidadGestora is created
         .andExpect(MockMvcResultMatchers.status().isCreated())
         .andExpect(MockMvcResultMatchers.jsonPath("id").isNotEmpty())
-        .andExpect(MockMvcResultMatchers.jsonPath("proyecto.id").value(proyectoEntidadGestora.getProyecto().getId()))
+        .andExpect(MockMvcResultMatchers.jsonPath("proyectoId").value(proyectoEntidadGestora.getProyectoId()))
         .andExpect(MockMvcResultMatchers.jsonPath("entidadRef").value(proyectoEntidadGestora.getEntidadRef()));
   }
 
@@ -99,8 +98,7 @@ public class ProyectoEntidadGestoraControllerTest extends BaseControllerTest {
         // then: ProyectoEntidadGestora is updated
         .andExpect(MockMvcResultMatchers.status().isOk())
         .andExpect(MockMvcResultMatchers.jsonPath("id").value(proyectoEntidadGestoraExistente.getId()))
-        .andExpect(
-            MockMvcResultMatchers.jsonPath("proyecto.id").value(proyectoEntidadGestoraExistente.getProyecto().getId()))
+        .andExpect(MockMvcResultMatchers.jsonPath("proyectoId").value(proyectoEntidadGestoraExistente.getProyectoId()))
         .andExpect(MockMvcResultMatchers.jsonPath("entidadRef").value(proyectoEntidadGestora.getEntidadRef()));
   }
 
@@ -170,11 +168,13 @@ public class ProyectoEntidadGestoraControllerTest extends BaseControllerTest {
    */
   private ProyectoEntidadGestora generarMockProyectoEntidadGestora(Long id, Long proyectoId) {
 
-    return ProyectoEntidadGestora.builder()//
-        .id(id)//
-        .proyecto(Proyecto.builder().id(proyectoId).build())//
-        .entidadRef("entidad-" + (id == null ? "" : String.format("%03d", id)))//
+    // @formatter:off
+    return ProyectoEntidadGestora.builder()
+        .id(id)
+        .proyectoId(proyectoId)
+        .entidadRef("entidad-" + (id == null ? "" : String.format("%03d", id)))
         .build();
+    // @formatter:on
   }
 
 }

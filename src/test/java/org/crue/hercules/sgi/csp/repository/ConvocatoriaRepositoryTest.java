@@ -1,5 +1,6 @@
 package org.crue.hercules.sgi.csp.repository;
 
+import java.time.Instant;
 import java.util.Optional;
 
 import org.assertj.core.api.Assertions;
@@ -34,14 +35,15 @@ public class ConvocatoriaRepositoryTest extends BaseRepositoryTest {
     Assertions.assertThat(dataFound.getUnidadGestionRef()).isEqualTo(convocatoria.getUnidadGestionRef());
     Assertions.assertThat(dataFound.getModeloEjecucion().getId()).isEqualTo(convocatoria.getModeloEjecucion().getId());
     Assertions.assertThat(dataFound.getCodigo()).isEqualTo(convocatoria.getCodigo());
-    Assertions.assertThat(dataFound.getAnio()).isEqualTo(convocatoria.getAnio());
+    Assertions.assertThat(dataFound.getFechaPublicacion()).isEqualTo(convocatoria.getFechaPublicacion());
+    Assertions.assertThat(dataFound.getFechaProvisional()).isEqualTo(convocatoria.getFechaProvisional());
+    Assertions.assertThat(dataFound.getFechaConcesion()).isEqualTo(convocatoria.getFechaConcesion());
     Assertions.assertThat(dataFound.getTitulo()).isEqualTo(convocatoria.getTitulo());
     Assertions.assertThat(dataFound.getObjeto()).isEqualTo(convocatoria.getObjeto());
     Assertions.assertThat(dataFound.getObservaciones()).isEqualTo(convocatoria.getObservaciones());
     Assertions.assertThat(dataFound.getFinalidad().getId()).isEqualTo(convocatoria.getFinalidad().getId());
     Assertions.assertThat(dataFound.getRegimenConcurrencia().getId())
         .isEqualTo(convocatoria.getRegimenConcurrencia().getId());
-    Assertions.assertThat(dataFound.getDestinatarios()).isEqualTo(convocatoria.getDestinatarios());
     Assertions.assertThat(dataFound.getColaborativos()).isEqualTo(convocatoria.getColaborativos());
     Assertions.assertThat(dataFound.getEstado()).isEqualTo(convocatoria.getEstado());
     Assertions.assertThat(dataFound.getDuracion()).isEqualTo(convocatoria.getDuracion());
@@ -71,55 +73,58 @@ public class ConvocatoriaRepositoryTest extends BaseRepositoryTest {
    */
   private Convocatoria generarMockConvocatoria(String suffix) {
 
-    ModeloEjecucion modeloEjecucion = ModeloEjecucion.builder()//
-        .nombre("nombreModeloEjecucion" + suffix)//
-        .activo(Boolean.TRUE)//
+    // @formatter:off
+    ModeloEjecucion modeloEjecucion = ModeloEjecucion.builder()
+        .nombre("nombreModeloEjecucion" + suffix)
+        .activo(Boolean.TRUE)
         .build();
     entityManager.persistAndFlush(modeloEjecucion);
 
-    TipoFinalidad tipoFinalidad = TipoFinalidad.builder()//
-        .nombre("nombreTipoFinalidad" + suffix)//
-        .activo(Boolean.TRUE)//
+    TipoFinalidad tipoFinalidad = TipoFinalidad.builder()
+        .nombre("nombreTipoFinalidad" + suffix)
+        .activo(Boolean.TRUE)
         .build();
     entityManager.persistAndFlush(tipoFinalidad);
 
-    ModeloTipoFinalidad modeloTipoFinalidad = ModeloTipoFinalidad.builder()//
-        .modeloEjecucion(modeloEjecucion)//
-        .tipoFinalidad(tipoFinalidad)//
-        .activo(Boolean.TRUE)//
+    ModeloTipoFinalidad modeloTipoFinalidad = ModeloTipoFinalidad.builder()
+        .modeloEjecucion(modeloEjecucion)
+        .tipoFinalidad(tipoFinalidad)
+        .activo(Boolean.TRUE)
         .build();
     entityManager.persistAndFlush(modeloTipoFinalidad);
 
-    TipoRegimenConcurrencia tipoRegimenConcurrencia = TipoRegimenConcurrencia.builder()//
-        .nombre("nombreTipoRegimenConcurrencia" + suffix)//
-        .activo(Boolean.TRUE)//
+    TipoRegimenConcurrencia tipoRegimenConcurrencia = TipoRegimenConcurrencia.builder()
+        .nombre("nombreTipoRegimenConcurrencia" + suffix)
+        .activo(Boolean.TRUE)
         .build();
     entityManager.persistAndFlush(tipoRegimenConcurrencia);
 
-    TipoAmbitoGeografico tipoAmbitoGeografico = TipoAmbitoGeografico.builder()//
-        .nombre("nombreTipoAmbitoGeografico" + suffix)//
-        .activo(Boolean.TRUE)//
+    TipoAmbitoGeografico tipoAmbitoGeografico = TipoAmbitoGeografico.builder()
+        .nombre("nombreTipoAmbitoGeografico" + suffix)
+        .activo(Boolean.TRUE)
         .build();
     entityManager.persistAndFlush(tipoAmbitoGeografico);
 
-    Convocatoria convocatoria = Convocatoria.builder()//
-        .unidadGestionRef("unidad" + suffix)//
-        .modeloEjecucion(modeloEjecucion)//
-        .codigo("codigo" + suffix)//
-        .anio(2020)//
-        .titulo("titulo" + suffix)//
-        .objeto("objeto" + suffix)//
-        .observaciones("observaciones" + suffix)//
-        .finalidad(modeloTipoFinalidad.getTipoFinalidad())//
-        .regimenConcurrencia(tipoRegimenConcurrencia)//
-        .destinatarios(Convocatoria.Destinatarios.INDIVIDUAL)//
-        .colaborativos(Boolean.TRUE)//
-        .estado(Convocatoria.Estado.REGISTRADA)//
-        .duracion(12)//
-        .ambitoGeografico(tipoAmbitoGeografico)//
-        .clasificacionCVN(ClasificacionCVN.AYUDAS)//
-        .activo(Boolean.TRUE)//
+    Convocatoria convocatoria = Convocatoria.builder()
+        .unidadGestionRef("unidad" + suffix)
+        .modeloEjecucion(modeloEjecucion)
+        .codigo("codigo" + suffix)
+        .fechaPublicacion(Instant.parse("2021-08-01T00:00:00Z"))
+        .fechaProvisional(Instant.parse("2021-08-01T00:00:00Z"))
+        .fechaConcesion(Instant.parse("2021-08-01T00:00:00Z"))
+        .titulo("titulo" + suffix)
+        .objeto("objeto" + suffix)
+        .observaciones("observaciones" + suffix)
+        .finalidad(modeloTipoFinalidad.getTipoFinalidad())
+        .regimenConcurrencia(tipoRegimenConcurrencia)
+        .colaborativos(Boolean.TRUE)
+        .estado(Convocatoria.Estado.REGISTRADA)
+        .duracion(12)
+        .ambitoGeografico(tipoAmbitoGeografico)
+        .clasificacionCVN(ClasificacionCVN.AYUDAS)
+        .activo(Boolean.TRUE)
         .build();
+    // @formatter:on
     return entityManager.persistAndFlush(convocatoria);
   }
 }

@@ -1,6 +1,6 @@
 package org.crue.hercules.sgi.csp.repository;
 
-import java.time.LocalDate;
+import java.time.Instant;
 
 import org.assertj.core.api.Assertions;
 import org.crue.hercules.sgi.csp.model.ModeloEjecucion;
@@ -29,7 +29,7 @@ public class ProyectoEntidadGestoraRepositoryTest extends BaseRepositoryTest {
     ProyectoEntidadGestora proyectoEntidadGestora1 = generarMockProyectoEntidadGestora("-001");
     generarMockProyectoEntidadGestora("-002");
 
-    Long idProyectoBusqueda = proyectoEntidadGestora1.getProyecto().getId();
+    Long idProyectoBusqueda = proyectoEntidadGestora1.getProyectoId();
     String entidadRefBusqueda = proyectoEntidadGestora1.getEntidadRef();
 
     // when: comprueba la existencia del ProyectoEntidadGestora para un proyecto y
@@ -49,7 +49,7 @@ public class ProyectoEntidadGestoraRepositoryTest extends BaseRepositoryTest {
     ProyectoEntidadGestora proyectoEntidadGestora1 = generarMockProyectoEntidadGestora("-001");
     ProyectoEntidadGestora proyectoEntidadGestora2 = generarMockProyectoEntidadGestora("-002");
 
-    Long idProyectoBusqueda = proyectoEntidadGestora1.getProyecto().getId();
+    Long idProyectoBusqueda = proyectoEntidadGestora1.getProyectoId();
     String entidadRefBusqueda = proyectoEntidadGestora2.getEntidadRef();
 
     // when: comprueba la existencia del ProyectoEntidadGestora para un proyecto y
@@ -69,7 +69,7 @@ public class ProyectoEntidadGestoraRepositoryTest extends BaseRepositoryTest {
     ProyectoEntidadGestora proyectoEntidadGestora2 = generarMockProyectoEntidadGestora("-002");
 
     Long idProyectoEntidadGestoraExcluidoBusqueda = proyectoEntidadGestora2.getId();
-    Long idProyectoBusqueda = proyectoEntidadGestora1.getProyecto().getId();
+    Long idProyectoBusqueda = proyectoEntidadGestora1.getProyectoId();
     String entidadRefBusqueda = proyectoEntidadGestora1.getEntidadRef();
 
     // when: comprueba la existencia del ProyectoEntidadGestora para un proyecto y
@@ -90,7 +90,7 @@ public class ProyectoEntidadGestoraRepositoryTest extends BaseRepositoryTest {
     generarMockProyectoEntidadGestora("-002");
 
     Long idProyectoEntidadGestoraExcluidoBusqueda = proyectoEntidadGestora1.getId();
-    Long idProyectoBusqueda = proyectoEntidadGestora1.getProyecto().getId();
+    Long idProyectoBusqueda = proyectoEntidadGestora1.getProyectoId();
     String entidadRefBusqueda = proyectoEntidadGestora1.getEntidadRef();
 
     // when: comprueba la existencia del ProyectoEntidadGestora para un proyecto y
@@ -110,50 +110,52 @@ public class ProyectoEntidadGestoraRepositoryTest extends BaseRepositoryTest {
    */
   private ProyectoEntidadGestora generarMockProyectoEntidadGestora(String suffix) {
 
-    ModeloEjecucion modeloEjecucion = ModeloEjecucion.builder()//
-        .nombre("nombreModeloEjecucion" + suffix)//
-        .activo(Boolean.TRUE)//
+    // @formatter:off
+    ModeloEjecucion modeloEjecucion = ModeloEjecucion.builder()
+        .nombre("nombreModeloEjecucion" + suffix)
+        .activo(Boolean.TRUE)
         .build();
     entityManager.persistAndFlush(modeloEjecucion);
 
-    TipoFinalidad tipoFinalidad = TipoFinalidad.builder()//
-        .nombre("nombreTipoFinalidad" + suffix)//
-        .activo(Boolean.TRUE)//
+    TipoFinalidad tipoFinalidad = TipoFinalidad.builder()
+        .nombre("nombreTipoFinalidad" + suffix)
+        .activo(Boolean.TRUE)
         .build();
     entityManager.persistAndFlush(tipoFinalidad);
 
-    TipoAmbitoGeografico tipoAmbitoGeografico = TipoAmbitoGeografico.builder()//
-        .nombre("nombreTipoAmbitoGeografico" + suffix)//
-        .activo(Boolean.TRUE)//
+    TipoAmbitoGeografico tipoAmbitoGeografico = TipoAmbitoGeografico.builder()
+        .nombre("nombreTipoAmbitoGeografico" + suffix)
+        .activo(Boolean.TRUE)
         .build();
     entityManager.persistAndFlush(tipoAmbitoGeografico);
 
-    ModeloUnidad modeloUnidad = ModeloUnidad.builder()//
-        .modeloEjecucion(modeloEjecucion)//
-        .unidadGestionRef("OPE")//
-        .activo(Boolean.TRUE)//
+    ModeloUnidad modeloUnidad = ModeloUnidad.builder()
+        .modeloEjecucion(modeloEjecucion)
+        .unidadGestionRef("OPE")
+        .activo(Boolean.TRUE)
         .build();
     entityManager.persistAndFlush(modeloUnidad);
 
-    Proyecto proyecto = Proyecto.builder()//
-        .acronimo("PR" + suffix)//
-        .codigoExterno("COD" + suffix)//
-        .titulo("titulo-" + suffix)//
-        .unidadGestionRef("OPE")//
-        .modeloEjecucion(modeloEjecucion)//
-        .finalidad(tipoFinalidad)//
-        .ambitoGeografico(tipoAmbitoGeografico)//
-        .fechaInicio(LocalDate.of(2020, 01, 01))//
-        .fechaFin(LocalDate.of(2020, 12, 31))//
-        .paquetesTrabajo(Boolean.TRUE)//
-        .activo(Boolean.TRUE)//
+    Proyecto proyecto = Proyecto.builder()
+        .acronimo("PR" + suffix)
+        .codigoExterno("COD" + suffix)
+        .titulo("titulo-" + suffix)
+        .unidadGestionRef("OPE")
+        .modeloEjecucion(modeloEjecucion)
+        .finalidad(tipoFinalidad)
+        .ambitoGeografico(tipoAmbitoGeografico)
+        .fechaInicio(Instant.parse("2020-01-01T00:00:00Z"))
+        .fechaFin(Instant.parse("2020-12-31T23:59:59Z"))
+        .permitePaquetesTrabajo(Boolean.TRUE)
+        .activo(Boolean.TRUE)
         .build();
     entityManager.persistAndFlush(proyecto);
 
-    ProyectoEntidadGestora proyectoEntidadGestora = ProyectoEntidadGestora.builder()//
-        .proyecto(proyecto)//
-        .entidadRef("entidadRef-" + suffix)//
+    ProyectoEntidadGestora proyectoEntidadGestora = ProyectoEntidadGestora.builder()
+        .proyectoId(proyecto.getId())
+        .entidadRef("entidadRef-" + suffix)
         .build();
+    // @formatter:on
     return entityManager.persistAndFlush(proyectoEntidadGestora);
   }
 

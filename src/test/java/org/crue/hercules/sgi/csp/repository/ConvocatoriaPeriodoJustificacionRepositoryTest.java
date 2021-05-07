@@ -1,6 +1,6 @@
 package org.crue.hercules.sgi.csp.repository;
 
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.List;
 
 import org.assertj.core.api.Assertions;
@@ -20,34 +20,36 @@ public class ConvocatoriaPeriodoJustificacionRepositoryTest extends BaseReposito
   public void findAllByConvocatoriaId_ReturnsConvocatoriaPeriodoJustificacion() throws Exception {
 
     // given: 2 ConvocatoriaPeriodoJustificacion para el ConvocatoriaId buscado
-    Convocatoria convocatoria1 = Convocatoria.builder()//
-        .estado(Convocatoria.Estado.BORRADOR)//
-        .codigo("codigo-1")//
-        .unidadGestionRef("OPE")//
-        .anio(2020)//
-        .titulo("titulo")//
-        .activo(Boolean.TRUE)//
+    // @formatter:off
+    Convocatoria convocatoria1 = Convocatoria.builder()
+        .estado(Convocatoria.Estado.BORRADOR)
+        .codigo("codigo-1")
+        .unidadGestionRef("OPE")
+        .fechaPublicacion(Instant.parse("2021-08-01T00:00:00Z"))
+        .titulo("titulo")
+        .activo(Boolean.TRUE)
         .build();
     ;
     entityManager.persistAndFlush(convocatoria1);
-    Convocatoria convocatoria2 = Convocatoria.builder()//
-        .estado(Convocatoria.Estado.BORRADOR)//
-        .codigo("codigo-2")//
-        .unidadGestionRef("OPE")//
-        .anio(2020)//
-        .titulo("titulo")//
-        .activo(Boolean.TRUE)//
+    Convocatoria convocatoria2 = Convocatoria.builder()
+        .estado(Convocatoria.Estado.BORRADOR)
+        .codigo("codigo-2")
+        .unidadGestionRef("OPE")
+        .fechaPublicacion(Instant.parse("2021-08-01T00:00:00Z"))
+        .titulo("titulo")
+        .activo(Boolean.TRUE)
         .build();
     ;
     entityManager.persistAndFlush(convocatoria2);
+    // @formatter:on
 
     ConvocatoriaPeriodoJustificacion convocatoriaPeriodoJustificacion1 = new ConvocatoriaPeriodoJustificacion(null,
-        convocatoria1, 1, 1, 2, LocalDate.of(2020, 10, 10), LocalDate.of(2020, 11, 20), "observaciones-1",
-        ConvocatoriaPeriodoJustificacion.Tipo.FINAL);
+        convocatoria1.getId(), 1, 1, 2, Instant.parse("2020-10-10T00:00:00Z"), Instant.parse("2020-11-20T00:00:00Z"),
+        "observaciones-1", ConvocatoriaPeriodoJustificacion.Tipo.FINAL);
     entityManager.persistAndFlush(convocatoriaPeriodoJustificacion1);
     ConvocatoriaPeriodoJustificacion convocatoriaPeriodoJustificacion2 = new ConvocatoriaPeriodoJustificacion(null,
-        convocatoria1, 2, 3, 5, LocalDate.of(2020, 12, 10), LocalDate.of(2021, 11, 20), "observaciones-2",
-        ConvocatoriaPeriodoJustificacion.Tipo.PERIODICO);
+        convocatoria1.getId(), 2, 3, 5, Instant.parse("2020-12-10T00:00:00Z"), Instant.parse("2021-11-20T23:59:59Z"),
+        "observaciones-2", ConvocatoriaPeriodoJustificacion.Tipo.PERIODICO);
     entityManager.persistAndFlush(convocatoriaPeriodoJustificacion2);
 
     Long convocatoriaIdBuscado = convocatoria1.getId();
@@ -59,8 +61,8 @@ public class ConvocatoriaPeriodoJustificacionRepositoryTest extends BaseReposito
     // buscado
     Assertions.assertThat(dataFound.size()).isEqualTo(2);
     Assertions.assertThat(dataFound.get(0).getId()).isEqualTo(convocatoriaPeriodoJustificacion1.getId());
-    Assertions.assertThat(dataFound.get(0).getConvocatoria().getId())
-        .isEqualTo(convocatoriaPeriodoJustificacion1.getConvocatoria().getId());
+    Assertions.assertThat(dataFound.get(0).getConvocatoriaId())
+        .isEqualTo(convocatoriaPeriodoJustificacion1.getConvocatoriaId());
     Assertions.assertThat(dataFound.get(0).getObservaciones())
         .isEqualTo(convocatoriaPeriodoJustificacion1.getObservaciones());
   }
@@ -70,23 +72,25 @@ public class ConvocatoriaPeriodoJustificacionRepositoryTest extends BaseReposito
       throws Exception {
 
     // given: 2 ConvocatoriaPeriodoJustificacion de una Convocatoria
-    Convocatoria convocatoria1 = Convocatoria.builder()//
-        .estado(Convocatoria.Estado.BORRADOR)//
-        .codigo("codigo-1")//
-        .unidadGestionRef("OPE")//
-        .anio(2020)//
-        .titulo("titulo")//
-        .activo(Boolean.TRUE)//
+    // @formatter:off
+    Convocatoria convocatoria1 = Convocatoria.builder()
+        .estado(Convocatoria.Estado.BORRADOR)
+        .codigo("codigo-1")
+        .unidadGestionRef("OPE")
+        .fechaPublicacion(Instant.parse("2021-08-01T00:00:00Z"))
+        .titulo("titulo")
+        .activo(Boolean.TRUE)
         .build();
     entityManager.persistAndFlush(convocatoria1);
+    // @formatter:on
 
     ConvocatoriaPeriodoJustificacion convocatoriaPeriodoJustificacion1 = new ConvocatoriaPeriodoJustificacion(null,
-        convocatoria1, 2, 7, 9, LocalDate.of(2020, 12, 10), LocalDate.of(2021, 11, 20), "observaciones-1",
-        ConvocatoriaPeriodoJustificacion.Tipo.PERIODICO);
+        convocatoria1.getId(), 2, 7, 9, Instant.parse("2020-12-10T00:00:00Z"), Instant.parse("2021-11-20T23:59:59Z"),
+        "observaciones-1", ConvocatoriaPeriodoJustificacion.Tipo.PERIODICO);
     entityManager.persistAndFlush(convocatoriaPeriodoJustificacion1);
     ConvocatoriaPeriodoJustificacion convocatoriaPeriodoJustificacion2 = new ConvocatoriaPeriodoJustificacion(null,
-        convocatoria1, 1, 3, 5, LocalDate.of(2020, 10, 10), LocalDate.of(2020, 11, 20), "observaciones-2",
-        ConvocatoriaPeriodoJustificacion.Tipo.PERIODICO);
+        convocatoria1.getId(), 1, 3, 5, Instant.parse("2020-10-10T00:00:00Z"), Instant.parse("2020-11-20T00:00:00Z"),
+        "observaciones-2", ConvocatoriaPeriodoJustificacion.Tipo.PERIODICO);
     entityManager.persistAndFlush(convocatoriaPeriodoJustificacion2);
 
     Long convocatoriaIdBuscado = convocatoria1.getId();
@@ -100,8 +104,8 @@ public class ConvocatoriaPeriodoJustificacionRepositoryTest extends BaseReposito
     // periodo
     Assertions.assertThat(dataFound).isNotNull();
     Assertions.assertThat(dataFound.getId()).as("getId()").isEqualTo(convocatoriaPeriodoJustificacion1.getId());
-    Assertions.assertThat(dataFound.getConvocatoria().getId()).as("getConvocatoria().getId()")
-        .isEqualTo(convocatoriaPeriodoJustificacion1.getConvocatoria().getId());
+    Assertions.assertThat(dataFound.getConvocatoriaId()).as("getConvocatoriaId()")
+        .isEqualTo(convocatoriaPeriodoJustificacion1.getConvocatoriaId());
     Assertions.assertThat(dataFound.getMesFinal()).as("getObservaciones()")
         .isEqualTo(convocatoriaPeriodoJustificacion1.getMesFinal());
     Assertions.assertThat(dataFound.getObservaciones()).as("getObservaciones()")
